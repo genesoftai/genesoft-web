@@ -78,6 +78,7 @@ export default function Login() {
       }
       setLoading(false);
     } catch (error) {
+      console.error(error);
       setErrorMessage('Invalid email or password, Please try again');
       setLoading(false);
     }

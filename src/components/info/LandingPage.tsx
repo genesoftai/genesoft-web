@@ -3,16 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Clock,
-  DollarSign,
-  Waypoints,
-  FileLock,
-  UserCheck,
-  CircleDollarSign,
-  Rocket,
-  FileCheck,
-} from 'lucide-react';
+import { UserCheck, CircleDollarSign, Rocket, FileCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 import HeroSectionBanner from '@public/image/showcase/project-page-example.png';

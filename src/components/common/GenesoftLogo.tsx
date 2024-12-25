@@ -3,7 +3,7 @@ import Image from 'next/image';
 import GenesoftLogo from '@public/assets/genesoft.png';
 
 interface LogoProps {
-  size: 'big' | 'medium' | 'small';
+  size?: 'big' | 'medium' | 'small';
 }
 
 const Logo: React.FC<LogoProps> = ({ size = 'medium' }) => {
