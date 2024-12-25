@@ -6,10 +6,9 @@ import { Label } from '@/components/ui/label';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, EyeIcon, EyeOffIcon } from 'lucide-react';
 import { signup } from '@/app/(auth)/signup/actions';
-import { Loading } from '../common/Loading';
+import SimpleLoading from '@/components/common/SimpleLoading';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import posthog from 'posthog-js';
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +31,6 @@ export default function Signup() {
   }, [password, confirmPassword]);
 
   const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
-    posthog.capture('signup_page_clicked_signup_with_email');
     setLoading(true);
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -68,7 +66,6 @@ export default function Signup() {
   };
 
   const handleContinueWithGoogle = async () => {
-    posthog.capture('signup_page_clicked_continue_with_google');
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -99,16 +96,11 @@ export default function Signup() {
           Genesoft
         </p>
 
-        <div className="text-muted-foreground text-2xl w-8/12 ">
-          {'Get started to fine tune LLM for your use case'}
+        <div className="text-subtext-in-dark-bg text-2xl w-8/12 ">
+          {
+            'Get started to build your web application with software development team of AI Agents'
+          }
         </div>
-
-        {/* <div>
-          <SubscriptionCard
-            place="signup-page"
-            handleSubscribe={() => alert("Please Sign Up First")}
-          />
-        </div> */}
       </div>
 
       {/* Right side - Signup form */}
@@ -203,7 +195,7 @@ export default function Signup() {
               type="submit"
               className="w-full bg-primary text-white bg-genesoft hover:bg-genesoft/90"
             >
-              {loading ? <Loading /> : 'Signup'}
+              {loading ? <SimpleLoading /> : 'Signup'}
             </Button>
           </form>
 
@@ -256,10 +248,10 @@ export default function Signup() {
         <div className="mt-8 text-center text-sm text-gray-500">
           <div>Support</div>
           <a
-            href="mailto:support@Genesoft.com"
+            href="mailto:support@genesoftai.com"
             className="text-primary hover:underline"
           >
-            support@Genesoft.com
+            support@genesoftai.com
           </a>
         </div>
       </div>

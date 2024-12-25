@@ -13,6 +13,10 @@ export default {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
         genesoft: '#2563EB',
+        'primary-dark': '#1e1e1e',
+        'secondary-dark': '#2a2a2a',
+        'tertiary-dark': '#383838',
+        'subtext-in-dark-bg': '#D4D4D4',
       },
       borderRadius: {
         lg: 'var(--radius)',

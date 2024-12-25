@@ -8,9 +8,9 @@ import { loginWithEmail, resetPassword } from '@/app/(auth)/login/actions';
 import { ArrowLeft, EyeIcon, EyeOffIcon } from 'lucide-react';
 import { validateEmail } from '@/utils/auth/email';
 import { useRouter } from 'next/navigation';
-import { Loading } from '../common/Loading';
+import SimpleLoading from '@/components/common/SimpleLoading';
 import { createClient } from '@/utils/supabase/client';
-import posthog from 'posthog-js';
+import GenesoftLogo from '@/components/common/GenesoftLogo';
 
 const StreamingText = ({
   text,
@@ -51,9 +51,9 @@ export default function Login() {
   const supabase = createClient();
 
   const heroContent = [
-    'Easiest way to fine tune LLM for your use case that ready to run on production',
-    'Fine tuning service make easy by select LLM specification, dump your data, and call API once Fine tuning done.',
-    'Built for non AI Model Developer who need the simplest way to get fine tuned LLM for their use case',
+    'Software Development team of AI Agents for small company and startup',
+    'Helping you get on-demand web application anytime with cheapest cost and fastest delivery',
+    'Built for non-tech product owner to get their own web application without pay a lot for hiring in-house developer or outsource',
   ];
 
   const nextStage = () => {
@@ -61,8 +61,6 @@ export default function Login() {
   };
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    posthog.capture('login_page_clicked_login_with_email');
-
     event.preventDefault();
     setErrorMessage('');
     setLoading(true);
@@ -87,8 +85,6 @@ export default function Login() {
   };
 
   const handleForgotPassword = async () => {
-    posthog.capture('login_page_clicked_forgot_password');
-
     if (!email) {
       alert('Please enter your email');
       return;
@@ -105,8 +101,6 @@ export default function Login() {
   };
 
   const handleContinueWithGoogle = async () => {
-    posthog.capture('login_page_clicked_continue_with_google');
-
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -143,41 +137,24 @@ export default function Login() {
     <div className="min-h-screen flex bg-primary-dark">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:flex-col lg:w-1/2 p-12 items-center justify-evenly">
-        <p className="text-6xl font-medium text-genesoft hidden lg:block">
+        {/* <p className="text-6xl font-medium text-genesoft hidden lg:block">
           Genesoft
-        </p>
+        </p> */}
+        <GenesoftLogo size="big" />
 
         <section className="flex flex-col space-y-4 py-12 text-center px-4">
           <h1 className="text-2xl font-bold tracking-tight text-genesoft">
             {heroStage === 0 && (
               <StreamingText
                 text={heroContent[0]}
-                speed={50}
+                speed={30}
                 onComplete={nextStage}
               />
             )}
             {heroStage > 0 && heroContent[0]}
           </h1>
-          <h2 className="text-xl text-white">
-            {/* {heroStage === 1 && (
-              <StreamingText
-                text={heroContent[1]}
-                speed={50}
-                onComplete={nextStage}
-              />
-            )}
-            {heroStage > 1 && heroContent[1]} */}
-            {heroContent[1]}
-          </h2>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-            {/* {heroStage === 2 && (
-              <StreamingText
-                text={heroContent[2]}
-                speed={50}
-                onComplete={nextStage}
-              />
-            )}
-            {heroStage > 2 && heroContent[2]} */}
+          <h2 className="text-xl text-subtext-in-dark-bg">{heroContent[1]}</h2>
+          <p className="text-base text-subtext-in-dark-bg max-w-2xl mx-auto">
             {heroContent[2]}
           </p>
         </section>
@@ -258,7 +235,7 @@ export default function Login() {
               type="submit"
               className="w-full bg-primary text-white bg-genesoft hover:bg-genesoft/90 cursor-pointer"
             >
-              {loading ? <Loading /> : 'Sign in'}
+              {loading ? <SimpleLoading /> : 'Sign in'}
             </Button>
           </form>
 
@@ -314,10 +291,10 @@ export default function Login() {
         <div className="mt-8 text-center text-sm text-gray-500">
           <div>Support</div>
           <a
-            href="mailto:support@Genesoft.com"
+            href="mailto:support@genesoftai.com"
             className="text-primary hover:underline"
           >
-            support@Genesoft.com
+            support@genesoftai.com
           </a>
         </div>
       </div>

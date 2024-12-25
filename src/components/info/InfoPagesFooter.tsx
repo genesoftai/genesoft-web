@@ -48,10 +48,10 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Support</h3>
             <p className="text-muted-foreground mb-2">Need help?</p>
             <a
-              href="mailto:support@genesoft.com"
+              href="mailto:support@genesoftai.com"
               className="text-primary hover:underline"
             >
-              support@genesoft.com
+              support@genesoftai.com
             </a>
           </div>
 

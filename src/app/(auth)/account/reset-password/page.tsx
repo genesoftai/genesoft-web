@@ -164,10 +164,10 @@ export default function ResetPassword() {
           <div className="mt-8 text-center text-sm text-gray-500">
             <div>Need help?</div>
             <a
-              href="mailto:support@genesoft.com"
+              href="mailto:support@genesoftai.com"
               className="text-primary hover:underline"
             >
-              support@genesoft.com
+              support@genesoftai.com
             </a>
           </div>
         </div>
