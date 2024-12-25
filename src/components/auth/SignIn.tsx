@@ -1,68 +1,105 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCallback, useEffect, useState } from "react";
+import { signInWithEmail, resetPassword } from "@/app/(auth)/signin/actions";
 import { ArrowLeft, EyeIcon, EyeOffIcon } from "lucide-react";
-import { signup } from "@/app/(auth)/signup/actions";
-import SimpleLoading from "@/components/common/SimpleLoading";
+import { validateEmail } from "@/utils/auth/email";
 import { useRouter } from "next/navigation";
+import SimpleLoading from "@/components/common/SimpleLoading";
 import { createClient } from "@/utils/supabase/client";
+import GenesoftLogo from "@/components/common/GenesoftLogo";
 
-export default function Signup() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+const StreamingText = ({
+    text,
+    speed = 20,
+    onComplete,
+}: {
+    text: string;
+    speed?: number;
+    onComplete?: () => void;
+}) => {
+    const [displayedText, setDisplayedText] = useState("");
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (currentIndex < text.length) {
+            const timeoutId = setTimeout(() => {
+                setDisplayedText((prev) => prev + text[currentIndex]);
+                setCurrentIndex((prev) => prev + 1);
+            }, speed);
+
+            return () => clearTimeout(timeoutId);
+        } else if (onComplete) {
+            onComplete();
+        }
+    }, [text, speed, currentIndex, onComplete]);
+
+    return <span>{displayedText}</span>;
+};
+
+export default function SignIn() {
     const [email, setEmail] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [heroStage, setHeroStage] = useState(0);
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const supabase = createClient();
 
-    const router = useRouter();
+    const heroContent = [
+        "Software Development team of AI Agents for small company and startup",
+        "Helping you get on-demand web application anytime with cheapest cost and fastest delivery",
+        "Built for non-tech product owner to get their own web application without pay a lot for hiring in-house developer or outsource",
+    ];
 
-    const checkPasswordMatch = useCallback(() => {
-        if (password && confirmPassword && password !== confirmPassword) {
-            setErrorMessage("Passwords do not match");
-        } else {
-            setErrorMessage("");
-        }
-    }, [password, confirmPassword]);
-
-    const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
-        setLoading(true);
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const password = formData.get("password") as string;
-        const confirmPassword = formData.get("confirmPassword") as string;
-        if (password !== confirmPassword) {
-            alert("Passwords do not match");
-            setLoading(false);
-            return;
-        }
-
-        try {
-            // TODO: signup to supabase
-            await signup(formData);
-            alert("Sign Up successful, check your email for confirmation");
-            setLoading(false);
-            router.push("/dashboard");
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-            alert("Something went wrong");
-        }
+    const nextStage = () => {
+        setHeroStage((prev) => prev + 1);
     };
 
-    useEffect(() => {
-        checkUserSession();
-    }, []);
+    const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setErrorMessage("");
+        setLoading(true);
+        const formData = new FormData(event.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+        try {
+            const data = await signInWithEmail({
+                email,
+                password,
+            });
 
-    const checkUserSession = async () => {
-        const { data: userAuth } = await supabase.auth.getUser();
-        if (userAuth.user) {
-            router.push("/dashboard");
+            if (data) {
+                router.push("/dashboard");
+            }
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+            setErrorMessage("Invalid email or password, Please try again");
+            setLoading(false);
+        }
+        setLoading(false);
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            alert("Please enter your email");
+            return;
+        } else {
+            const isValid = validateEmail(email);
+            if (!isValid) {
+                alert("Please enter a valid email");
+                return;
+            } else {
+                await resetPassword(email);
+                alert(
+                    `A password reset email has been sent to your email: ${email}`,
+                );
+            }
         }
     };
 
@@ -79,7 +116,7 @@ export default function Signup() {
             });
 
             if (error) {
-                throw new Error("Failed to Sign In with Google");
+                throw new Error("Failed to Sign in with Google");
             }
 
             window.localStorage.setItem("google_data", JSON.stringify(data));
@@ -88,46 +125,70 @@ export default function Signup() {
         }
     };
 
+    useEffect(() => {
+        checkUserSession();
+    }, []);
+
+    const checkUserSession = async () => {
+        const { data: userAuth } = await supabase.auth.getUser();
+        if (userAuth.user) {
+            router.push("/dashboard");
+        }
+    };
+
     return (
-        // <div className="min-h-screen flex bg-neutral-50">
         <div className="min-h-screen flex bg-primary-dark">
             {/* Left side - Branding */}
             <div className="hidden lg:flex lg:flex-col lg:w-1/2 p-12 items-center justify-evenly">
-                <p className="text-6xl font-medium text-genesoft hidden lg:block">
-                    Genesoft
-                </p>
+                {/* <p className="text-6xl font-medium text-genesoft hidden lg:block">
+          Genesoft
+        </p> */}
+                <GenesoftLogo size="big" />
 
-                <div className="text-subtext-in-dark-bg text-2xl w-8/12 ">
-                    {
-                        "Get started to build your web application with software development team of AI Agents"
-                    }
-                </div>
+                <section className="flex flex-col space-y-4 py-12 text-center px-4">
+                    <h1 className="text-2xl font-bold tracking-tight text-genesoft">
+                        {heroStage === 0 && (
+                            <StreamingText
+                                text={heroContent[0]}
+                                speed={30}
+                                onComplete={nextStage}
+                            />
+                        )}
+                        {heroStage > 0 && heroContent[0]}
+                    </h1>
+                    <h2 className="text-xl text-subtext-in-dark-bg">
+                        {heroContent[1]}
+                    </h2>
+                    <p className="text-base text-subtext-in-dark-bg max-w-2xl mx-auto">
+                        {heroContent[2]}
+                    </p>
+                </section>
             </div>
 
-            {/* Right side - Signup form */}
-
+            {/* Right side - SignIn form */}
             <div className="w-full lg:w-1/2 p-8 flex flex-col bg-white">
-                <ArrowLeft
-                    className="h-4 fixed left-2 top-10 flex md:hidden"
-                    onClick={() => router.push("/")}
-                />
-
-                <div className="flex justify-start space-x-2 items-center mb-12">
+                <div className="flex justify-between items-center mb-12">
+                    <ArrowLeft
+                        className="h-4 fixed left-2 top-10 flex md:hidden"
+                        onClick={() => router.push("/")}
+                    />
                     <div className="text-2xl md:text-6xl font-medium text-genesoft lg:hidden">
-                        <p>Genesoft</p>
+                        <GenesoftLogo />
                     </div>
                 </div>
 
                 <div className="flex-grow flex flex-col justify-center max-w-sm mx-auto w-full">
                     <h1 className="text-3xl font-semibold mb-8 text-center text-gray-800">
-                        Sign Up to Genesoft
+                        Sign in to Genesoft
                     </h1>
 
-                    <div className="text-muted-foreground text-lg w-full flex lg:hidden mb-10">
-                        {"Get started to fine tune LLM for your use case"}
-                    </div>
+                    {errorMessage && (
+                        <p className="text-center text-red-500">
+                            {errorMessage}
+                        </p>
+                    )}
 
-                    <form className="space-y-4" onSubmit={handleSignup}>
+                    <form className="space-y-4" onSubmit={handleSignIn}>
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-gray-700">
                                 Email
@@ -140,6 +201,7 @@ export default function Signup() {
                                 className="border-gray-300"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="space-y-2">
@@ -152,11 +214,7 @@ export default function Signup() {
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Enter your password"
-                                    className="border-gray-300 pr-10"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
+                                    className="border-gray-300"
                                     required
                                 />
                                 <button
@@ -178,52 +236,31 @@ export default function Signup() {
                                     )}
                                 </button>
                             </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="confirmPassword"
-                                className="text-gray-700"
+
+                            <div
+                                onClick={handleForgotPassword}
+                                className="py-4 text-sm text-muted-foreground cursor-pointer hover:text-genesoft"
                             >
-                                Confirm Password
-                            </Label>
-                            <Input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Confirm your password"
-                                className="border-gray-300"
-                                value={confirmPassword}
-                                onChange={(e) =>
-                                    setConfirmPassword(e.target.value)
-                                }
-                                onBlur={checkPasswordMatch}
-                                required
-                            />
+                                <p>Forgot Password?</p>
+                            </div>
                         </div>
-
-                        {errorMessage && (
-                            <p className="text-red-500 text-sm">
-                                {errorMessage}
-                            </p>
-                        )}
-
                         <Button
                             type="submit"
-                            className="w-full bg-primary text-white bg-genesoft hover:bg-genesoft/90"
+                            className="w-full bg-primary text-white bg-genesoft hover:bg-genesoft/90 cursor-pointer"
                         >
-                            {loading ? <SimpleLoading /> : "Signup"}
+                            {loading ? <SimpleLoading /> : "Sign in"}
                         </Button>
                     </form>
 
                     <div className="mt-4 text-center text-sm">
                         <span className="text-gray-600">
-                            Already have an account?{" "}
+                            Don&apos;t have an account?{" "}
                         </span>
                         <a
-                            href="/signin"
-                            className="text-genesoft hover:underline"
+                            href="/signup"
+                            className="text-genesoft hover:underline cursor-pointer"
                         >
-                            Sign in
+                            Sign up
                         </a>
                     </div>
 
