@@ -49,6 +49,7 @@ export default function Signup() {
       setLoading(false);
       router.push('/');
     } catch (error) {
+      console.error(error);
       setLoading(false);
       alert('Something went wrong');
     }
