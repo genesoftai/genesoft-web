@@ -17,44 +17,51 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { createOrganization } from "@/actions/organization";
+import { updateOrganization } from "@/actions/organization";
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { GenesoftOrganization } from "@/types/organization";
 
-const pageName = "DashboardPage";
+type Props = {};
 
-export default function Dashboard() {
+const pageName = "OrganizationInfoPage";
+const OrganizationInfoPage = (props: Props) => {
     const { email } = useUserStore();
-    const { updateGenesoftUser } = useGenesoftUserStore();
     const [loading, setLoading] = useState(false);
     const [hasOrganization, setHasOrganization] = useState(false);
-    const [user, setUser] = useState(null);
-
+    const [organization, setOrganization] =
+        useState<GenesoftOrganization | null>(null);
     const [organizationName, setOrganizationName] = useState("");
     const [organizationDescription, setOrganizationDescription] = useState("");
-    const [isCreatingOrganization, setIsCreatingOrganization] = useState(false);
+    const [isUpdatingOrganization, setIsUpdatingOrganization] = useState(false);
     const router = useRouter();
+    const { updateGenesoftUser } = useGenesoftUserStore();
 
     useEffect(() => {
         if (email) {
-            setupUser();
+            setupUserOrganization();
         }
-    }, [email, hasOrganization]);
+    }, [email]);
 
-    const setupUser = async () => {
+    const setupUserOrganization = async () => {
         setLoading(true);
         const user = await getUserByEmail({ email });
+        if (!user.organization) {
+            router.push("/dashboard");
+        }
         setHasOrganization(user.organization !== null);
-        setUser(user);
+        setOrganization(user.organization);
         updateGenesoftUser(user);
         setLoading(false);
+        setOrganizationName(user.organization.name);
+        setOrganizationDescription(user.organization.description);
     };
 
-    const handleCreateOrganization = async () => {
-        setIsCreatingOrganization(true);
+    const handleUpdateOrganization = async () => {
+        setIsUpdatingOrganization(true);
         try {
-            const result = await createOrganization({
-                email,
+            const result = await updateOrganization({
+                id: organization.id,
                 name: organizationName,
                 description: organizationDescription,
             });
@@ -66,26 +73,24 @@ export default function Dashboard() {
         } catch (error) {
             console.error(error);
         } finally {
-            setIsCreatingOrganization(false);
+            setIsUpdatingOrganization(false);
         }
-    };
-
-    const handleCreateProject = async () => {
-        router.push("/dashboard/create-project/info");
     };
 
     console.log({
         message: `${pageName}: Overview`,
         email,
         hasOrganization,
-        user,
+        organization,
     });
 
     if (loading) {
         return (
             <div className="flex flex-col justify-center items-center h-screen bg-primary-dark text-white">
-                <SimpleLoading color="#2563EB" size={100} />
-                <p className="text-2xl">Loading your information...</p>
+                <SimpleLoading color="#2563EB" size={50} />
+                <p className="text-2xl">
+                    Loading your organization information...
+                </p>
             </div>
         );
     }
@@ -108,41 +113,10 @@ export default function Dashboard() {
                 </div>
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
-                {hasOrganization ? (
-                    <div className="flex flex-col gap-4 p-4 pt-0 w-full rounded-xl bg-secondary-dark">
-                        <p className="text-2xl p-4 text-subtext-in-dark-bg">
-                            Software Development team of AI Agents for{" "}
-                            {user?.organization?.name}
-                        </p>
-
-                        <div>
-                            <p className="text-2xl p-4 text-subtext-in-dark-bg font-bold">
-                                Organization Projects
-                            </p>
-                            {/* TODO: list all projects in organization */}
-                            <p className="text-base p-4 text-subtext-in-dark-bg">
-                                You have no projects yet. Create one!
-                            </p>
-                        </div>
-
-                        <Button
-                            className="flex items-center p-4 self-center w-fit bg-genesoft font-medium hover:bg-genesoft/80"
-                            onClick={handleCreateProject}
-                        >
-                            <span>Create Project</span>
-                        </Button>
-
-                        <div className="min-h-[100vh] flex-1 rounded-xl bg-secondary-dark md:min-h-min" />
-                    </div>
-                ) : (
+                {hasOrganization && (
                     <div className="min-h-[100vh] flex-1 rounded-xl bg-secondary-dark md:min-h-min p-4 w-full flex flex-col">
                         <p className="text-2xl p-4 text-subtext-in-dark-bg font-bold">
-                            Create Organization
-                        </p>
-
-                        <p className="text-base p-4 text-subtext-in-dark-bg">
-                            You don&apos;t have an organization yet. Please
-                            create a new organization.
+                            Organization Information
                         </p>
 
                         <div className="flex flex-col items-start gap-y-8 p-4 self-center w-10/12 sm:w-8/12 md:w-6/12">
@@ -187,12 +161,12 @@ export default function Dashboard() {
                             </div>
 
                             <Button
-                                disabled={isCreatingOrganization}
+                                disabled={isUpdatingOrganization}
                                 className="flex items-center p-4 self-center w-fit bg-genesoft font-medium hover:bg-genesoft/80"
-                                onClick={handleCreateOrganization}
+                                onClick={handleUpdateOrganization}
                             >
-                                <span>Create organization</span>
-                                {isCreatingOrganization && (
+                                <span>Update organization</span>
+                                {isUpdatingOrganization && (
                                     <Loader2 className="animate-spin" />
                                 )}
                             </Button>
@@ -202,4 +176,6 @@ export default function Dashboard() {
             </div>
         </div>
     );
-}
+};
+
+export default OrganizationInfoPage;
