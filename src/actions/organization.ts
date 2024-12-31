@@ -58,3 +58,13 @@ export async function updateOrganization(payload: UpdateOrganization) {
         throw new Error("Failed to update organization");
     }
 }
+
+export async function getOrganizationProjects(organizationId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/organization/${organizationId}/projects`;
+    const res = await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+        },
+    });
+    return res.data;
+}

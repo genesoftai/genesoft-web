@@ -17,9 +17,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { createOrganization } from "@/actions/organization";
+import {
+    createOrganization,
+    getOrganizationProjects,
+} from "@/actions/organization";
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { ProjectCard } from "@/components/project/ProjectCard";
+import { Project } from "next/dist/build/swc/types";
 
 const pageName = "DashboardPage";
 
@@ -29,15 +34,20 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(false);
     const [hasOrganization, setHasOrganization] = useState(false);
     const [user, setUser] = useState(null);
-
     const [organizationName, setOrganizationName] = useState("");
     const [organizationDescription, setOrganizationDescription] = useState("");
     const [isCreatingOrganization, setIsCreatingOrganization] = useState(false);
+    const [organizationProjects, setOrganizationProjects] = useState<Project[]>(
+        [],
+    );
     const router = useRouter();
 
     useEffect(() => {
         if (email) {
             setupUser();
+        }
+        if (hasOrganization) {
+            setUpOrganizationProjects();
         }
     }, [email, hasOrganization]);
 
@@ -71,7 +81,16 @@ export default function Dashboard() {
     };
 
     const handleCreateProject = async () => {
-        router.push("/dashboard/create-project/info");
+        router.push("/dashboard/project/create/info");
+    };
+
+    const setUpOrganizationProjects = async () => {
+        const projects = await getOrganizationProjects(user?.organization?.id);
+        console.log({
+            message: `${pageName}: Organization projects`,
+            projects,
+        });
+        setOrganizationProjects(projects);
     };
 
     console.log({
@@ -94,7 +113,7 @@ export default function Dashboard() {
         <div className="flex flex-col min-h-screen bg-primary-dark text-white w-full">
             <header className="flex h-16 shrink-0 items-center gap-2">
                 <div className="flex items-center gap-2 px-4">
-                    <SidebarTrigger className="-ml-1" />
+                    <SidebarTrigger className="-ml-1 text-white" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <Breadcrumb>
                         <BreadcrumbList>
@@ -109,20 +128,40 @@ export default function Dashboard() {
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
                 {hasOrganization ? (
-                    <div className="flex flex-col gap-4 p-4 pt-0 w-full rounded-xl bg-secondary-dark">
-                        <p className="text-2xl p-4 text-subtext-in-dark-bg">
-                            Software Development team of AI Agents for{" "}
-                            {user?.organization?.name}
-                        </p>
-
+                    <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
                         <div>
-                            <p className="text-2xl p-4 text-subtext-in-dark-bg font-bold">
-                                Organization Projects
-                            </p>
+                            <div className="flex flex-col gap-y-2 mb-8">
+                                <p className="text-2xl text-subtext-in-dark-bg font-bold">
+                                    Organization Projects
+                                </p>
+                                <p className="text-base text-subtext-in-dark-bg">
+                                    List of all projects in your organization to
+                                    develop and managed by software development
+                                    team of AI Agents
+                                </p>
+                            </div>
+
                             {/* TODO: list all projects in organization */}
-                            <p className="text-base p-4 text-subtext-in-dark-bg">
-                                You have no projects yet. Create one!
-                            </p>
+                            {organizationProjects.length > 0 ? (
+                                <div className="flex flex-col gap-4 p-4 pt-0 w-full items-center rounded-xl bg-secondary-dark">
+                                    {organizationProjects.map((project) => (
+                                        <ProjectCard
+                                            key={project.id}
+                                            id={project.id}
+                                            name={project.name}
+                                            description={project.description}
+                                            purpose={project.purpose}
+                                            target_audience={
+                                                project.target_audience
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-base p-4 text-subtext-in-dark-bg">
+                                    You have no projects yet. Create one!
+                                </p>
+                            )}
                         </div>
 
                         <Button

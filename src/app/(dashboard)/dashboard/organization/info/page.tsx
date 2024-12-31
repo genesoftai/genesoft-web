@@ -21,6 +21,7 @@ import { updateOrganization } from "@/actions/organization";
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { GenesoftOrganization } from "@/types/organization";
+import { useCreateProjectStore } from "@/stores/create-project-store";
 
 type Props = {};
 
@@ -105,7 +106,14 @@ const OrganizationInfoPage = (props: Props) => {
                         <BreadcrumbList>
                             <BreadcrumbItem>
                                 <BreadcrumbPage className="text-white">
-                                    Dashboard
+                                    Organization
+                                </BreadcrumbPage>
+                                <Separator
+                                    orientation="vertical"
+                                    className="h-4"
+                                />
+                                <BreadcrumbPage className="text-white">
+                                    Info
                                 </BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
