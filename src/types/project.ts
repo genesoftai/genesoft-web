@@ -41,6 +41,46 @@ export interface Branding {
 export interface Feature {
     name: string;
     description: string;
-    file_ids?: string[];
-    reference_link_ids?: string[];
+    references?: FeatureReference[];
+    files?: FeatureFile[];
+}
+
+export interface FeatureReference {
+    id?: string;
+    name: string;
+    url: string;
+    context: string;
+}
+
+export interface FeatureFile {
+    id?: string;
+    url: string;
+    name: string;
+    context: string;
+}
+
+export interface CreateProjectRequest {
+    organization_id: string;
+    name: string;
+    description: string;
+    purpose: string;
+    target_audience: string;
+    branding?: {
+        logo_url?: string;
+        color?: string;
+        theme?: string;
+        perception?: string;
+    };
+    pages?: {
+        name: string;
+        description: string;
+        file_ids?: string[];
+        reference_link_ids?: string[];
+    }[];
+    features?: {
+        name: string;
+        description: string;
+        file_ids?: string[];
+        reference_link_ids?: string[];
+    }[];
 }

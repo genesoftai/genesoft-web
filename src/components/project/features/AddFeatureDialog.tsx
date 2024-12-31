@@ -14,24 +14,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Upload, X } from "lucide-react";
 import { useCreateProjectStore } from "@/stores/create-project-store";
-import { PageReference, PageFile } from "@/types/project";
+import { FeatureReference, FeatureFile } from "@/types/project";
 import { createReferenceLink } from "@/actions/reference_link";
 import { uploadFileForOrganization } from "@/actions/file";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 
-const componentName = "AddPageDialog";
+const componentName = "AddFeatureDialog";
 
-interface TempFile extends PageFile {
+interface TempFile extends FeatureFile {
     file: File | undefined;
 }
 
-export function AddPageDialog() {
+export function AddfeatureDialog() {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [references, setReferences] = useState<PageReference[]>([]);
-    const [files, setFiles] = useState<PageFile[]>([]);
-    const [newReference, setNewReference] = useState<PageReference>({
+    const [references, setReferences] = useState<FeatureReference[]>([]);
+    const [files, setFiles] = useState<FeatureFile[]>([]);
+    const [newReference, setNewReference] = useState<FeatureReference>({
         id: "",
         url: "",
         context: "",
@@ -50,7 +50,7 @@ export function AddPageDialog() {
 
     const [isUploadingReference, setIsUploadingReference] = useState(false);
 
-    const { addPage } = useCreateProjectStore();
+    const { addFeature } = useCreateProjectStore();
     const { organization, email } = useGenesoftUserStore();
 
     const handleAddReference = async () => {
@@ -125,7 +125,7 @@ export function AddPageDialog() {
                     organization?.id || "",
                     fileName,
                     description,
-                    "page",
+                    "feature",
                     newFile.file,
                 );
 
@@ -159,10 +159,10 @@ export function AddPageDialog() {
         }
     };
 
-    const handleAddPage = () => {
+    const handleAddFeature = () => {
         setError(null);
         console.log({
-            message: `${componentName}.handleAddPage: add page`,
+            message: `${componentName}.handleAddFeature: add feature`,
             metadata: {
                 name,
                 description,
@@ -170,7 +170,7 @@ export function AddPageDialog() {
                 files,
             },
         });
-        addPage({
+        addFeature({
             name,
             description,
             references,
@@ -187,41 +187,33 @@ export function AddPageDialog() {
         setOpen(false);
     };
 
-    console.log({
-        message: `${componentName}: Page information`,
-        name,
-        description,
-        references,
-        files,
-    });
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" className="w-fit text-black">
                     <Plus className="mr-2 h-4 w-4" />
-                    <span className="font-semibold">Add Page</span>
+                    <span className="font-semibold">Add Feature</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll flex flex-col">
                 <DialogHeader>
-                    <DialogTitle className="text-xl">Add Page</DialogTitle>
+                    <DialogTitle className="text-xl">Add Feature</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-6 py-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Page name</Label>
+                        <Label htmlFor="name">Feature name</Label>
                         <Input
                             id="name"
-                            placeholder="Enter page name"
+                            placeholder="Enter feature name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Page Description</Label>
+                        <Label htmlFor="description">Feature Description</Label>
                         <Textarea
                             id="description"
-                            placeholder="Describe important information of this page such as structure, content, features, and etc."
+                            placeholder="Describe important information of this feature such as structure, content, features, and etc."
                             className="min-h-[100px]"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -293,7 +285,7 @@ export function AddPageDialog() {
                                     }
                                 />
                                 <Textarea
-                                    placeholder="give context for how to use this reference for this page"
+                                    placeholder="give context for how to use this reference for this feature"
                                     className="min-h-[60px]"
                                     value={newReference.context}
                                     onChange={(e) =>
@@ -321,7 +313,7 @@ export function AddPageDialog() {
                                 Files
                             </h3>
                             <p className="text-sm text-subtext-in-white-bg mb-4">
-                                Upload files those aim to use in this page
+                                Upload files those aim to use in this feature
                             </p>
                             {files.length > 0 && (
                                 <div className="mb-4 space-y-3">
@@ -402,7 +394,7 @@ export function AddPageDialog() {
                                     }
                                 />
                                 <Textarea
-                                    placeholder="give context for how to use this file for this page"
+                                    placeholder="give context for how to use this file for this feature"
                                     className="min-h-[60px]"
                                     value={newFile.context}
                                     onChange={(e) =>
@@ -437,10 +429,10 @@ export function AddPageDialog() {
                 <Button
                     className="w-fit self-center bg-genesoft text-white px-2 py-4"
                     size="lg"
-                    onClick={handleAddPage}
+                    onClick={handleAddFeature}
                 >
                     <Plus className="mr-1 h-4 w-4" />
-                    Add Page
+                    Add feature
                 </Button>
             </DialogContent>
         </Dialog>

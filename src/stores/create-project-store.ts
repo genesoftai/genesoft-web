@@ -13,6 +13,7 @@ export interface CreateProjectStore {
     updateCreateProjectStore: (project: Partial<CreateProjectStore>) => void;
     clearCreateProjectStore: () => void;
     addPage: (page: Page) => void;
+    addFeature: (feature: Feature) => void;
 }
 
 const initialProjectStoreStates = {
@@ -42,6 +43,11 @@ export const useCreateProjectStore = create<CreateProjectStore>()(
                 set((state) => ({
                     ...state,
                     pages: [...(state.pages || []), page],
+                })),
+            addFeature: (feature) =>
+                set((state) => ({
+                    ...state,
+                    features: [...(state.features || []), feature],
                 })),
         }),
         {
