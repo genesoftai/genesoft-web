@@ -17,6 +17,8 @@ export default {
                 "secondary-dark": "#2a2a2a",
                 "tertiary-dark": "#383838",
                 "subtext-in-dark-bg": "#D4D4D4",
+                "subtext-in-white-bg": "#525252",
+                "line-in-dark-bg": "#404040",
                 sidebar: {
                     DEFAULT: "hsl(var(--sidebar-background))",
                     foreground: "hsl(var(--sidebar-foreground))",
