@@ -9,6 +9,7 @@ import {
     BreadcrumbPage,
     BreadcrumbItem,
     BreadcrumbList,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -21,7 +22,6 @@ import { updateOrganization } from "@/actions/organization";
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { GenesoftOrganization } from "@/types/organization";
-import { useCreateProjectStore } from "@/stores/create-project-store";
 
 type Props = {};
 
@@ -108,10 +108,7 @@ const OrganizationInfoPage = (props: Props) => {
                                 <BreadcrumbPage className="text-white">
                                     Organization
                                 </BreadcrumbPage>
-                                <Separator
-                                    orientation="vertical"
-                                    className="h-4"
-                                />
+                                <BreadcrumbSeparator />
                                 <BreadcrumbPage className="text-white">
                                     Info
                                 </BreadcrumbPage>

@@ -10,6 +10,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
 
 interface ProjectCardProps {
     id: string;
@@ -26,6 +27,7 @@ export function ProjectCard({
     purpose,
     target_audience,
 }: ProjectCardProps) {
+    const router = useRouter();
     return (
         <Card className="w-8/12 h-96 bg-primary-dark text-white flex flex-col">
             <CardHeader>
@@ -50,7 +52,12 @@ export function ProjectCard({
                 </div>
             </CardContent>
             <CardFooter className="flex justify-end self-end">
-                <Button className="bg-genesoft text-white rounded-lg">
+                <Button
+                    className="bg-genesoft text-white rounded-lg"
+                    onClick={() =>
+                        router.push(`/dashboard/project/manage/${id}`)
+                    }
+                >
                     Manage
                 </Button>
             </CardFooter>
