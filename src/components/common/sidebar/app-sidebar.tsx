@@ -1,23 +1,9 @@
 "use client";
 
 import * as React from "react";
-import {
-    AppWindow,
-    BookOpen,
-    Bot,
-    Building,
-    Command,
-    Frame,
-    LifeBuoy,
-    Map,
-    PieChart,
-    Send,
-    Settings2,
-    SquareTerminal,
-} from "lucide-react";
+import { AppWindow, BookOpen, Building, LifeBuoy, Send } from "lucide-react";
 
 import { NavMain } from "@/components/common/sidebar/nav-main";
-import { NavProjects } from "@/components/common/sidebar/nav-projects";
 import { NavSecondary } from "@/components/common/sidebar/nav-secondary";
 import { NavUser } from "@/components/common/sidebar/nav-user";
 import {
@@ -44,15 +30,15 @@ const data = {
             icon: Building,
             items: [
                 {
-                    title: "info",
+                    title: "Info",
                     url: "/dashboard/organization/info",
                 },
                 {
-                    title: "usage",
+                    title: "Usage",
                     url: "/dashboard/organization/usage",
                 },
                 {
-                    title: "invoices",
+                    title: "Invoices",
                     url: "/dashboard/organization/invoices",
                 },
             ],

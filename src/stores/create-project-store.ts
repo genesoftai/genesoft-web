@@ -1,26 +1,6 @@
+import { Branding, Feature, Page } from "@/types/project";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-interface Branding {
-    logo_url?: string;
-    color?: string;
-    theme?: string;
-    perception?: string;
-}
-
-interface Page {
-    name: string;
-    description: string;
-    file_ids?: string[];
-    reference_link_ids?: string[];
-}
-
-interface Feature {
-    name: string;
-    description: string;
-    file_ids?: string[];
-    reference_link_ids?: string[];
-}
 
 export interface CreateProjectStore {
     name: string;
@@ -32,6 +12,8 @@ export interface CreateProjectStore {
     features?: Feature[];
     updateCreateProjectStore: (project: Partial<CreateProjectStore>) => void;
     clearCreateProjectStore: () => void;
+    addPage: (page: Page) => void;
+    addFeature: (feature: Feature) => void;
 }
 
 const initialProjectStoreStates = {
@@ -57,6 +39,16 @@ export const useCreateProjectStore = create<CreateProjectStore>()(
                 set((state) => ({ ...state, ...project })),
             clearCreateProjectStore: () =>
                 set(() => ({ ...initialProjectStoreStates })),
+            addPage: (page) =>
+                set((state) => ({
+                    ...state,
+                    pages: [...(state.pages || []), page],
+                })),
+            addFeature: (feature) =>
+                set((state) => ({
+                    ...state,
+                    features: [...(state.features || []), feature],
+                })),
         }),
         {
             name: "create-project-storage",

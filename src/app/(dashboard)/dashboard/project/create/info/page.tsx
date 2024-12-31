@@ -6,6 +6,7 @@ import {
     BreadcrumbPage,
     BreadcrumbItem,
     BreadcrumbList,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -17,9 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 
-type Props = {};
-
-const CreateProjectInfoPage = (props: Props) => {
+const CreateProjectInfoPage = () => {
     const router = useRouter();
     const {
         name,
@@ -57,10 +56,7 @@ const CreateProjectInfoPage = (props: Props) => {
                                 <BreadcrumbPage className="text-white">
                                     Create Project
                                 </BreadcrumbPage>
-                                <Separator
-                                    orientation="vertical"
-                                    className="h-4"
-                                />
+                                <BreadcrumbSeparator />
                                 <BreadcrumbPage className="text-white">
                                     Info
                                 </BreadcrumbPage>
@@ -72,16 +68,18 @@ const CreateProjectInfoPage = (props: Props) => {
             <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
                 <div>
                     <div className="flex flex-col gap-y-2 mb-8">
-                        <div className="flex items-start gap-x-2">
-                            <Info className="w-6 h-6 text-subtext-in-dark-bg" />
-                            <p className="text-2xl text-subtext-in-dark-bg font-bold">
+                        <div className="flex items-center gap-x-2">
+                            <Info className="w-6 h-6 text-white" />
+                            <p className="text-2xl text-white font-bold">
                                 Basic Information
                             </p>
                         </div>
 
                         <p className="text-base text-subtext-in-dark-bg">
-                            basic information of your web application project
+                            Basic information of your web application project
                         </p>
+
+                        <p className="text-base text-white">Step 1 of 4</p>
                     </div>
                 </div>
 

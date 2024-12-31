@@ -6,12 +6,13 @@ import {
     BreadcrumbPage,
     BreadcrumbItem,
     BreadcrumbList,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Info } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 import {
@@ -26,9 +27,7 @@ import { SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
 
-type Props = {};
-
-const CreateProjectBrandingPage = (props: Props) => {
+const CreateProjectBrandingPage = () => {
     const router = useRouter();
     const { branding, updateCreateProjectStore } = useCreateProjectStore();
 
@@ -66,17 +65,11 @@ const CreateProjectBrandingPage = (props: Props) => {
                                 <BreadcrumbPage className="text-white">
                                     Create Project
                                 </BreadcrumbPage>
-                                <Separator
-                                    orientation="vertical"
-                                    className="h-4"
-                                />
+                                <BreadcrumbSeparator />
                                 <BreadcrumbPage className="text-white">
                                     Info
                                 </BreadcrumbPage>
-                                <Separator
-                                    orientation="vertical"
-                                    className="h-4"
-                                />
+                                <BreadcrumbSeparator />
                                 <BreadcrumbPage className="text-white">
                                     Branding
                                 </BreadcrumbPage>
@@ -88,9 +81,9 @@ const CreateProjectBrandingPage = (props: Props) => {
             <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
                 <div>
                     <div className="flex flex-col gap-y-2 mb-8">
-                        <div className="flex items-start gap-x-2">
-                            <Info className="w-6 h-6 text-subtext-in-dark-bg" />
-                            <p className="text-2xl text-subtext-in-dark-bg font-bold">
+                        <div className="flex items-center gap-x-2">
+                            <Eye className="w-6 h-6 text-white" />
+                            <p className="text-2xl text-white font-bold">
                                 Branding
                             </p>
                         </div>
@@ -98,6 +91,8 @@ const CreateProjectBrandingPage = (props: Props) => {
                         <p className="text-base text-subtext-in-dark-bg">
                             Your web application branding information
                         </p>
+
+                        <p className="text-base text-white">Step 2 of 4</p>
                     </div>
                 </div>
 
