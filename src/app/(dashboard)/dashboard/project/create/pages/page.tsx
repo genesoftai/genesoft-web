@@ -163,7 +163,7 @@ const CreateProjectPagesPage = () => {
                         </div>
                     ))}
                     <div className="self-center">
-                        <AddPageDialog />
+                        <AddPageDialog onAddPage={() => {}} type="create" />
                     </div>
                 </div>
 

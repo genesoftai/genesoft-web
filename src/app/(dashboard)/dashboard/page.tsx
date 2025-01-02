@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { getUserByEmail } from "@/actions/user";
 import { useUserStore } from "@/stores/user-store";
-import SimpleLoading from "@/components/common/SimpleLoading";
 import {
     Breadcrumb,
     BreadcrumbPage,
@@ -25,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { Project } from "next/dist/build/swc/types";
+import PageLoading from "@/components/common/PageLoading";
 
 const pageName = "DashboardPage";
 
@@ -101,12 +101,7 @@ export default function Dashboard() {
     });
 
     if (loading) {
-        return (
-            <div className="flex flex-col justify-center items-center h-screen bg-primary-dark text-white">
-                <SimpleLoading color="#2563EB" size={100} />
-                <p className="text-2xl">Loading your information...</p>
-            </div>
-        );
+        return <PageLoading size={50} text={"Loading your information..."} />;
     }
 
     return (

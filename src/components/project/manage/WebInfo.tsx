@@ -78,13 +78,18 @@ export function WebInfo() {
                     </CollapsibleContent>
                 </Collapsible>
 
-                <Button className="bg-genesoft w-fit self-center" size="lg">
-                    <Rocket className="mr-2 h-4 w-4" />
-                    Launch
-                </Button>
-                <p className="text-center text-sm text-muted-foreground">
-                    Make latest version of your web online
-                </p>
+                <div className="flex flex-col items-center gap-2">
+                    <Button
+                        className="bg-genesoft w-fit self-center hover:text-black hover:bg-white"
+                        size="lg"
+                    >
+                        <Rocket className="mr-2 h-4 w-4" />
+                        <span>Launch</span>
+                    </Button>
+                    <p className="text-xs text-subtext-in-dark-bg">
+                        Make latest version of your web online
+                    </p>
+                </div>
             </CardContent>
         </Card>
     );

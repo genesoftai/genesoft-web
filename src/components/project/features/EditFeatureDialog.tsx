@@ -12,34 +12,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Plus, Upload, X } from "lucide-react";
-import { useCreateProjectStore } from "@/stores/create-project-store";
-import { PageReference, PageFile, Page } from "@/types/project";
+import { Edit, Loader2, Upload, X } from "lucide-react";
+import {
+    Feature,
+    EditFeatureRequest,
+    FeatureReference,
+    FeatureFile,
+} from "@/types/project";
 import { createReferenceLink } from "@/actions/reference_link";
 import { uploadFileForOrganization } from "@/actions/file";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 
-const componentName = "AddPageDialog";
+const componentName = "EditFeatureDialog";
 
-interface TempFile extends PageFile {
+interface TempFile extends FeatureFile {
     file: File | undefined;
 }
 
-interface AddPageDialogProps {
-    type?: "create" | "update";
-    onAddPage: (page: Page) => void;
+interface EditFeatureDialogProps {
+    feature: Feature;
+    onEditFeature: (payload: EditFeatureRequest) => void;
 }
 
-export function AddPageDialog({
-    type = "create",
-    onAddPage,
-}: AddPageDialogProps) {
+export function EditFeatureDialog({
+    feature,
+    onEditFeature,
+}: EditFeatureDialogProps) {
     const [open, setOpen] = useState(false);
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [references, setReferences] = useState<PageReference[]>([]);
-    const [files, setFiles] = useState<PageFile[]>([]);
-    const [newReference, setNewReference] = useState<PageReference>({
+    const [name, setName] = useState(feature.name);
+    const [description, setDescription] = useState(feature.description);
+    const [references, setReferences] = useState<FeatureReference[]>(
+        feature.references || [],
+    );
+    const [files, setFiles] = useState<FeatureFile[]>(feature.files || []);
+    const [newReference, setNewReference] = useState<FeatureReference>({
         id: "",
         url: "",
         context: "",
@@ -55,10 +61,8 @@ export function AddPageDialog({
 
     const [isUploadingFile, setIsUploadingFile] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
     const [isUploadingReference, setIsUploadingReference] = useState(false);
 
-    const { addPage } = useCreateProjectStore();
     const { organization } = useGenesoftUserStore();
 
     const handleAddReference = async () => {
@@ -92,12 +96,14 @@ export function AddPageDialog({
 
     const handleRemoveReference = (index: number) => {
         setError(null);
-        setReferences(references.filter((_, i) => i !== index));
+        const updatedReferences = references?.filter((_, i) => i !== index);
+        setReferences(updatedReferences);
     };
 
     const handleRemoveFile = (index: number) => {
         setError(null);
-        setFiles(files.filter((_, i) => i !== index));
+        const updatedFiles = files?.filter((_, i) => i !== index);
+        setFiles(updatedFiles);
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,14 +139,9 @@ export function AddPageDialog({
                     organization?.id || "",
                     fileName,
                     description,
-                    "page",
+                    "feature",
                     newFile.file,
                 );
-
-                console.log({
-                    message: `${componentName}: Upload file response`,
-                    response,
-                });
 
                 setFiles([
                     ...files,
@@ -167,79 +168,51 @@ export function AddPageDialog({
         }
     };
 
-    const handleAddPage = () => {
+    const handleEditFeature = () => {
         setError(null);
-        console.log({
-            message: `${componentName}.handleAddPage: add page`,
-            metadata: {
-                name,
-                description,
-                references,
-                files,
-            },
+
+        onEditFeature({
+            name,
+            description,
+            reference_link_ids: references.map((ref) => ref.id || ""),
+            file_ids: files.map((file) => file.id || ""),
         });
-        if (type === "create") {
-            addPage({
-                name,
-                description,
-                references,
-                files,
-            });
-        } else {
-            onAddPage({
-                name,
-                description,
-                references,
-                files,
-            });
-        }
-        // Reset all states
-        setName("");
-        setDescription("");
-        setReferences([]);
-        setFiles([]);
-        setNewReference({ id: "", url: "", context: "", name: "" });
-        setNewFile({ id: "", name: "", context: "", url: "", file: undefined });
+
         setError(null);
         setOpen(false);
     };
 
-    console.log({
-        message: `${componentName}: Page information`,
-        name,
-        description,
-        references,
-        files,
-    });
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-fit text-black">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span className="font-semibold">Add Page</span>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-blue-500 hover:text-blue-600 hover:bg-transparent"
+                >
+                    <Edit className="h-5 w-5" />
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll flex flex-col">
                 <DialogHeader>
-                    <DialogTitle className="text-xl">Add Page</DialogTitle>
+                    <DialogTitle className="text-xl">Edit Feature</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-6 py-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Page name</Label>
+                        <Label htmlFor="name">Feature name</Label>
                         <Input
                             id="name"
-                            placeholder="Enter page name"
+                            placeholder="Enter feature name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Page Description</Label>
+                        <Label htmlFor="description">Feature Description</Label>
                         <Textarea
                             id="description"
-                            placeholder="Describe important information of this page such as structure, content, features, and etc."
-                            className="min-h-[100px]"
+                            placeholder="Describe important information of this feature such as functionality, requirements, and etc."
+                            className="min-h-[100px] break-words"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
@@ -249,13 +222,13 @@ export function AddPageDialog({
                             <h3 className="text-lg font-semibold mb-2">
                                 References
                             </h3>
-                            <p className="text-sm text-subtext-in-white-bg mb-4">
+                            <p className="text-sm text-subtext-in-white-bg mb-4 break-words">
                                 Provide reference information for this feature
                                 by url
                             </p>
-                            {references.length > 0 && (
+                            {references?.length > 0 && (
                                 <div className="mb-4 space-y-3">
-                                    {references.map((ref, index) => (
+                                    {references?.map((ref, index) => (
                                         <div
                                             key={index}
                                             className="p-3 rounded-lg relative shadow-md border-1 border-gray-200"
@@ -270,18 +243,18 @@ export function AddPageDialog({
                                             >
                                                 <X className="h-4 w-4" />
                                             </Button>
-                                            <p className="font-medium text-sm truncate pr-8">
+                                            <p className="font-medium text-sm break-words pr-8">
                                                 {ref.name}
                                             </p>
                                             <a
                                                 href={ref.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-sm text-blue-500 mt-1 hover:underline"
+                                                className="text-sm text-blue-500 mt-1 hover:underline break-all"
                                             >
                                                 {ref.url}
                                             </a>
-                                            <p className="text-sm text-subtext-in-white-bg mt-1">
+                                            <p className="text-sm text-subtext-in-white-bg mt-1 break-words">
                                                 {ref.context}
                                             </p>
                                         </div>
@@ -310,8 +283,8 @@ export function AddPageDialog({
                                     }
                                 />
                                 <Textarea
-                                    placeholder="give context for how to use this reference for this page"
-                                    className="min-h-[60px]"
+                                    placeholder="give context for how to use this reference for this feature"
+                                    className="min-h-[60px] break-words"
                                     value={newReference.context}
                                     onChange={(e) =>
                                         setNewReference({
@@ -337,12 +310,12 @@ export function AddPageDialog({
                             <h3 className="text-lg font-semibold mb-2">
                                 Files
                             </h3>
-                            <p className="text-sm text-subtext-in-white-bg mb-4">
-                                Upload files those aim to use in this page
+                            <p className="text-sm text-subtext-in-white-bg mb-4 break-words">
+                                Upload files those aim to use in this feature
                             </p>
-                            {files.length > 0 && (
+                            {files?.length > 0 && (
                                 <div className="mb-4 space-y-3">
-                                    {files.map((file, index) => (
+                                    {files?.map((file, index) => (
                                         <div
                                             key={index}
                                             className="p-3 rounded-lg relative shadow-md border-1 border-gray-200"
@@ -357,17 +330,17 @@ export function AddPageDialog({
                                             >
                                                 <X className="h-4 w-4" />
                                             </Button>
-                                            <p className="font-medium text-sm truncate pr-8">
+                                            <p className="font-medium text-sm break-words pr-8">
                                                 {file.name}
                                             </p>
-                                            <p className="text-sm text-subtext-in-white-bg mt-1">
+                                            <p className="text-sm text-subtext-in-white-bg mt-1 break-words">
                                                 {file.context}
                                             </p>
                                             <a
                                                 href={file.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-sm text-blue-500 mt-1 hover:underline"
+                                                className="text-sm text-blue-500 mt-1 hover:underline break-all"
                                             >
                                                 {file.url}
                                             </a>
@@ -403,7 +376,7 @@ export function AddPageDialog({
                                         </Button>
                                     </Label>
                                     {newFile.url && (
-                                        <p className="text-sm text-subtext-in-white-bg mt-1">
+                                        <p className="text-sm text-subtext-in-white-bg mt-1 break-all">
                                             {newFile.url}
                                         </p>
                                     )}
@@ -419,8 +392,8 @@ export function AddPageDialog({
                                     }
                                 />
                                 <Textarea
-                                    placeholder="give context for how to use this file for this page"
-                                    className="min-h-[60px]"
+                                    placeholder="give context for how to use this file for this feature"
+                                    className="min-h-[60px] break-words"
                                     value={newFile.context}
                                     onChange={(e) =>
                                         setNewFile({
@@ -446,18 +419,17 @@ export function AddPageDialog({
                 </div>
 
                 {error && (
-                    <div className="text-red-500 text-sm self-center">
+                    <div className="text-red-500 text-sm self-center break-words">
                         {error}
                     </div>
                 )}
 
                 <Button
-                    className="w-fit self-center bg-genesoft text-white px-2 py-4"
+                    className="w-fit self-center bg-blue-500 text-white px-2 py-4"
                     size="lg"
-                    onClick={handleAddPage}
+                    onClick={handleEditFeature}
                 >
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Page
+                    Save Changes
                 </Button>
             </DialogContent>
         </Dialog>

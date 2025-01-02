@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Loader2, MonitorCog, Trash2 } from "lucide-react";
 import { useCreateProjectStore } from "@/stores/create-project-store";
-import { AddfeatureDialog } from "@/components/project/features/AddFeatureDialog";
+import { AddFeatureDialog } from "@/components/project/features/AddFeatureDialog";
 import { getPages, getFeatures } from "@/utils/project/create";
 import { CreateProjectRequest, Page, Feature } from "@/types/project";
 import { createProject } from "@/actions/project";
@@ -227,7 +227,10 @@ const CreateProjectFeaturesPage = () => {
                         </div>
                     ))}
                     <div className="self-center">
-                        <AddfeatureDialog />
+                        <AddFeatureDialog
+                            onAddFeature={() => {}}
+                            type="create"
+                        />
                     </div>
                 </div>
 
