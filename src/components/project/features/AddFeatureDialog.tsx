@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Upload, X } from "lucide-react";
 import { useCreateProjectStore } from "@/stores/create-project-store";
-import { FeatureReference, FeatureFile } from "@/types/project";
+import { FeatureReference, FeatureFile, Feature } from "@/types/project";
 import { createReferenceLink } from "@/actions/reference_link";
 import { uploadFileForOrganization } from "@/actions/file";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
@@ -25,7 +25,15 @@ interface TempFile extends FeatureFile {
     file: File | undefined;
 }
 
-export function AddfeatureDialog() {
+interface AddFeatureDialogProps {
+    type?: "create" | "update";
+    onAddFeature: (feature: Feature) => void;
+}
+
+export function AddFeatureDialog({
+    type = "create",
+    onAddFeature,
+}: AddFeatureDialogProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -51,7 +59,7 @@ export function AddfeatureDialog() {
     const [isUploadingReference, setIsUploadingReference] = useState(false);
 
     const { addFeature } = useCreateProjectStore();
-    const { organization, email } = useGenesoftUserStore();
+    const { organization } = useGenesoftUserStore();
 
     const handleAddReference = async () => {
         setError(null);
@@ -170,12 +178,21 @@ export function AddfeatureDialog() {
                 files,
             },
         });
-        addFeature({
-            name,
-            description,
-            references,
-            files,
-        });
+        if (type === "create") {
+            addFeature({
+                name,
+                description,
+                references,
+                files,
+            });
+        } else {
+            onAddFeature({
+                name,
+                description,
+                references,
+                files,
+            });
+        }
         // Reset all states
         setName("");
         setDescription("");

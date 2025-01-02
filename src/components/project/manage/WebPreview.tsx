@@ -6,25 +6,16 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { MessageSquare, PencilRuler, Monitor, Smartphone } from "lucide-react";
+import { MessageSquare, Monitor, Smartphone, AppWindow } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import Image from "next/image";
 import { Project } from "@/types/project";
-import { useRouter } from "next/navigation";
 
 interface WebPreviewProps {
     project: Project | null;
 }
 
 export function WebPreview({ project }: WebPreviewProps) {
-    const router = useRouter();
-
-    const handleUpdateRequirements = () => {
-        router.push(
-            `/dashboard/project/manage/${project?.id}/requirements/info`,
-        );
-    };
-
     return (
         <Card className="bg-primary-dark text-white border-none">
             <CardHeader>
@@ -60,22 +51,28 @@ export function WebPreview({ project }: WebPreviewProps) {
                         />
                     </div>
                 </div>
-                <div className="grid w-full gap-4 md:grid-cols-2 place-items-center">
-                    <Button
-                        variant="outline"
-                        className="flex items-center gap-2 bg-genesoft border-none w-fit"
-                    >
-                        <MessageSquare className="h-4 w-4" />
-                        Add Feedback
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="flex items-center gap-2 bg-genesoft border-none w-fit"
-                        onClick={handleUpdateRequirements}
-                    >
-                        <PencilRuler className="h-4 w-4" />
-                        Update requirements
-                    </Button>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col items-center gap-2">
+                        <Button className="flex items-center gap-2 bg-genesoft w-fit self-center hover:bg-white hover:text-black">
+                            <MessageSquare className="h-4 w-4" />
+                            Add Feedback
+                        </Button>
+                        <span className="text-xs text-subtext-in-dark-bg">
+                            Talk with AI Agent for feedback to improve your web
+                            application
+                        </span>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-2">
+                        <Button className="flex items-center gap-2 bg-genesoft w-fit self-center hover:bg-white hover:text-black">
+                            <AppWindow className="h-4 w-4" />
+                            <span>Build web application</span>
+                        </Button>
+                        <span className="text-xs text-subtext-in-dark-bg">
+                            inform AI Agent to build your web application
+                        </span>
+                    </div>
                 </div>
             </CardContent>
         </Card>
