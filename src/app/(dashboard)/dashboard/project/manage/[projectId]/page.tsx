@@ -22,14 +22,11 @@ import {
 import { WebInfo } from "@/components/project/manage/WebInfo";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDialog";
+import { useParams } from "next/navigation";
 const pageName = "ManageProjectPage";
 
-export default function ProjectManage({
-    params,
-}: {
-    params: { projectId: string };
-}) {
-    const { projectId } = params;
+export default function ProjectManage() {
+    const { projectId } = useParams();
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
 
@@ -58,6 +55,7 @@ export default function ProjectManage({
     console.log({
         message: `${pageName}: Project`,
         project,
+        projectId,
     });
 
     if (loading) {

@@ -29,7 +29,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
     const router = useRouter();
     return (
-        <Card className="w-8/12 h-96 bg-primary-dark text-white flex flex-col">
+        <Card className="w-8/12 h-96 bg-primary-dark text-white flex flex-col border-none">
             <CardHeader>
                 <CardTitle className="text-xl">{name}</CardTitle>
                 <CardDescription>{description}</CardDescription>

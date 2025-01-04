@@ -33,6 +33,7 @@ export default function ResetPassword() {
                 setLoading(false);
                 router.push("/signin");
             } catch (error) {
+                console.error(error);
                 setLoading(false);
                 setError("Failed to reset password, Please try again.");
             }
