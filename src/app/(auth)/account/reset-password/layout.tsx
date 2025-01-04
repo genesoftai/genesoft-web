@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import React from "react";
+import React, { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Reset Password",
@@ -14,7 +14,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>{children}</body>
+            <body>
+                <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            </body>
         </html>
     );
 }

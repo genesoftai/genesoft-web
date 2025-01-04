@@ -6,9 +6,9 @@ const routeName = "/api/user/[email]";
 
 export async function GET(
     request: Request,
-    { params }: { params: { email: string } },
+    { params }: { params: Promise<{ email: string }> },
 ) {
-    const { email } = params;
+    const { email } = await params;
     const url = `${genesoftCoreApiServiceBaseUrl}/user/email/${email}`;
     console.log({
         message: `${routeName} - [GET]: getting user by email from Core API Service`,

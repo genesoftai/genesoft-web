@@ -23,10 +23,8 @@ import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { GenesoftOrganization } from "@/types/organization";
 
-type Props = {};
-
 const pageName = "OrganizationInfoPage";
-const OrganizationInfoPage = (props: Props) => {
+const OrganizationInfoPage = () => {
     const { email } = useUserStore();
     const [loading, setLoading] = useState(false);
     const [hasOrganization, setHasOrganization] = useState(false);
@@ -62,7 +60,7 @@ const OrganizationInfoPage = (props: Props) => {
         setIsUpdatingOrganization(true);
         try {
             const result = await updateOrganization({
-                id: organization.id,
+                id: organization?.id ?? "",
                 name: organizationName,
                 description: organizationDescription,
             });

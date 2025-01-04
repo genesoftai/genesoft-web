@@ -1,13 +1,7 @@
-export const rgbaToHex = (rgba: {
-    r: string;
-    g: string;
-    b: string;
-    a: string;
-}) => {
-    const r = parseInt(rgba.r);
-    const g = parseInt(rgba.g);
-    const b = parseInt(rgba.b);
-    const a = parseFloat(rgba.a);
+import { RGBColor } from "react-color";
+
+export const rgbaToHex = (rgba: RGBColor) => {
+    const { r, g, b, a = 1 } = rgba;
 
     const toHex = (n: number) => {
         const hex = n.toString(16);
@@ -20,16 +14,16 @@ export const rgbaToHex = (rgba: {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}${alphaHex}`;
 };
 
-export const hexToRgba = (hex: string) => {
+export const hexToRgba = (hex: string): RGBColor => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     const a = hex.length === 9 ? parseInt(hex.slice(7, 9), 16) / 255 : 1;
 
     return {
-        r: r.toString(),
-        g: g.toString(),
-        b: b.toString(),
-        a: a.toString(),
+        r,
+        g,
+        b,
+        a,
     };
 };

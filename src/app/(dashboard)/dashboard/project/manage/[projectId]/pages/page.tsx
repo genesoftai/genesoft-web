@@ -11,7 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Files, Trash2 } from "lucide-react";
 import { AddPageDialog } from "@/components/project/pages/AddPageDialog";
 import {
@@ -34,15 +34,17 @@ import PageLoading from "@/components/common/PageLoading";
 
 const pageName = "UpdateProjectPagesPage";
 
-const UpdateProjectPagesPage = ({
-    params,
-}: {
-    params: { projectId: string };
-}) => {
+const UpdateProjectPagesPage = () => {
+    const pathParams = useParams();
     const router = useRouter();
-    const { projectId } = params;
     const [pages, setPages] = useState<Page[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [projectId, setProjectId] = useState<string>("");
+
+    useEffect(() => {
+        const { projectId } = pathParams;
+        setProjectId(projectId as string);
+    }, [pathParams]);
 
     useEffect(() => {
         setupProject();

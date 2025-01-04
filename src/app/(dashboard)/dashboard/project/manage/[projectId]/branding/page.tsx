@@ -11,7 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Eye, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { getProjectById, updateProjectBranding } from "@/actions/project";
@@ -27,19 +27,21 @@ import { SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
 
-const UpdateProjectBrandingPage = ({
-    params,
-}: {
-    params: { projectId: string };
-}) => {
+const UpdateProjectBrandingPage = () => {
+    const pathParams = useParams();
     const router = useRouter();
-    const { projectId } = params;
+    const [projectId, setProjectId] = useState<string>("");
 
     const [logoUrl, setLogoUrl] = useState("");
     const [perception, setPerception] = useState("");
     const [selectedColor, setSelectedColor] = useState(hexToRgba("#000000"));
     const [webTheme, setWebTheme] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
+
+    useEffect(() => {
+        const { projectId } = pathParams;
+        setProjectId(projectId as string);
+    }, [pathParams]);
 
     useEffect(() => {
         setupProject();
@@ -143,18 +145,14 @@ const UpdateProjectBrandingPage = ({
                             className="text-black"
                         />
 
-                        <div className="flex gap-x-4">
-                            <div
-                                style={{
-                                    backgroundColor: rgbaToHex(selectedColor),
-                                    width: 100,
-                                    height: 50,
-                                    border: "2px solid white",
-                                }}
-                            ></div>
-                            <p>{`Hex: ${rgbaToHex(selectedColor)}`}</p>
-                            <p>{`RGBA: rgba(${selectedColor.r},${selectedColor.g},${selectedColor.b},${selectedColor.a})`}</p>
-                        </div>
+                        <div
+                            style={{
+                                backgroundColor: rgbaToHex(selectedColor),
+                                width: 100,
+                                height: 50,
+                                border: "2px solid white",
+                            }}
+                        ></div>
                     </div>
 
                     {/* Web Theme */}

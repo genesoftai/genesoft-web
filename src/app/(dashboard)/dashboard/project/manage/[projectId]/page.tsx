@@ -25,18 +25,20 @@ import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDi
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, Files, MonitorCog } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 const pageName = "ManageProjectPage";
 
-export default function ManageProjectPage({
-    params,
-}: {
-    params: { projectId: string };
-}) {
-    const { projectId } = params;
+export default function ManageProjectPage() {
+    const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
     const router = useRouter();
+    const [projectId, setProjectId] = useState<string>("");
+
+    useEffect(() => {
+        const { projectId } = pathParams;
+        setProjectId(projectId as string);
+    }, [pathParams]);
 
     useEffect(() => {
         console.log({
@@ -63,6 +65,7 @@ export default function ManageProjectPage({
     console.log({
         message: `${pageName}: Project`,
         project,
+        projectId,
     });
 
     if (loading) {
