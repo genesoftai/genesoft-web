@@ -22,13 +22,23 @@ import {
 import { WebInfo } from "@/components/project/manage/WebInfo";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDialog";
-import { useParams } from "next/navigation";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Eye, Files, MonitorCog } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 const pageName = "ManageProjectPage";
 
-export default function ProjectManage() {
-    const { projectId } = useParams();
+export default function ManageProjectPage() {
+    const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
+    const router = useRouter();
+    const [projectId, setProjectId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const { projectId } = pathParams;
+        setProjectId(projectId as string);
+    }, [pathParams]);
 
     useEffect(() => {
         console.log({
@@ -110,6 +120,24 @@ export default function ProjectManage() {
                                     <CardDescription className="mt-2 max-w-2xl text-subtext-in-dark-bg">
                                         {project?.description}
                                     </CardDescription>
+                                    <div className="mt-4 space-y-2">
+                                        <div>
+                                            <Label className="text-sm font-semibold">
+                                                Purpose
+                                            </Label>
+                                            <p className="text-subtext-in-dark-bg px-4">
+                                                {project?.purpose}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <Label className="text-sm font-semibold">
+                                                Target Audience
+                                            </Label>
+                                            <p className="text-subtext-in-dark-bg px-4">
+                                                {project?.target_audience}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <EditProjectInfoDialog
                                     projectId={projectId}
@@ -117,11 +145,68 @@ export default function ProjectManage() {
                                     projectDescription={
                                         project?.description || ""
                                     }
+                                    projectPurpose={project?.purpose || ""}
+                                    projectTargetAudience={
+                                        project?.target_audience || ""
+                                    }
                                     onSuccess={setupProject}
                                 />
                             </CardHeader>
                         </Card>
                     </div>
+
+                    {/* Project Requirements */}
+                    <Card className="bg-primary-dark border-none text-white">
+                        <CardHeader className="flex flex-col space-y-4">
+                            <div>
+                                <CardTitle className="text-2xl">
+                                    Project Requirements
+                                </CardTitle>
+                                <CardDescription className="mt-2 text-subtext-in-dark-bg">
+                                    Click button to view and update each section
+                                    requirements of this project
+                                </CardDescription>
+                            </div>
+
+                            <div className="flex flex-row gap-4">
+                                <Button
+                                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/project/manage/${projectId}/branding`,
+                                        )
+                                    }
+                                >
+                                    <Eye className="w-6 h-6" />
+                                    <span>Branding</span>
+                                </Button>
+
+                                <Button
+                                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/project/manage/${projectId}/pages`,
+                                        )
+                                    }
+                                >
+                                    <Files className="w-6 h-6" />
+                                    <span>Pages</span>
+                                </Button>
+
+                                <Button
+                                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/project/manage/${projectId}/features`,
+                                        )
+                                    }
+                                >
+                                    <MonitorCog className="w-6 h-6" />
+                                    <span>Features</span>
+                                </Button>
+                            </div>
+                        </CardHeader>
+                    </Card>
 
                     <WebPreview project={project} />
 

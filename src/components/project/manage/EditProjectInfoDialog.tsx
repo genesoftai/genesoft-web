@@ -21,6 +21,8 @@ interface EditProjectInfoDialogProps {
     projectId: string;
     projectName: string;
     projectDescription: string;
+    projectPurpose: string;
+    projectTargetAudience: string;
     onSuccess: () => Promise<void>;
 }
 
@@ -28,11 +30,15 @@ export default function EditProjectInfoDialog({
     projectId,
     projectName,
     projectDescription,
+    projectPurpose,
+    projectTargetAudience,
     onSuccess,
 }: EditProjectInfoDialogProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState(projectName);
     const [description, setDescription] = useState(projectDescription);
+    const [purpose, setPurpose] = useState(projectPurpose);
+    const [targetAudience, setTargetAudience] = useState(projectTargetAudience);
     const [error, setError] = useState<string | null>(null);
     const [isUpdatingProject, setIsUpdatingProject] = useState(false);
 
@@ -44,13 +50,19 @@ export default function EditProjectInfoDialog({
             metadata: {
                 name,
                 description,
+                purpose,
+                target_audience: targetAudience,
             },
         });
-        // TODO: Implement project update logic
         try {
             const res = await updateProjectInfo({
                 projectId,
-                payload: { name, description },
+                payload: {
+                    name,
+                    description,
+                    purpose,
+                    target_audience: targetAudience,
+                },
             });
             console.log({
                 message: `${componentName}.handleUpdateProject: update project response`,
@@ -71,9 +83,9 @@ export default function EditProjectInfoDialog({
             <DialogTrigger asChild>
                 <Button
                     variant="default"
-                    className="flex items-center gap-2 bg-white text-primary-dark hover:text-white"
+                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
                 >
-                    <Edit className="h-4 w-4 text-primary-dark" />
+                    <Edit className="h-4 w-4" />
                     Edit
                 </Button>
             </DialogTrigger>
@@ -99,6 +111,26 @@ export default function EditProjectInfoDialog({
                             className="min-h-[100px]"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="purpose">Project Purpose</Label>
+                        <Textarea
+                            id="purpose"
+                            placeholder="Enter purpose of your project"
+                            className="min-h-[100px]"
+                            value={purpose}
+                            onChange={(e) => setPurpose(e.target.value)}
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="target-audience">Target Audience</Label>
+                        <Textarea
+                            id="target-audience"
+                            placeholder="Enter target audience of your project"
+                            className="min-h-[100px]"
+                            value={targetAudience}
+                            onChange={(e) => setTargetAudience(e.target.value)}
                         />
                     </div>
                 </div>

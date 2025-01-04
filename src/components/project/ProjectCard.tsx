@@ -28,6 +28,7 @@ export function ProjectCard({
     target_audience,
 }: ProjectCardProps) {
     const router = useRouter();
+
     return (
         <Card className="w-8/12 h-96 bg-primary-dark text-white flex flex-col border-none">
             <CardHeader>
