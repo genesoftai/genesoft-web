@@ -33,7 +33,7 @@ export default function ManageProjectPage() {
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
     const router = useRouter();
-    const [projectId, setProjectId] = useState<string | null>(null);
+    const [projectId, setProjectId] = useState<string>("");
 
     useEffect(() => {
         const { projectId } = pathParams;

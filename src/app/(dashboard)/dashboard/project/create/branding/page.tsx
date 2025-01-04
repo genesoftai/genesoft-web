@@ -23,7 +23,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import UploadLogo from "@/components/project/branding/UploadLogo";
-import { SketchPicker } from "react-color";
+import { RGBColor, SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
 
@@ -48,7 +48,7 @@ const CreateProjectBrandingPage = () => {
     };
 
     const [perception, setPerception] = useState(branding?.perception);
-    const [selectedColor, setSelectedColor] = useState(
+    const [selectedColor, setSelectedColor] = useState<RGBColor>(
         hexToRgba(branding?.color || "#000000"),
     );
     const [webTheme, setWebTheme] = useState(branding?.theme);
@@ -120,18 +120,14 @@ const CreateProjectBrandingPage = () => {
                             className="text-black"
                         />
 
-                        <div className="flex gap-x-4">
-                            <div
-                                style={{
-                                    backgroundColor: rgbaToHex(selectedColor),
-                                    width: 100,
-                                    height: 50,
-                                    border: "2px solid white",
-                                }}
-                            ></div>
-                            <p>{`Hex: ${rgbaToHex(selectedColor)}`}</p>
-                            <p>{`RGBA: rgba(${selectedColor.r},${selectedColor.g},${selectedColor.b},${selectedColor.a})`}</p>
-                        </div>
+                        <div
+                            style={{
+                                backgroundColor: rgbaToHex(selectedColor),
+                                width: 100,
+                                height: 50,
+                                border: "2px solid white",
+                            }}
+                        ></div>
                     </div>
 
                     {/* Web Theme */}

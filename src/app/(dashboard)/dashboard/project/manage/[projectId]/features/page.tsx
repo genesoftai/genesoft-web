@@ -11,7 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { MonitorCog, Trash2 } from "lucide-react";
 import {
     addFeature,
@@ -31,17 +31,18 @@ import {
 } from "@/types/project";
 import { EditFeatureDialog } from "@/components/project/features/EditFeatureDialog";
 import PageLoading from "@/components/common/PageLoading";
-const pageName = "UpdateProjectFeaturesPage";
 
-const UpdateProjectFeaturesPage = ({
-    params,
-}: {
-    params: { projectId: string };
-}) => {
+const UpdateProjectFeaturesPage = () => {
+    const pathParams = useParams();
     const router = useRouter();
-    const { projectId } = params;
+    const [projectId, setProjectId] = useState<string>("");
     const [features, setFeatures] = useState<Feature[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const { projectId } = pathParams;
+        setProjectId(projectId as string);
+    }, [pathParams]);
 
     useEffect(() => {
         setupProject();
@@ -106,7 +107,7 @@ const UpdateProjectFeaturesPage = ({
         try {
             await deleteFeature({
                 projectId,
-                featureId: features[index].id,
+                featureId: features[index]?.id ?? "",
             });
             const updatedFeatures = features?.filter((_, i) => i !== index);
             setFeatures(updatedFeatures);

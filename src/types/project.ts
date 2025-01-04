@@ -71,6 +71,7 @@ export interface Branding {
 }
 
 export interface Feature {
+    id?: string;
     name: string;
     description: string;
     references?: FeatureReference[];

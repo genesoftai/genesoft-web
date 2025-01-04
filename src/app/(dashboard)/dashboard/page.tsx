@@ -23,8 +23,9 @@ import {
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { ProjectCard } from "@/components/project/ProjectCard";
-import { Project } from "next/dist/build/swc/types";
 import PageLoading from "@/components/common/PageLoading";
+import { GenesoftUser } from "@/types/user";
+import { Project } from "@/types/project";
 
 const pageName = "DashboardPage";
 
@@ -33,7 +34,7 @@ export default function Dashboard() {
     const { updateGenesoftUser } = useGenesoftUserStore();
     const [loading, setLoading] = useState(false);
     const [hasOrganization, setHasOrganization] = useState(false);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<GenesoftUser | null>(null);
     const [organizationName, setOrganizationName] = useState("");
     const [organizationDescription, setOrganizationDescription] = useState("");
     const [isCreatingOrganization, setIsCreatingOrganization] = useState(false);
@@ -85,7 +86,9 @@ export default function Dashboard() {
     };
 
     const setUpOrganizationProjects = async () => {
-        const projects = await getOrganizationProjects(user?.organization?.id);
+        const projects = await getOrganizationProjects(
+            user?.organization?.id ?? "",
+        );
         console.log({
             message: `${pageName}: Organization projects`,
             projects,
@@ -139,18 +142,22 @@ export default function Dashboard() {
                             {/* TODO: list all projects in organization */}
                             {organizationProjects.length > 0 ? (
                                 <div className="flex flex-col gap-4 p-4 pt-0 w-full items-center rounded-xl bg-secondary-dark">
-                                    {organizationProjects.map((project) => (
-                                        <ProjectCard
-                                            key={project.id}
-                                            id={project.id}
-                                            name={project.name}
-                                            description={project.description}
-                                            purpose={project.purpose}
-                                            target_audience={
-                                                project.target_audience
-                                            }
-                                        />
-                                    ))}
+                                    {organizationProjects.map(
+                                        (project: Project) => (
+                                            <ProjectCard
+                                                key={project.id}
+                                                id={project.id}
+                                                name={project.name}
+                                                description={
+                                                    project.description
+                                                }
+                                                purpose={project.purpose}
+                                                target_audience={
+                                                    project.target_audience
+                                                }
+                                            />
+                                        ),
+                                    )}
                                 </div>
                             ) : (
                                 <p className="text-base p-4 text-subtext-in-dark-bg">
