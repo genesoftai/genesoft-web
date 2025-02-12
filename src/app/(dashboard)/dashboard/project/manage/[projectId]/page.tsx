@@ -26,6 +26,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, Files, MonitorCog } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { Toaster } from "@/components/ui/toaster";
+
 const pageName = "ManageProjectPage";
 
 export default function ManageProjectPage() {
@@ -213,6 +215,8 @@ export default function ManageProjectPage() {
                     <WebInfo />
                 </div>
             </div>
+
+            <Toaster />
         </div>
     );
 }
