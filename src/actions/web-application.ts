@@ -1,0 +1,30 @@
+"use server";
+
+import { genesoftCoreApiServiceBaseUrl } from "@/constants/api-service/url";
+import { genesoftCoreApiServiceApiKey } from "@/constants/api-service/authorization";
+import axios from "axios";
+
+export async function getWebApplicationInfo(projectId: string | undefined) {
+    if (!projectId) {
+        throw new Error("Project ID is required");
+    }
+
+    const url = `${genesoftCoreApiServiceBaseUrl}/web-application/project/${projectId}`;
+
+    try {
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        console.log({
+            message: "getWebApplicationInfo",
+            res: res,
+            data: res.data,
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error getting web application info:", error);
+        throw new Error("Failed to get web application info");
+    }
+}
