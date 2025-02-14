@@ -19,7 +19,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { WebInfo } from "@/components/project/manage/WebInfo";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDialog";
 import { Label } from "@/components/ui/label";
@@ -113,34 +112,38 @@ export default function ManageProjectPage() {
                             </p>
                         </div>
 
-                        <Card className="bg-primary-dark border-none text-white">
-                            <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                                <div>
-                                    <CardTitle className="text-2xl">
-                                        {project?.name}
-                                    </CardTitle>
-                                    <CardDescription className="mt-2 max-w-2xl text-subtext-in-dark-bg">
-                                        {project?.description}
-                                    </CardDescription>
-                                    <div className="mt-4 space-y-2">
-                                        <div>
-                                            <Label className="text-sm font-semibold">
+                        <Card className="bg-primary-dark border-none text-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+                            <CardHeader className="flex flex-row items-start justify-between space-y-0 p-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                                            {project?.name}
+                                        </CardTitle>
+                                        <CardDescription className="mt-3 max-w-2xl text-gray-300 leading-relaxed">
+                                            {project?.description}
+                                        </CardDescription>
+                                    </div>
+
+                                    <div className="space-y-4 bg-black/20 rounded-lg p-6">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm uppercase tracking-wider text-blue-400 font-bold">
                                                 Purpose
                                             </Label>
-                                            <p className="text-subtext-in-dark-bg px-4">
+                                            <p className="text-gray-300 leading-relaxed pl-4 border-l-2 border-blue-400/30">
                                                 {project?.purpose}
                                             </p>
                                         </div>
-                                        <div>
-                                            <Label className="text-sm font-semibold">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm uppercase tracking-wider text-purple-400 font-bold">
                                                 Target Audience
                                             </Label>
-                                            <p className="text-subtext-in-dark-bg px-4">
+                                            <p className="text-gray-300 leading-relaxed pl-4 border-l-2 border-purple-400/30">
                                                 {project?.target_audience}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
+
                                 <EditProjectInfoDialog
                                     projectId={projectId}
                                     projectName={project?.name || ""}
@@ -211,8 +214,6 @@ export default function ManageProjectPage() {
                     </Card>
 
                     <WebPreview project={project} />
-
-                    <WebInfo />
                 </div>
             </div>
 
