@@ -85,12 +85,12 @@ const data = {
     navSecondary: [
         {
             title: "Support",
-            url: "#",
+            url: "mailto:support@genesoftai.com",
             icon: LifeBuoy,
         },
         {
             title: "Feedback",
-            url: "#",
+            url: "mailto:support@genesoftai.com",
             icon: Send,
         },
     ],
@@ -128,6 +128,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 <NavMain items={data.navMain} />
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
+                <div className="flex flex-col items-start justify-center mb-8">
+                    <p className="text-xs text-muted-foreground">
+                        Support Email
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        support@genesoftai.com
+                    </p>
+                </div>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser />
