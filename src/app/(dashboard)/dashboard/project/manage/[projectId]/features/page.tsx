@@ -31,8 +31,10 @@ import {
 } from "@/types/project";
 import { EditFeatureDialog } from "@/components/project/features/EditFeatureDialog";
 import PageLoading from "@/components/common/PageLoading";
+import posthog from "posthog-js";
 
 const UpdateProjectFeaturesPage = () => {
+    posthog.capture("pageview_update_project_features");
     const pathParams = useParams();
     const router = useRouter();
     const [projectId, setProjectId] = useState<string>("");
@@ -104,6 +106,9 @@ const UpdateProjectFeaturesPage = () => {
     };
 
     const handleRemoveFeature = async (index: number) => {
+        posthog.capture(
+            "click_remove_feature_from_update_project_features_page",
+        );
         try {
             await deleteFeature({
                 projectId,
@@ -157,6 +162,7 @@ const UpdateProjectFeaturesPage = () => {
     };
 
     const handleBack = () => {
+        posthog.capture("click_back_from_update_project_features_page");
         router.push(`/dashboard/project/manage/${projectId}`);
     };
 

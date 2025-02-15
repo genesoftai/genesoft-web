@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import React from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/common/sidebar/app-sidebar";
+import { PostHogProvider } from "@/app/posthog-provider";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,17 +29,19 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
-                {/* <Navbar /> */}
-                <SidebarProvider>
-                    <AppSidebar />
-                    <main className="w-full">
-                        <SidebarInset>{children}</SidebarInset>
-                    </main>
-                </SidebarProvider>
-            </body>
+            <PostHogProvider>
+                <body
+                    className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                >
+                    {/* <Navbar /> */}
+                    <SidebarProvider>
+                        <AppSidebar />
+                        <main className="w-full">
+                            <SidebarInset>{children}</SidebarInset>
+                        </main>
+                    </SidebarProvider>
+                </body>
+            </PostHogProvider>
         </html>
     );
 }

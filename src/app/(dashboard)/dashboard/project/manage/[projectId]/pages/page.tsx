@@ -31,10 +31,12 @@ import {
 } from "@/types/project";
 import { EditPageDialog } from "@/components/project/pages/EditPageDialog";
 import PageLoading from "@/components/common/PageLoading";
+import posthog from "posthog-js";
 
 const pageName = "UpdateProjectPagesPage";
 
 const UpdateProjectPagesPage = () => {
+    posthog.capture("pageview_update_project_pages");
     const pathParams = useParams();
     const router = useRouter();
     const [pages, setPages] = useState<Page[]>([]);
@@ -98,6 +100,7 @@ const UpdateProjectPagesPage = () => {
     };
 
     const handleRemovePage = async (index: number) => {
+        posthog.capture("click_remove_page_from_update_project_pages_page");
         const pageId = pages[index]?.id;
         console.log({
             message: `${pageName}.handleRemovePage: remove page`,
@@ -117,6 +120,7 @@ const UpdateProjectPagesPage = () => {
     };
 
     const handleBack = () => {
+        posthog.capture("click_back_from_update_project_pages_page");
         router.push(`/dashboard/project/manage/${projectId}`);
     };
 

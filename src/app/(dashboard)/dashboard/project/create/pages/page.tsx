@@ -15,20 +15,25 @@ import { useRouter } from "next/navigation";
 import { Files, Trash2 } from "lucide-react";
 import { AddPageDialog } from "@/components/project/pages/AddPageDialog";
 import { useCreateProjectStore } from "@/stores/create-project-store";
+import posthog from "posthog-js";
 
 const CreateProjectPagesPage = () => {
+    posthog.capture("pageview_create_project_pages");
     const router = useRouter();
     const { pages, updateCreateProjectStore } = useCreateProjectStore();
 
     const handleNext = () => {
+        posthog.capture("click_next_from_create_project_pages_page");
         router.push("/dashboard/project/create/features");
     };
 
     const handleBack = () => {
+        posthog.capture("click_back_from_create_project_pages_page");
         router.push("/dashboard/project/create/branding");
     };
 
     const handleRemovePage = (index: number) => {
+        posthog.capture("click_remove_page_from_create_project_pages_page");
         const updatedPages = pages?.filter((_, i) => i !== index);
         updateCreateProjectStore({ pages: updatedPages });
     };

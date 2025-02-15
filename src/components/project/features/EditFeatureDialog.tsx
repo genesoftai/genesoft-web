@@ -22,8 +22,7 @@ import {
 import { createReferenceLink } from "@/actions/reference_link";
 import { uploadFileForOrganization } from "@/actions/file";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
-
-const componentName = "EditFeatureDialog";
+import posthog from "posthog-js";
 
 interface TempFile extends FeatureFile {
     file: File | undefined;
@@ -95,18 +94,21 @@ export function EditFeatureDialog({
     };
 
     const handleRemoveReference = (index: number) => {
+        posthog.capture("click_remove_reference_from_edit_feature_dialog");
         setError(null);
         const updatedReferences = references?.filter((_, i) => i !== index);
         setReferences(updatedReferences);
     };
 
     const handleRemoveFile = (index: number) => {
+        posthog.capture("click_remove_file_from_edit_feature_dialog");
         setError(null);
         const updatedFiles = files?.filter((_, i) => i !== index);
         setFiles(updatedFiles);
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        posthog.capture("click_upload_file_from_edit_feature_dialog");
         setError(null);
         const file = e.target.files?.[0];
         if (!file) return;
@@ -129,6 +131,7 @@ export function EditFeatureDialog({
     };
 
     const handleAddFile = async () => {
+        posthog.capture("click_add_file_from_edit_feature_dialog");
         setError(null);
         if (newFile.name && newFile.context && newFile.name && newFile.file) {
             setIsUploadingFile(true);
@@ -169,6 +172,7 @@ export function EditFeatureDialog({
     };
 
     const handleEditFeature = () => {
+        posthog.capture("click_save_changes_from_edit_feature_dialog");
         setError(null);
 
         onEditFeature({

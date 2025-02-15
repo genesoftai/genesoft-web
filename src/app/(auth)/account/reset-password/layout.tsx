@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import React, { Suspense } from "react";
+import { PostHogProvider } from "@/app/posthog-provider";
 
 export const metadata: Metadata = {
     title: "Reset Password",
@@ -14,9 +15,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>
-                <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-            </body>
+            <PostHogProvider>
+                <body>
+                    <Suspense fallback={<div>Loading...</div>}>
+                        {children}
+                    </Suspense>
+                </body>
+            </PostHogProvider>
         </html>
     );
 }

@@ -26,8 +26,10 @@ import UploadLogo from "@/components/project/branding/UploadLogo";
 import { SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
+import posthog from "posthog-js";
 
 const UpdateProjectBrandingPage = () => {
+    posthog.capture("pageview_update_project_branding");
     const pathParams = useParams();
     const router = useRouter();
     const [projectId, setProjectId] = useState<string>("");
@@ -60,6 +62,9 @@ const UpdateProjectBrandingPage = () => {
     };
 
     const handleUpdateBranding = async () => {
+        posthog.capture(
+            "click_update_branding_from_update_project_branding_page",
+        );
         setIsUpdating(true);
         try {
             await updateProjectBranding({
@@ -80,6 +85,7 @@ const UpdateProjectBrandingPage = () => {
     };
 
     const handleBack = () => {
+        posthog.capture("click_back_from_update_project_branding_page");
         router.push(`/dashboard/project/manage/${projectId}`);
     };
 

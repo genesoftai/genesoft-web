@@ -22,9 +22,11 @@ import { updateOrganization } from "@/actions/organization";
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { GenesoftOrganization } from "@/types/organization";
+import posthog from "posthog-js";
 
 const pageName = "OrganizationInfoPage";
 const OrganizationInfoPage = () => {
+    posthog.capture("pageview_organization_info");
     const { email } = useUserStore();
     const [loading, setLoading] = useState(false);
     const [hasOrganization, setHasOrganization] = useState(false);
@@ -57,6 +59,7 @@ const OrganizationInfoPage = () => {
     };
 
     const handleUpdateOrganization = async () => {
+        posthog.capture("click_update_organization_from_organization_info");
         setIsUpdatingOrganization(true);
         try {
             const result = await updateOrganization({
