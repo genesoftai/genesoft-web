@@ -9,8 +9,9 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { updateUserPassword } from "../../signin/actions";
 import SimpleLoading from "@/components/common/SimpleLoading";
 import GenesoftLogo from "@/components/common/GenesoftLogo";
-
+import posthog from "posthog-js";
 export default function ResetPassword() {
+    posthog.capture("pageview_reset_password");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");

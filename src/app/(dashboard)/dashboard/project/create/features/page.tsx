@@ -19,9 +19,11 @@ import { getPages, getFeatures } from "@/utils/project/create";
 import { CreateProjectRequest, Page, Feature } from "@/types/project";
 import { createProject } from "@/actions/project";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import posthog from "posthog-js";
 const pageName = "CreateProjectFeaturesPage";
 
 const CreateProjectFeaturesPage = () => {
+    posthog.capture("pageview_create_project_features");
     const router = useRouter();
     const {
         name,
@@ -39,6 +41,9 @@ const CreateProjectFeaturesPage = () => {
     const [error, setError] = useState<string | null>(null);
 
     const handleCreateProject = async () => {
+        posthog.capture(
+            "click_create_project_from_create_project_features_page",
+        );
         setIsCreatingProject(true);
 
         const project: CreateProjectRequest = {
@@ -86,10 +91,14 @@ const CreateProjectFeaturesPage = () => {
     };
 
     const handleBack = () => {
+        posthog.capture("click_back_from_create_project_features_page");
         router.push("/dashboard/project/create/pages");
     };
 
-    const handleRemoveFeeature = (index: number) => {
+    const handleRemoveFeature = (index: number) => {
+        posthog.capture(
+            "click_remove_feature_from_create_project_features_page",
+        );
         const updatedFeatures = features?.filter((_, i) => i !== index);
         updateCreateProjectStore({ features: updatedFeatures });
     };
@@ -157,7 +166,7 @@ const CreateProjectFeaturesPage = () => {
                                 variant="ghost"
                                 size="icon"
                                 className="absolute top-2 right-2 text-red-500 hover:text-red-600 hover:bg-transparent"
-                                onClick={() => handleRemoveFeeature(index)}
+                                onClick={() => handleRemoveFeature(index)}
                             >
                                 <Trash2 className="h-5 w-5" />
                             </Button>

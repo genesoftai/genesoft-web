@@ -1,9 +1,11 @@
-import Signup from '@/components/auth/Signup';
+import Signup from "@/components/auth/Signup";
+import posthog from "posthog-js";
 
 export default function SignupPage() {
-  return (
-    <div>
-      <Signup />
-    </div>
-  );
+    posthog.capture("pageview_signup");
+    return (
+        <div>
+            <Signup />
+        </div>
+    );
 }

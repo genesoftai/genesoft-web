@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit, Loader2 } from "lucide-react";
 import { updateProjectInfo } from "@/actions/project";
-
+import posthog from "posthog-js";
 const componentName = "EditProjectInfoDialog";
 
 interface EditProjectInfoDialogProps {
@@ -43,6 +43,9 @@ export default function EditProjectInfoDialog({
     const [isUpdatingProject, setIsUpdatingProject] = useState(false);
 
     const handleUpdateProject = async () => {
+        posthog.capture(
+            "click_update_project_info_from_edit_project_info_dialog",
+        );
         setError(null);
         setIsUpdatingProject(true);
         console.log({

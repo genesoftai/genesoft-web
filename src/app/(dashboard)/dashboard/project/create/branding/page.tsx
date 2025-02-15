@@ -26,12 +26,14 @@ import UploadLogo from "@/components/project/branding/UploadLogo";
 import { RGBColor, SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
-
+import posthog from "posthog-js";
 const CreateProjectBrandingPage = () => {
+    posthog.capture("pageview_create_project_branding");
     const router = useRouter();
     const { branding, updateCreateProjectStore } = useCreateProjectStore();
 
     const handleNext = () => {
+        posthog.capture("click_next_from_create_project_branding_page");
         updateCreateProjectStore({
             branding: {
                 ...branding,
@@ -44,6 +46,7 @@ const CreateProjectBrandingPage = () => {
     };
 
     const handleBack = () => {
+        posthog.capture("click_back_from_create_project_branding_page");
         router.push("/dashboard/project/create/info");
     };
 

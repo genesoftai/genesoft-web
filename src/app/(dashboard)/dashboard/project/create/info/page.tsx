@@ -17,8 +17,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateProjectStore } from "@/stores/create-project-store";
+import posthog from "posthog-js";
 
 const CreateProjectInfoPage = () => {
+    posthog.capture("pageview_create_project_info");
     const router = useRouter();
     const {
         name,
@@ -35,6 +37,7 @@ const CreateProjectInfoPage = () => {
         useState(target_audience);
 
     const handleNext = () => {
+        posthog.capture("click_next_from_create_project_info_page");
         updateCreateProjectStore({
             name: projectName,
             description: projectDescription,

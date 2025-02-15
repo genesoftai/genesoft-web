@@ -1,20 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-    BadgeCheck,
-    Bell,
-    ChevronsUpDown,
-    CreditCard,
-    LogOut,
-    Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
@@ -30,6 +22,7 @@ import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 type UserData = { user: User } | { user: null };
 
@@ -72,6 +65,7 @@ export function NavUser() {
     };
 
     const signOut = async () => {
+        posthog.capture("click_signout_from_nav_user");
         clearUserStore();
         await supabase.auth.signOut();
         router.push("/");

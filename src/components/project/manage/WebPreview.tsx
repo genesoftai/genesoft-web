@@ -20,6 +20,7 @@ import {
 } from "@/types/web-application";
 import { DevelopmentStatusBadge } from "../web-application/DevelopmentStatus";
 import { DeploymentStatusBadge } from "../web-application/DeploymentStatus";
+import posthog from "posthog-js";
 
 interface WebPreviewProps {
     project: Project | null;
@@ -33,10 +34,14 @@ export function WebPreview({ project }: WebPreviewProps) {
         useState<WebApplicationInfo | null>(null);
     const [isCheckingBuildErrors, setIsCheckingBuildErrors] = useState(false);
     const handleAddFeedback = () => {
+        posthog.capture("click_add_feedback_from_manage_project_web_preview");
         router.push(`/dashboard/project/manage/${project?.id}/feedback`);
     };
 
     const handleBuildWebApplication = async () => {
+        posthog.capture(
+            "click_build_web_application_from_manage_project_web_preview",
+        );
         if (!project?.id) {
             toast({
                 title: "Project ID is required",
@@ -69,6 +74,7 @@ export function WebPreview({ project }: WebPreviewProps) {
     };
 
     const handleFixErrors = async () => {
+        posthog.capture("click_fix_errors_from_manage_project_web_preview");
         if (!project?.id) {
             toast({
                 title: "Project ID is required",
