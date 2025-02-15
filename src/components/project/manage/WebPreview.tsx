@@ -190,7 +190,8 @@ export function WebPreview({ project }: WebPreviewProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col items-center gap-2">
                         <Button
-                            className="flex items-center gap-2 bg-genesoft w-fit self-center hover:bg-white hover:text-black"
+                            disabled={isInProgress}
+                            className={`flex items-center gap-2 w-fit self-center hover:bg-white hover:text-black ${isInProgress ? "bg-gray-500" : "bg-genesoft"}`}
                             onClick={handleAddFeedback}
                         >
                             <MessageSquare className="h-4 w-4" />
@@ -204,8 +205,9 @@ export function WebPreview({ project }: WebPreviewProps) {
 
                     <div className="flex flex-col items-center gap-2">
                         <Button
+                            disabled={isInProgress}
                             onClick={handleBuildWebApplication}
-                            className="flex items-center gap-2 bg-genesoft w-fit self-center hover:bg-white hover:text-black"
+                            className={`flex items-center gap-2 w-fit self-center hover:bg-white hover:text-black ${isInProgress ? "bg-gray-500" : "bg-genesoft"}`}
                         >
                             <AppWindow className="h-4 w-4" />
                             <span>Build web application</span>
@@ -221,8 +223,9 @@ export function WebPreview({ project }: WebPreviewProps) {
 
                 <div className="flex flex-col items-center gap-2">
                     <Button
+                        disabled={isInProgress}
                         onClick={handleFixErrors}
-                        className="flex items-center gap-2 bg-red-500 w-fit self-center hover:bg-white hover:text-black"
+                        className={`flex items-center gap-2 w-fit self-center hover:bg-white hover:text-black ${isInProgress ? "bg-gray-500" : "bg-red-500"}`}
                     >
                         <AppWindow className="h-4 w-4" />
                         <span>Fix errors</span>
