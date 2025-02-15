@@ -75,12 +75,12 @@ export default function Navbar() {
                         >
                             Dashboard
                         </Link>
-                        <Link
+                        <a
                             href="mailto:support@genesoftai.com"
                             className="text-sm font-medium transition-colors hover:text-primary"
                         >
                             Support
-                        </Link>
+                        </a>
                     </div>
                 </div>
 
@@ -144,12 +144,12 @@ export default function Navbar() {
                                 >
                                     Dashboard
                                 </Link>
-                                <Link
+                                <a
                                     href="mailto:support@genesoftai.com"
                                     className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                                 >
                                     Support
-                                </Link>
+                                </a>
                             </div>
 
                             {userEmail ? (

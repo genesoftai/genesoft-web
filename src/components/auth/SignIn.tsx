@@ -51,9 +51,9 @@ export default function SignIn() {
     const supabase = createClient();
 
     const heroContent = [
-        "Software Development team of AI Agents for small company and startup",
-        "Helping you get on-demand web application anytime with cheapest cost and fastest delivery",
-        "Built for non-tech product owner to get their own web application without pay a lot for hiring in-house developer or outsource",
+        "10X cheaper Software Development team of AI Agents for small company and startup",
+        "Help you get on-demand web application anytime with 10x cheaper cost and less effort without need to deal with fuzzy technical tasks",
+        "Built for non-technical product owner and startup founder who need to make idea come true but don't have a lot of funding and technical background",
     ];
 
     const nextStage = () => {

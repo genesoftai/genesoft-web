@@ -42,8 +42,8 @@ export default function Footer() {
                     <div className="mb-8 md:mb-0 flex flex-col items-start gap-y-4">
                         <GenesoftLogo />
                         <p className="text-muted-foreground mb-4">
-                            Empowering business with Software Engieering team of
-                            AI Agent
+                            Empowering small business and startup with Software
+                            Development team of AI Agent
                         </p>
                     </div>
 
