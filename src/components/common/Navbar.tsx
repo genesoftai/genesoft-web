@@ -12,6 +12,7 @@ import { createClient } from "@/utils/supabase/client";
 import UserNav from "./UserNav";
 import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
+import posthog from "posthog-js";
 
 type UserData = { user: User } | { user: null };
 
@@ -96,6 +97,7 @@ export default function Navbar() {
                         <div className="flex items-center space-x-4">
                             <Button
                                 onClick={() => {
+                                    posthog.capture("click_signin_from_navbar");
                                     router.push("/signin");
                                 }}
                                 className="text-sm font-medium transition-colors bg-white text-genesoft hover:bg-genesoft/10 cursor-pointer"
@@ -105,6 +107,7 @@ export default function Navbar() {
 
                             <Button
                                 onClick={() => {
+                                    posthog.capture("click_signup_from_navbar");
                                     router.push("/signup");
                                 }}
                                 className="text-sm font-medium transition-colors bg-genesoft hover:bg-genesoft/90 cursor-pointer"
@@ -162,6 +165,9 @@ export default function Navbar() {
                                 <div className="flex items-center space-x-4">
                                     <Button
                                         onClick={() => {
+                                            posthog.capture(
+                                                "click_signin_from_navbar",
+                                            );
                                             router.push("/signin");
                                         }}
                                         className="text-sm font-medium transition-colors bg-white text-genesoft hover:bg-genesoft/10 cursor-pointer"
@@ -171,6 +177,9 @@ export default function Navbar() {
 
                                     <Button
                                         onClick={() => {
+                                            posthog.capture(
+                                                "click_signup_from_navbar",
+                                            );
                                             router.push("/signup");
                                         }}
                                         className="text-sm font-medium transition-colors bg-genesoft hover:bg-genesoft/90 cursor-pointer"

@@ -26,10 +26,11 @@ import { ProjectCard } from "@/components/project/ProjectCard";
 import PageLoading from "@/components/common/PageLoading";
 import { GenesoftUser } from "@/types/user";
 import { Project } from "@/types/project";
-
+import posthog from "posthog-js";
 const pageName = "DashboardPage";
 
 export default function Dashboard() {
+    posthog.capture("pageview_dashboard");
     const { email } = useUserStore();
     const { updateGenesoftUser } = useGenesoftUserStore();
     const [loading, setLoading] = useState(false);
@@ -62,6 +63,7 @@ export default function Dashboard() {
     };
 
     const handleCreateOrganization = async () => {
+        posthog.capture("click_create_organization_from_dashboard");
         setIsCreatingOrganization(true);
         try {
             const result = await createOrganization({
@@ -82,6 +84,7 @@ export default function Dashboard() {
     };
 
     const handleCreateProject = async () => {
+        posthog.capture("click_create_project_from_dashboard");
         router.push("/dashboard/project/create/info");
     };
 

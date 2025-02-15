@@ -9,6 +9,7 @@ import { signup } from "@/app/(auth)/signup/actions";
 import SimpleLoading from "@/components/common/SimpleLoading";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import posthog from "posthog-js";
 
 export default function Signup() {
     const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +68,7 @@ export default function Signup() {
     };
 
     const handleContinueWithGoogle = async () => {
+        posthog.capture("click_continue_with_google_from_signup_page");
         try {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: "google",

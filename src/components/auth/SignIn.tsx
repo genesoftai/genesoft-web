@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import SimpleLoading from "@/components/common/SimpleLoading";
 import { createClient } from "@/utils/supabase/client";
 import GenesoftLogo from "@/components/common/GenesoftLogo";
-
+import posthog from "posthog-js";
 const StreamingText = ({
     text,
     speed = 20,
@@ -86,6 +86,7 @@ export default function SignIn() {
     };
 
     const handleForgotPassword = async () => {
+        posthog.capture("click_forgot_password_from_signin_page");
         if (!email) {
             alert("Please enter your email");
             return;
@@ -104,6 +105,7 @@ export default function SignIn() {
     };
 
     const handleContinueWithGoogle = async () => {
+        posthog.capture("click_continue_with_google_from_signin_page");
         try {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: "google",

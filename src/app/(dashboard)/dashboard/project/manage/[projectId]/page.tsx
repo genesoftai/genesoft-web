@@ -26,10 +26,11 @@ import { Button } from "@/components/ui/button";
 import { Eye, Files, MonitorCog } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
-
+import posthog from "posthog-js";
 const pageName = "ManageProjectPage";
 
 export default function ManageProjectPage() {
+    posthog.capture("pageview_manage_project");
     const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);

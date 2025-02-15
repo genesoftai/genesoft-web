@@ -22,6 +22,7 @@ import {
 import { createReferenceLink } from "@/actions/reference_link";
 import { uploadFileForOrganization } from "@/actions/file";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import posthog from "posthog-js";
 
 const componentName = "EditPageDialog";
 
@@ -93,18 +94,21 @@ export function EditPageDialog({ page, onEditPage }: EditPageDialogProps) {
     };
 
     const handleRemoveReference = (index: number) => {
+        posthog.capture("click_remove_reference_from_edit_page_dialog");
         setError(null);
         const updatedReferences = references?.filter((_, i) => i !== index);
         setReferences(updatedReferences);
     };
 
     const handleRemoveFile = (index: number) => {
+        posthog.capture("click_remove_file_from_edit_page_dialog");
         setError(null);
         const updatedFiles = files?.filter((_, i) => i !== index);
         setFiles(updatedFiles);
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        posthog.capture("click_upload_file_from_edit_page_dialog");
         setError(null);
         const file = e.target.files?.[0];
         if (!file) return;
@@ -127,6 +131,7 @@ export function EditPageDialog({ page, onEditPage }: EditPageDialogProps) {
     };
 
     const handleAddFile = async () => {
+        posthog.capture("click_add_file_from_edit_page_dialog");
         setError(null);
         if (newFile.name && newFile.context && newFile.name && newFile.file) {
             setIsUploadingFile(true);
@@ -172,6 +177,7 @@ export function EditPageDialog({ page, onEditPage }: EditPageDialogProps) {
     };
 
     const handleEditPage = () => {
+        posthog.capture("click_save_changes_from_edit_page_dialog");
         setError(null);
         console.log({
             message: `${componentName}.handleEditPage: edit page`,

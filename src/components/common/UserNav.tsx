@@ -12,6 +12,7 @@ import { useUserStore } from "@/stores/user-store";
 import { createClient } from "@/utils/supabase/client";
 import { UserIcon, LogOutIcon, ChevronDownIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 interface UserNavProps {
     email: string;
@@ -25,6 +26,7 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
     const { clearUserStore } = useUserStore();
 
     const signOut = async () => {
+        posthog.capture("click_signout_from_user_nav");
         clearUserStore();
         await supabase.auth.signOut();
         router.push("/");

@@ -18,6 +18,7 @@ import { FeatureReference, FeatureFile, Feature } from "@/types/project";
 import { createReferenceLink } from "@/actions/reference_link";
 import { uploadFileForOrganization } from "@/actions/file";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import posthog from "posthog-js";
 
 const componentName = "AddFeatureDialog";
 
@@ -91,16 +92,19 @@ export function AddFeatureDialog({
     };
 
     const handleRemoveReference = (index: number) => {
+        posthog.capture("click_remove_reference_from_add_feature_dialog");
         setError(null);
         setReferences(references.filter((_, i) => i !== index));
     };
 
     const handleRemoveFile = (index: number) => {
+        posthog.capture("click_remove_file_from_add_feature_dialog");
         setError(null);
         setFiles(files.filter((_, i) => i !== index));
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        posthog.capture("click_upload_file_from_add_feature_dialog");
         setError(null);
         const file = e.target.files?.[0];
         if (!file) return;
@@ -123,6 +127,7 @@ export function AddFeatureDialog({
     };
 
     const handleAddFile = async () => {
+        posthog.capture("click_add_file_from_add_feature_dialog");
         setError(null);
         if (newFile.name && newFile.context && newFile.name && newFile.file) {
             setIsUploadingFile(true);
@@ -168,6 +173,7 @@ export function AddFeatureDialog({
     };
 
     const handleAddFeature = () => {
+        posthog.capture("click_add_feature_from_add_feature_dialog");
         setError(null);
         console.log({
             message: `${componentName}.handleAddFeature: add feature`,

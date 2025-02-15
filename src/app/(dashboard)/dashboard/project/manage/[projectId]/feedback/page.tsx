@@ -32,8 +32,10 @@ import { Info, Loader2, Send } from "lucide-react";
 import PageLoading from "@/components/common/PageLoading";
 import Conversation from "@/components/project/feedback/Converation";
 import { SelectConversation } from "@/components/project/feedback/SelectConversation";
+import posthog from "posthog-js";
 
 const FeedbackPage = () => {
+    posthog.capture("pageview_manage_project_feedback");
     const pathParams = useParams();
     const [projectId, setProjectId] = useState<string>("");
     const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -98,6 +100,7 @@ const FeedbackPage = () => {
     });
 
     const handleSendMessage = async () => {
+        posthog.capture("click_send_message_from_manage_project_feedback_page");
         setIsSending(true);
         try {
             const updatedFeedback = await talkToFeedback({
@@ -125,6 +128,9 @@ const FeedbackPage = () => {
     };
 
     const handleSubmitFeedback = async () => {
+        posthog.capture(
+            "click_submit_feedback_from_manage_project_feedback_page",
+        );
         setIsSubmitting(true);
         console.log({
             message: "Submitting Feedback",
