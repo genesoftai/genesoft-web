@@ -2,7 +2,7 @@
 
 import { genesoftCoreApiServiceBaseUrl } from "@/constants/api-service/url";
 import { genesoftCoreApiServiceApiKey } from "@/constants/api-service/authorization";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
     AddFeatureRequest,
     AddPageRequest,
@@ -31,6 +31,9 @@ export async function createProject(payload: CreateProjectRequest) {
         return res.data;
     } catch (error) {
         console.error("Error creating project:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
         throw new Error("Failed to create project");
     }
 }
