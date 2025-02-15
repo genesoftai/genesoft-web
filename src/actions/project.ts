@@ -2,7 +2,7 @@
 
 import { genesoftCoreApiServiceBaseUrl } from "@/constants/api-service/url";
 import { genesoftCoreApiServiceApiKey } from "@/constants/api-service/authorization";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
     AddFeatureRequest,
     AddPageRequest,
@@ -16,6 +16,12 @@ import {
 export async function createProject(payload: CreateProjectRequest) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project`;
 
+    console.log({
+        message: "createProject",
+        payload,
+        url,
+    });
+
     try {
         const res = await axios.post(url, payload, {
             headers: {
@@ -25,12 +31,20 @@ export async function createProject(payload: CreateProjectRequest) {
         return res.data;
     } catch (error) {
         console.error("Error creating project:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
         throw new Error("Failed to create project");
     }
 }
 
 export async function getOrganizationProjects(organizationId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/organization/${organizationId}/projects`;
+    console.log({
+        message: "getOrganizationProjects",
+        organizationId,
+        url,
+    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -46,6 +60,11 @@ export async function getOrganizationProjects(organizationId: string) {
 
 export async function getProjectById(projectId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}`;
+    console.log({
+        message: "getProjectById",
+        projectId,
+        url,
+    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -67,6 +86,12 @@ export async function updateProjectInfo({
     payload: UpdateProjectRequest;
 }) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/info`;
+    console.log({
+        message: "updateProjectInfo",
+        projectId,
+        payload,
+        url,
+    });
     try {
         const res = await axios.patch(url, payload, {
             headers: {
@@ -198,6 +223,12 @@ export async function deletePage({
     pageId: string;
 }) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/page/${pageId}`;
+    console.log({
+        message: "deletePage",
+        projectId,
+        pageId,
+        url,
+    });
     try {
         const res = await axios.delete(url, {
             headers: {
@@ -219,6 +250,12 @@ export async function deleteFeature({
     featureId: string;
 }) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/feature/${featureId}`;
+    console.log({
+        message: "deleteFeature",
+        projectId,
+        featureId,
+        url,
+    });
     try {
         const res = await axios.delete(url, {
             headers: {
@@ -234,6 +271,12 @@ export async function deleteFeature({
 
 export async function getPageReferenceLinks(projectId: string, pageId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/page/${pageId}/reference-links`;
+    console.log({
+        message: "getPageReferenceLinks",
+        projectId,
+        pageId,
+        url,
+    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -249,6 +292,12 @@ export async function getPageReferenceLinks(projectId: string, pageId: string) {
 
 export async function getPageFiles(projectId: string, pageId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/page/${pageId}/files`;
+    console.log({
+        message: "getPageFiles",
+        projectId,
+        pageId,
+        url,
+    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -264,6 +313,12 @@ export async function getPageFiles(projectId: string, pageId: string) {
 
 export async function getFeatureFiles(projectId: string, featureId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/feature/${featureId}/files`;
+    console.log({
+        message: "getFeatureFiles",
+        projectId,
+        featureId,
+        url,
+    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -282,6 +337,12 @@ export async function getFeatureReferenceLinks(
     featureId: string,
 ) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/feature/${featureId}/reference-links`;
+    console.log({
+        message: "getFeatureReferenceLinks",
+        projectId,
+        featureId,
+        url,
+    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -304,16 +365,20 @@ export const editFeature = async ({
     featureId: string;
     payload: EditFeatureRequest;
 }) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/feature/${featureId}`;
+    console.log({
+        message: "editFeature",
+        projectId,
+        featureId,
+        payload,
+        url,
+    });
     try {
-        const response = await axios.patch(
-            `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/feature/${featureId}`,
-            payload,
-            {
-                headers: {
-                    Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
-                },
+        const response = await axios.patch(url, payload, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
             },
-        );
+        });
         return response.data;
     } catch (error) {
         console.error("Error editing feature:", error);

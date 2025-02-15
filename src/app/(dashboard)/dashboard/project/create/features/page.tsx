@@ -70,7 +70,16 @@ const CreateProjectFeaturesPage = () => {
                 `${pageName}.handleCreateProject: Error creating project`,
                 error,
             );
-            setError("Error creating project, please try again");
+            if (
+                error instanceof Error &&
+                error.message === "Can only have one project per organization"
+            ) {
+                setError(
+                    "For Beta version of Genesoft, we allow only one project per organization, if you want to create more, please send email to support@genesoftai.com",
+                );
+            } else {
+                setError("Error creating project, please try again");
+            }
         } finally {
             setIsCreatingProject(false);
         }
