@@ -54,9 +54,8 @@ export default function LandingPage() {
     const [heroStage, setHeroStage] = useState(0);
 
     const heroContent = [
-        "10X cheaper Software Development team of AI Agents for small company and startup",
-        "Help you get on-demand web application anytime with 10x cheaper cost and less effort without need to deal with fuzzy technical tasks",
-        "Develop web app with Structured Form of requirements not conversation based that can lead to confusion and misunderstanding of AI Agent for long running project that need constant improvement",
+        "Submit web app requirements, live your life, and get your web app live",
+        "Help you get on-demand web application anytime without need to stay in control AI Agent for hours, just let AI Agent develop your project on their own until it can go live",
         "Built for non-technical product owner and startup founder who need to make idea come true but don't have a lot of funding and technical background",
     ];
 
@@ -90,16 +89,13 @@ export default function LandingPage() {
                         <p className="text-xs sm:text-sm md:text-base font-semibold text-muted-foreground max-w-2xl mb-12">
                             {heroContent[2]}
                         </p>
-                        <p className="text-xs sm:text-sm md:text-base text-muted-foreground max-w-2xl mb-12">
-                            {heroContent[3]}
-                        </p>
 
                         <div className="flex flex-col items-center gap-x-1 gap-y-4 md:gap-x-4 w-full md:w-5/6">
                             <Button
                                 className="px-6 py-4 md:px-8 md:py-6 bg-genesoft hover:bg-genesoft/90 text-xs md:text-xl font-medium"
                                 onClick={handleStartNow}
                             >
-                                Get started free
+                                Get started your startup web application now
                             </Button>
                         </div>
                     </div>
@@ -133,6 +129,49 @@ export default function LandingPage() {
 
                 <Separator />
 
+                <div className="px-8 py-12 md:py-16 text-center flex flex-col gap-y-10 bg-gradient-to-b from-background to-secondary-dark/10">
+                    <div className="space-y-4">
+                        <p className="text-genesoft text-base sm:text-lg md:text-2xl font-bold bg-clip-text">
+                            Transform Your Vision into Reality
+                        </p>
+                        <p className="text-base sm:text-lg md:text-2xl font-bold bg-clip-text  text-genesoft/90">
+                            Let Our AI Agents Craft Your Perfect Web Application
+                        </p>
+                        <p className="text-base sm:text-lg md:text-2xl font-bold bg-clip-text  text-genesoft/80">
+                            While You Focus on What Matters Most
+                        </p>
+                    </div>
+
+                    <div className="relative flex justify-center">
+                        <div className="absolute -inset-1 bg-gradient-to-r rounded-lg blur opacity-25"></div>
+                        <iframe
+                            className="self-center hidden md:flex relative rounded-lg shadow-xl"
+                            width="560"
+                            height="315"
+                            src="https://www.youtube.com/embed/j5xhscX7Uj8?si=Hy2e1CkMyIEaZdza"
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                        ></iframe>
+
+                        <iframe
+                            className="self-center flex md:hidden relative rounded-lg shadow-xl"
+                            width="320"
+                            height="180"
+                            src="https://www.youtube.com/embed/j5xhscX7Uj8?si=Hy2e1CkMyIEaZdza"
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                </div>
+
+                <Separator />
+
                 {/* Why genesoft Section */}
                 <section className="py-8 md:py-16 rounded">
                     <div className="container mx-auto px-4">
@@ -156,7 +195,7 @@ export default function LandingPage() {
                                 {
                                     title: "Get your web application",
                                     description:
-                                        "Get your web application after software development team of AI Agent finish working on your project, Geensoft will inform you through email and you can see the web application live on the web",
+                                        "Get your web application after software development team of AI Agent finish working on your project, Genesoft will inform you through email and you can see the web application live on the web",
                                     icon: AppWindow,
                                 },
                                 {
