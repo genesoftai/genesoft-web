@@ -8,7 +8,6 @@ import {
     CircleDollarSign,
     Rocket,
     FileCheck,
-    Pencil,
     SquarePen,
     Laptop,
     AppWindow,
@@ -20,6 +19,16 @@ import { Separator } from "@/components/ui/separator";
 import HeroSectionBanner from "@public/image/showcase/manage-project-example.png";
 import Image from "next/image";
 import posthog from "posthog-js";
+import GenesoftEcommerce from "@public/image/showcase/project/genesoft-e-commerce.png";
+
+import Curlent from "@public/image/showcase/project/curlent.png";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "../ui/carousel";
 
 const StreamingText = ({
     text,
@@ -128,7 +137,7 @@ export default function LandingPage() {
                 </section>
 
                 <Separator />
-
+                {/* Video Section */}
                 <div className="px-8 py-12 md:py-16 text-center flex flex-col gap-y-10 bg-gradient-to-b from-background to-secondary-dark/10">
                     <div className="space-y-4">
                         <p className="text-genesoft text-base sm:text-lg md:text-2xl font-bold bg-clip-text">
@@ -169,6 +178,73 @@ export default function LandingPage() {
                         ></iframe>
                     </div>
                 </div>
+
+                <Separator />
+
+                {/* Showcase Section */}
+                <section className="py-8 md:py-16 rounded flex flex-col items-center">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-12 text-genesoft text-center">
+                            Showcases
+                        </h2>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                        <Carousel className="w-full max-w-4xl">
+                            <CarouselContent>
+                                <CarouselItem>
+                                    <div className="p-1">
+                                        <div
+                                            className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
+                                            onClick={() => {
+                                                window.open(
+                                                    "https://nextjs-webfeb76d90-2fbb-40e4-8073-657b737a643b-genesoft.vercel.app",
+                                                    "_blank",
+                                                );
+                                            }}
+                                        >
+                                            <p className="text-base sm:text-lg md:text-2xl font-medium bg-clip-text">
+                                                Genesoft e-commerce
+                                            </p>
+                                            <Image
+                                                src={GenesoftEcommerce}
+                                                alt="Showcase Image"
+                                                width={500}
+                                                height={500}
+                                            />
+                                        </div>
+                                    </div>
+                                </CarouselItem>
+
+                                <CarouselItem>
+                                    <div className="p-1">
+                                        <div
+                                            className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
+                                            onClick={() => {
+                                                window.open(
+                                                    "https://nextjs-web91e1305e-d5ff-40e9-8a47-10eeb7ebb97b.vercel.app/",
+                                                    "_blank",
+                                                );
+                                            }}
+                                        >
+                                            <p className="text-base sm:text-lg md:text-2xl font-medium bg-clip-text">
+                                                Curlent
+                                            </p>
+                                            <Image
+                                                src={Curlent}
+                                                alt="Showcase Image"
+                                                width={500}
+                                                height={500}
+                                            />
+                                        </div>
+                                    </div>
+                                </CarouselItem>
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                        </Carousel>
+                    </div>
+                </section>
 
                 <Separator />
 
