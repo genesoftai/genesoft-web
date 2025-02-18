@@ -140,6 +140,42 @@ export function WebPreview({ project }: WebPreviewProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6 ">
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                    <div className="w-full bg-gray-800 border-b border-white/10 p-2 flex items-center gap-2">
+                        {/* Browser controls */}
+                        <div className="flex gap-1.5">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        {/* URL bar */}
+                        <div className="flex-1 bg-gray-700 rounded px-3 py-1 text-sm text-gray-300 flex items-center">
+                            <Globe className="h-3 w-3 mr-2 text-gray-400" />
+                            {webApplicationInfo?.url || "No URL available"}
+                        </div>
+                    </div>
+
+                    {webApplicationInfo?.url ? (
+                        <div className="relative flex justify-center w-full h-[calc(100%-40px)]">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/20 to-blue-500/20 rounded-lg blur opacity-25"></div>
+                            <iframe
+                                className="relative w-full h-full rounded-b-lg shadow-xl border border-white/10"
+                                src={webApplicationInfo.url}
+                                title="Web Application Preview"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                sandbox="allow-scripts allow-same-origin"
+                            ></iframe>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-center w-full h-[calc(100%-40px)] bg-primary-dark/30 rounded-b-lg border border-white/10">
+                            <p className="text-gray-400">
+                                No preview available
+                            </p>
+                        </div>
+                    )}
+                </div>
+
                 <div className="flex flex-col gap-4 w-full p-4 bg-primary-dark/30 rounded-lg border border-white/10">
                     <div className="flex items-center gap-x-8">
                         <div className="text-sm font-medium text-gray-300">
