@@ -13,4 +13,6 @@ export interface WebApplicationInfo {
     status: DeploymentStatus;
     developmentStatus: DevelopmentStatus;
     url: string;
+    readyAt: number;
+    developmentDoneAt: number;
 }
