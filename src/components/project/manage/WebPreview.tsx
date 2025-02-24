@@ -187,6 +187,15 @@ export function WebPreview({ project }: WebPreviewProps) {
                                 DeploymentStatus.NOT_DEPLOYED
                             }
                         />
+                        {webApplicationInfo?.status ===
+                            DeploymentStatus.DEPLOYED && (
+                            <span className="text-xs text-white">
+                                at{" "}
+                                {new Date(
+                                    webApplicationInfo?.readyAt,
+                                ).toLocaleString()}
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-x-8">
@@ -203,6 +212,15 @@ export function WebPreview({ project }: WebPreviewProps) {
                             <span className="text-xs text-white">
                                 We will send email information to your email
                                 when development is done
+                            </span>
+                        )}
+                        {webApplicationInfo?.developmentStatus ===
+                            DevelopmentStatus.DEVELOPMENT_DONE && (
+                            <span className="text-xs text-white">
+                                at{" "}
+                                {new Date(
+                                    webApplicationInfo?.developmentDoneAt,
+                                ).toLocaleString()}
                             </span>
                         )}
                     </div>
