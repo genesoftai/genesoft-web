@@ -199,7 +199,7 @@ export default function LandingPage() {
                                             className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
                                             onClick={() => {
                                                 window.open(
-                                                    "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app",
+                                                    "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app/about",
                                                     "_blank",
                                                 );
                                             }}
