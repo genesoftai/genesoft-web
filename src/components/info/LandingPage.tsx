@@ -20,6 +20,7 @@ import HeroSectionBanner from "@public/image/showcase/manage-project-example.png
 import Image from "next/image";
 import posthog from "posthog-js";
 import GenesoftEcommerce from "@public/image/showcase/project/genesoft-e-commerce.png";
+import KhonkaenUnknown from "@public/image/showcase/project/khonkaen-unknown.png";
 
 import Curlent from "@public/image/showcase/project/curlent.png";
 import {
@@ -63,9 +64,9 @@ export default function LandingPage() {
     const [heroStage, setHeroStage] = useState(0);
 
     const heroContent = [
-        "Submit web app requirements, live your life, and get your web app live",
-        "Help you get on-demand web application anytime without need to stay in control AI Agent for hours, just let AI Agent develop your project on their own until it can go live",
-        "Built for non-technical product owner and startup founder who need to make idea come true but don't have a lot of funding and technical background",
+        "Your software development team in the AI era",
+        "Collaborate with our AI agent team to build your startup web application - our agents work 24/7 to turn your requirements into reality",
+        "Perfect for entrepreneurs and founders without technical expertise who want to turn ideas into reality on a low budget",
     ];
 
     const nextStage = () => {
@@ -104,7 +105,7 @@ export default function LandingPage() {
                                 className="px-6 py-4 md:px-8 md:py-6 bg-genesoft hover:bg-genesoft/90 text-xs md:text-xl font-medium"
                                 onClick={handleStartNow}
                             >
-                                Get started your startup web application now
+                                Get your web application now
                             </Button>
                         </div>
                     </div>
@@ -144,10 +145,10 @@ export default function LandingPage() {
                             Transform Your Vision into Reality
                         </p>
                         <p className="text-base sm:text-lg md:text-2xl font-bold bg-clip-text  text-genesoft/90">
-                            Let Our AI Agents Craft Your Perfect Web Application
+                            Our AI Agents develop your web application
                         </p>
                         <p className="text-base sm:text-lg md:text-2xl font-bold bg-clip-text  text-genesoft/80">
-                            While You Focus on What Matters Most
+                            While You Focus on Your Business and Customers
                         </p>
                     </div>
 
@@ -192,6 +193,30 @@ export default function LandingPage() {
                     <div className="flex items-center justify-center">
                         <Carousel className="w-full max-w-4xl">
                             <CarouselContent>
+                                <CarouselItem>
+                                    <div className="p-1">
+                                        <div
+                                            className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
+                                            onClick={() => {
+                                                window.open(
+                                                    "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app",
+                                                    "_blank",
+                                                );
+                                            }}
+                                        >
+                                            <p className="text-base sm:text-lg md:text-2xl font-medium bg-clip-text">
+                                                Khonkaen Unknown
+                                            </p>
+                                            <Image
+                                                src={KhonkaenUnknown}
+                                                alt="Showcase Image"
+                                                width={500}
+                                                height={500}
+                                            />
+                                        </div>
+                                    </div>
+                                </CarouselItem>
+
                                 <CarouselItem>
                                     <div className="p-1">
                                         <div
