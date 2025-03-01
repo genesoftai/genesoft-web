@@ -133,10 +133,23 @@ export function WebPreview({ project }: WebPreviewProps) {
                     </CardTitle>
                 </div>
                 <CardDescription className="text-subtext-in-dark-bg">
-                    {/* Preview User interface of your web */}
-                    {
+                    {/* {
                         "See web application information and manage your web application here by trigger AI Agent to build your web application or add feedback to improve your web application"
-                    }
+                    } */}
+                    <div className="flex items-center gap-x-8">
+                        <div className="text-sm font-medium text-gray-300">
+                            URL
+                        </div>
+                        <a
+                            href={webApplicationInfo?.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
+                        >
+                            <Globe className="h-4 w-4" />
+                            {webApplicationInfo?.url}
+                        </a>
+                    </div>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6 ">
@@ -149,10 +162,10 @@ export function WebPreview({ project }: WebPreviewProps) {
                             <div className="w-3 h-3 rounded-full bg-green-500"></div>
                         </div>
                         {/* URL bar */}
-                        <div className="flex-1 bg-gray-700 rounded px-3 py-1 text-sm text-gray-300 flex items-center">
+                        {/* <div className="flex-1 bg-gray-700 rounded px-3 py-1 text-sm text-gray-300 flex items-center">
                             <Globe className="h-3 w-3 mr-2 text-gray-400" />
                             {webApplicationInfo?.url || "No URL available"}
-                        </div>
+                        </div> */}
                     </div>
 
                     {webApplicationInfo?.url ? (
@@ -224,24 +237,9 @@ export function WebPreview({ project }: WebPreviewProps) {
                             </span>
                         )}
                     </div>
-
-                    <div className="flex items-center gap-x-8">
-                        <div className="text-sm font-medium text-gray-300">
-                            URL
-                        </div>
-                        <a
-                            href={webApplicationInfo?.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
-                        >
-                            <Globe className="h-4 w-4" />
-                            {webApplicationInfo?.url}
-                        </a>
-                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col items-center gap-2">
                         <Button
                             disabled={isInProgress}
@@ -292,7 +290,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                             "inform Genesoft and AI Agent team to fix errors in your web application"
                         }
                     </span>
-                </div>
+                </div> */}
             </CardContent>
         </Card>
     );

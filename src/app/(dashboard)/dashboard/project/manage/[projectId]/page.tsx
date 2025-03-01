@@ -22,11 +22,16 @@ import {
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDialog";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Eye, Files, MonitorCog } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { User } from "lucide-react";
+import { useParams } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import posthog from "posthog-js";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { useProjectStore } from "@/stores/project-store";
+import { getOrganizationById } from "@/actions/organization";
+import { GenesoftOrganization } from "@/types/organization";
+import Image from "next/image";
+
 const pageName = "ManageProjectPage";
 
 export default function ManageProjectPage() {
@@ -34,8 +39,12 @@ export default function ManageProjectPage() {
     const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
-    const router = useRouter();
+
     const [projectId, setProjectId] = useState<string>("");
+    const { updateGenesoftUser } = useGenesoftUserStore();
+    const { updateProjectStore } = useProjectStore();
+    const [organization, setOrganization] =
+        useState<GenesoftOrganization | null>(null);
 
     useEffect(() => {
         const { projectId } = pathParams;
@@ -48,6 +57,7 @@ export default function ManageProjectPage() {
             projectId,
         });
         if (projectId) {
+            updateGenesoftUser({ project_id: projectId });
             setupProject();
         }
     }, [projectId]);
@@ -57,6 +67,8 @@ export default function ManageProjectPage() {
         try {
             const projectData = await getProjectById(projectId);
             setProject(projectData);
+            setupOrganization(projectData.organization_id);
+            updateProjectStore(projectData);
         } catch (error) {
             console.error("Error fetching project:", error);
         } finally {
@@ -64,10 +76,16 @@ export default function ManageProjectPage() {
         }
     };
 
+    const setupOrganization = async (organizationId: string) => {
+        const organizationData = await getOrganizationById(organizationId);
+        setOrganization(organizationData);
+    };
+
     console.log({
         message: `${pageName}: Project`,
         project,
         projectId,
+        organization,
     });
 
     if (loading) {
@@ -100,19 +118,13 @@ export default function ManageProjectPage() {
                     </Breadcrumb>
                 </div>
             </header>
+
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
+                {/* <div className="flex flex-row gap-4">
+                        <ProjectSidebar />
+                    </div> */}
                 <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
                     <div className="space-y-6">
-                        <div>
-                            <h1 className="text-3xl font-bold tracking-tight">
-                                Project
-                            </h1>
-                            <p className="text-muted-foreground">
-                                Preview, Manage, and Feedback your web
-                                application project
-                            </p>
-                        </div>
-
                         <Card className="bg-primary-dark border-none text-white shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="flex flex-row items-start justify-between space-y-0 p-8">
                                 <div className="space-y-6">
@@ -161,7 +173,7 @@ export default function ManageProjectPage() {
                         </Card>
                     </div>
 
-                    {/* Project Requirements */}
+                    {/* Project Requirements
                     <Card className="bg-primary-dark border-none text-white">
                         <CardHeader className="flex flex-col space-y-4">
                             <div>
@@ -212,9 +224,40 @@ export default function ManageProjectPage() {
                                 </Button>
                             </div>
                         </CardHeader>
-                    </Card>
+                    </Card> */}
 
                     <WebPreview project={project} />
+
+                    <div className="flex flex-col gap-4  p-8 w-full rounded-xl bg-primary-dark">
+                        <h2 className="text-2xl font-bold">Project Members</h2>
+                        <div className="flex flex-row gap-4">
+                            {organization?.users?.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="flex items-center gap-2 p-4 border rounded-lg"
+                                >
+                                    {user.image ? (
+                                        <Image
+                                            src={user.image || ""}
+                                            alt={user.name || user.email}
+                                            width={40}
+                                            height={40}
+                                            className="rounded-full"
+                                        />
+                                    ) : (
+                                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                            <User className="w-6 h-6 text-gray-500" />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <p className="text-sm text-white">
+                                            {user.email}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 

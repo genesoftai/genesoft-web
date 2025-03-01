@@ -16,6 +16,7 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { NavProject } from "./nav-project";
 
 const data = {
     user: {
@@ -97,7 +98,11 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { organization } = useGenesoftUserStore();
+    const { organization, project_id } = useGenesoftUserStore();
+    console.log({
+        message: "AppSidebar",
+        project_id,
+    });
     return (
         <Sidebar
             variant="inset"
@@ -127,6 +132,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
+                <NavProject />
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
                 <div className="flex flex-col items-start justify-center mb-8">
                     <p className="text-xs text-muted-foreground">

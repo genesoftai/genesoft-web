@@ -213,7 +213,10 @@ export function AddFeatureDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-fit text-black">
+                <Button
+                    variant="ghost"
+                    className="w-fit bg-primary-dark text-white"
+                >
                     <Plus className="mr-2 h-4 w-4" />
                     <span className="font-semibold">Add Feature</span>
                 </Button>
