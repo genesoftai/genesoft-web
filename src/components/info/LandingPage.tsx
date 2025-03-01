@@ -223,30 +223,6 @@ export default function LandingPage() {
                                             className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
                                             onClick={() => {
                                                 window.open(
-                                                    "https://nextjs-webfeb76d90-2fbb-40e4-8073-657b737a643b-genesoft.vercel.app",
-                                                    "_blank",
-                                                );
-                                            }}
-                                        >
-                                            <p className="text-base sm:text-lg md:text-2xl font-medium bg-clip-text">
-                                                Genesoft e-commerce
-                                            </p>
-                                            <Image
-                                                src={GenesoftEcommerce}
-                                                alt="Showcase Image"
-                                                width={500}
-                                                height={500}
-                                            />
-                                        </div>
-                                    </div>
-                                </CarouselItem>
-
-                                <CarouselItem>
-                                    <div className="p-1">
-                                        <div
-                                            className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
-                                            onClick={() => {
-                                                window.open(
                                                     "https://nextjs-web91e1305e-d5ff-40e9-8a47-10eeb7ebb97b.vercel.app/",
                                                     "_blank",
                                                 );
