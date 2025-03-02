@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Eye } from "lucide-react";
+import { Eye, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 import {
@@ -27,27 +27,78 @@ import { RGBColor, SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
 import posthog from "posthog-js";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { CreateProjectRequest } from "@/types/project";
+import { createProject } from "@/actions/project";
+
+const pageName = "CreateProjectBrandingPage";
+
 const CreateProjectBrandingPage = () => {
     posthog.capture("pageview_create_project_branding");
     const router = useRouter();
-    const { branding, updateCreateProjectStore } = useCreateProjectStore();
-
-    const handleNext = () => {
-        posthog.capture("click_next_from_create_project_branding_page");
-        updateCreateProjectStore({
-            branding: {
-                ...branding,
-                color: rgbaToHex(selectedColor),
-                theme: webTheme,
-                perception: perception,
-            },
-        });
-        router.push("/dashboard/project/create/pages");
-    };
+    const {
+        name,
+        description,
+        purpose,
+        target_audience,
+        branding,
+        clearCreateProjectStore,
+    } = useCreateProjectStore();
+    const [isCreatingProject, setIsCreatingProject] = useState(false);
+    const { organization } = useGenesoftUserStore();
+    const [error, setError] = useState<string | null>(null);
 
     const handleBack = () => {
         posthog.capture("click_back_from_create_project_branding_page");
         router.push("/dashboard/project/create/info");
+    };
+
+    const handleCreateProject = async () => {
+        posthog.capture(
+            "click_create_project_from_create_project_branding_page",
+        );
+        setIsCreatingProject(true);
+
+        const project: CreateProjectRequest = {
+            organization_id: organization?.id || "",
+            name,
+            description,
+            purpose,
+            target_audience,
+            branding,
+        };
+
+        console.log({
+            message: `${pageName}.handleCreateProject: Create project request`,
+            project,
+        });
+
+        try {
+            const response = await createProject(project);
+            console.log({
+                message: `${pageName}.handleCreateProject: Create project response`,
+                response,
+            });
+            clearCreateProjectStore();
+            router.push(`/dashboard/project/manage/${response.id}`);
+        } catch (error) {
+            console.error(
+                `${pageName}.handleCreateProject: Error creating project`,
+                error,
+            );
+            if (
+                error instanceof Error &&
+                error.message === "Can only have one project per organization"
+            ) {
+                setError(
+                    "For Genesoft Free Tier, we allow only one project per organization, if you want to create more, please upgrade to Genesoft Standard or Genesoft Advanced to create more projects",
+                );
+            } else {
+                setError("Error creating project, please try again");
+            }
+        } finally {
+            setIsCreatingProject(false);
+        }
     };
 
     const [perception, setPerception] = useState(branding?.perception);
@@ -174,6 +225,10 @@ const CreateProjectBrandingPage = () => {
                     </div>
                 </div>
 
+                {error && (
+                    <p className="text-red-500 text-center my-8">{error}</p>
+                )}
+
                 <div className="flex w-full justify-between items-center">
                     <Button
                         className="flex items-center p-4 self-end w-fit bg-gray-500 font-medium hover:bg-gray-500/80 text-black"
@@ -183,9 +238,15 @@ const CreateProjectBrandingPage = () => {
                     </Button>
                     <Button
                         className="flex items-center p-4 self-end w-fit bg-genesoft font-medium hover:bg-genesoft/80"
-                        onClick={handleNext}
+                        onClick={handleCreateProject}
+                        disabled={isCreatingProject}
                     >
-                        <span>Next</span>
+                        <div className="flex items-center gap-x-2">
+                            <span>Create Project</span>
+                            {isCreatingProject && (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            )}
+                        </div>
                     </Button>
                 </div>
 
