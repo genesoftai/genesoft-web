@@ -30,36 +30,42 @@ export function ProjectCard({
     const router = useRouter();
 
     return (
-        <Card className="w-8/12 h-96 bg-primary-dark text-white flex flex-col border-none">
+        <Card className="w-full md:w-8/12 h-8/12 md:h-auto bg-primary-dark text-white flex flex-col border-none mb-4 md:mb-0">
             <CardHeader>
-                <CardTitle className="text-xl">{name}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardTitle className="text-base md:text-xl">{name}</CardTitle>
+                <CardDescription className="text-sm md:text-base">
+                    {description}
+                </CardDescription>
             </CardHeader>
             <Separator className="w-full bg-secondary-dark" />
-            <CardContent className="mt-10">
+            <CardContent className="mt-4 md:mt-10">
                 <div className="flex flex-col gap-y-4 w-full">
                     <div className="flex flex-col space-y-1.5">
-                        <p className="text-white text-sm font-bold">Purpose</p>
-                        <p className="text-subtext-in-dark-bg">{purpose}</p>
+                        <p className="text-white text-sm md:text-base font-bold">
+                            Purpose
+                        </p>
+                        <p className="text-subtext-in-dark-bg text-sm md:text-base">
+                            {purpose}
+                        </p>
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                        <p className="text-white text-sm font-bold">
+                        <p className="text-white text-sm md:text-base font-bold">
                             Target Audience
                         </p>
-                        <p className="text-subtext-in-dark-bg">
+                        <p className="text-subtext-in-dark-bg text-sm md:text-base">
                             {target_audience}
                         </p>
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className="flex justify-end self-end">
+            <CardFooter className="flex justify-end md:justify-start self-center md:self-end">
                 <Button
-                    className="bg-genesoft text-white rounded-lg"
+                    className="bg-genesoft text-white rounded-lg text-xs md:text-base"
                     onClick={() =>
                         router.push(`/dashboard/project/manage/${id}`)
                     }
                 >
-                    Manage
+                    <span className="text-xs md:text-base">Manage</span>
                 </Button>
             </CardFooter>
         </Card>

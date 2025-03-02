@@ -1,10 +1,15 @@
 "use client";
 
+import {
+    getActiveConversationByPageId,
+    getConversationById,
+    getConversationsByPageId,
+} from "@/actions/conversation";
 import { getOrganizationById } from "@/actions/organization";
 import { getPageById } from "@/actions/page";
 import { getProjectById } from "@/actions/project";
 import PageLoading from "@/components/common/PageLoading";
-import Conversation, { IMessage } from "@/components/Conversation";
+import Conversation from "@/components/conversation/Conversation";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import {
     Breadcrumb,
@@ -13,11 +18,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
@@ -26,6 +27,11 @@ import { Page, Project } from "@/types/project";
 import { AppWindow, ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import {
+    ConversationByPageId,
+    ConversationMessageForWeb,
+    Message,
+} from "@/types/message";
 
 type Props = {
     pageId: string;
@@ -39,16 +45,17 @@ const ManagePagePage = ({ pageId }: Props) => {
         useState<GenesoftOrganization | null>(null);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState<Page | null>(null);
-    const [messages, setMessages] = useState<IMessage[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [selectedSprint, setSelectedSprint] = useState<string | null>(null);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [conversation, setConversation] =
+        useState<ConversationMessageForWeb | null>(null);
+    const [isLoadingSetupPageConversation, setIsLoadingSetupPageConversation] =
+        useState<boolean>(false);
 
-    const sprintOptions = [
-        { id: "sprint-1", name: "Sprint 1: Initial Design" },
-        { id: "sprint-2", name: "Sprint 2: Homepage Development" },
-        { id: "sprint-3", name: "Sprint 3: User Authentication" },
-        { id: "sprint-4", name: "Sprint 4: Payment Integration" },
-    ];
+    const [sprintOptions, setSprintOptions] = useState<
+        { id: string; name: string }[]
+    >([]);
 
     const setupProject = async () => {
         setLoading(true);
@@ -76,72 +83,81 @@ const ManagePagePage = ({ pageId }: Props) => {
             pageId,
         });
         setupPage(pageId as string);
+        setupActivePageConversation(pageId as string);
+        setupSprintOptions(pageId as string);
     }, [pathParams]);
 
     useEffect(() => {
         setupProject();
     }, [projectId]);
 
-    useEffect(() => {
-        setMessages([
-            {
-                id: "1",
-                content:
-                    "We receive your requirements well, let me revise again that you want ... details ... on A page?",
-                sender: "ai",
-                timestamp: new Date(Date.now() - 1000 * 60 * 30),
-                user: {
-                    name: "Project Manager",
-                    avatar: "",
-                },
-            },
-            {
-                id: "2",
-                content:
-                    "Project manager is waiting for your confirmation (sent to user_email@gmail.com)",
-                sender: "system",
-                timestamp: new Date(Date.now() - 1000 * 60 * 25),
-            },
-            {
-                id: "3",
-                content: "Hi, sorry for late reply",
-                sender: "user",
-                timestamp: new Date(Date.now() - 1000 * 60 * 10),
-                user: {
-                    name: "User A",
-                },
-            },
-            {
-                id: "4",
-                content:
-                    "Yes, I want feature A to implement on section B of A Page",
-                sender: "user",
-                timestamp: new Date(Date.now() - 1000 * 60 * 10),
-                user: {
-                    name: "User A",
-                },
-            },
-            {
-                id: "5",
-                content: "Please continue",
-                sender: "user",
-                timestamp: new Date(Date.now() - 1000 * 60 * 10),
-                user: {
-                    name: "User A",
-                },
-            },
-        ]);
-    }, []);
-
     const setupOrganization = async (organizationId: string) => {
         const organizationData = await getOrganizationById(organizationId);
         setOrganization(organizationData);
+    };
+
+    const setupActivePageConversation = async (pageId: string) => {
+        setIsLoadingSetupPageConversation(true);
+        try {
+            const activeConversation =
+                await getActiveConversationByPageId(pageId);
+            const conversationForWeb = await getConversationById(
+                activeConversation.id,
+            );
+            setConversation(conversationForWeb);
+            setMessages(conversationForWeb.messages);
+        } catch (error) {
+            console.error("Error fetching active page conversation:", error);
+        } finally {
+            setIsLoadingSetupPageConversation(false);
+        }
+    };
+
+    const setupSprintOptions = async (pageId: string) => {
+        const conversations = await getConversationsByPageId(pageId);
+        const sprintOptions = conversations.map(
+            (conversation: ConversationByPageId, index: number) => ({
+                id: conversation.id,
+                name: `Sprint ${index + 1}: ${conversation.name || "untitled"}`,
+                status: conversation.status,
+            }),
+        );
+        setSprintOptions(sprintOptions);
+    };
+
+    const setupConversation = async (conversationId: string) => {
+        setIsLoadingSetupPageConversation(true);
+        try {
+            const conversationForWeb =
+                await getConversationById(conversationId);
+            setConversation(conversationForWeb);
+            setMessages(conversationForWeb.messages);
+        } catch (error) {
+            console.error("Error fetching conversation:", error);
+        } finally {
+            setIsLoadingSetupPageConversation(false);
+        }
+    };
+
+    const handleSubmitConversation = async () => {
+        // TODO: get latest active conversation and rerender conversation, also set latest sprints
+        setupSprintOptions(pageId as string);
+        setupConversation(selectedSprint as string);
+    };
+
+    const handleSprintChange = async (sprintId: string) => {
+        setSelectedSprint(sprintId);
+        const conversationForWeb = await getConversationById(sprintId);
+        setConversation(conversationForWeb);
+        setMessages(conversationForWeb.messages);
     };
 
     console.log({
         message: "ManagePagePage",
         pageId,
         page,
+        conversation,
+        messages,
     });
 
     if (loading) {
@@ -149,7 +165,25 @@ const ManagePagePage = ({ pageId }: Props) => {
     }
 
     return (
-        <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col w-full h-full relative px-2">
+            <div
+                className="absolute top-4 right-2 z-10 bg-white text-primary-dark p-1 rounded-md hover:bg-white/80 cursor-pointer"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+                {isCollapsed ? (
+                    <div className="flex items-center gap-x-2">
+                        <ChevronLeft className="h-5 w-5 text-primary-dark" />
+                        <p className="text-sm text-primary-dark">Open</p>
+                        <AppWindow className="h-5 w-5 text-primary-dark" />
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-x-2">
+                        <ChevronRight className="h-5 w-5 text-primary-dark" />
+                        <p className="text-sm text-primary-dark">Close</p>
+                        <AppWindow className="h-5 w-5 text-primary-dark" />
+                    </div>
+                )}
+            </div>
             <header className="flex h-16 shrink-0 items-center gap-2">
                 <div className="flex items-center gap-2 px-4">
                     <SidebarTrigger className="-ml-1 text-white" />
@@ -177,46 +211,29 @@ const ManagePagePage = ({ pageId }: Props) => {
                     </Breadcrumb>
                 </div>
             </header>
-            <div className="flex w-full gap-x-4">
+            <div className="flex w-full gap-x-2">
                 {/* Conversation */}
                 <div
                     className={`transition-all duration-300 ease-in-out ${
                         isCollapsed ? "w-full" : "w-[640px] shrink-0"
-                    }`}
+                    } pb-4`}
                 >
                     <Conversation
                         type="page"
                         channelName={page?.name || ""}
+                        channelDescription={page?.description || ""}
                         initialMessages={messages}
-                        sprintSelection={sprintOptions}
+                        sprintOptions={sprintOptions}
                         selectedSprint={selectedSprint || undefined}
-                        onSprintChange={setSelectedSprint}
+                        onSprintChange={handleSprintChange}
+                        conversationId={conversation?.id || ""}
+                        isLoading={isLoadingSetupPageConversation}
+                        onSubmitConversation={handleSubmitConversation}
+                        status={conversation?.status || ""}
                     />
                 </div>
                 {/* Web Development - Collapsible */}
                 <div className="relative flex-1">
-                    <div
-                        className="absolute top-4 right-2 z-10 bg-white text-primary-dark p-1 rounded-md hover:bg-white/80 cursor-pointer"
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                    >
-                        {isCollapsed ? (
-                            <div className="flex items-center gap-x-2">
-                                <ChevronRight className="h-5 w-5 text-primary-dark" />
-                                <p className="text-sm text-primary-dark">
-                                    Open
-                                </p>
-                                <AppWindow className="h-5 w-5 text-primary-dark" />
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-x-2">
-                                <ChevronLeft className="h-5 w-5 text-primary-dark" />
-                                <p className="text-sm text-primary-dark">
-                                    Close
-                                </p>
-                                <AppWindow className="h-5 w-5 text-primary-dark" />
-                            </div>
-                        )}
-                    </div>
                     <Collapsible
                         className={`transition-all duration-300 ease-in-out ${
                             isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Conversation from "@/components/Conversation";
+import Conversation from "@/components/conversation/Conversation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import "@/styles/conversation.css";

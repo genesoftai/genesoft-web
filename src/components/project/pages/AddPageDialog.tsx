@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Plus, Upload, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 import { PageReference, PageFile, Page } from "@/types/project";
 import { createReferenceLink } from "@/actions/reference_link";
@@ -229,9 +229,11 @@ export function AddPageDialog({
                     <span className="font-semibold">Add Page</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll flex flex-col">
+            <DialogContent className="w-11/12 sm:max-w-[600px] max-h-[90vh] overflow-y-scroll flex flex-col rounded-lg">
                 <DialogHeader>
-                    <DialogTitle className="text-xl">Add Page</DialogTitle>
+                    <DialogTitle className="text-base md:text-xl">
+                        Add Page
+                    </DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-6 py-4">
                     <div className="grid gap-2">
@@ -241,6 +243,7 @@ export function AddPageDialog({
                             placeholder="Enter page name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            className="text-sm md:text-base"
                         />
                     </div>
                     <div className="grid gap-2">
@@ -248,209 +251,10 @@ export function AddPageDialog({
                         <Textarea
                             id="description"
                             placeholder="Describe important information of this page such as structure, content, features, and etc."
-                            className="min-h-[100px]"
+                            className="min-h-[100px] text-sm md:text-base"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
-                    </div>
-                    <div className="grid gap-4">
-                        <div>
-                            <h3 className="text-lg font-semibold mb-2">
-                                References
-                            </h3>
-                            <p className="text-sm text-subtext-in-white-bg mb-4">
-                                Provide reference information for this feature
-                                by url
-                            </p>
-                            {references.length > 0 && (
-                                <div className="mb-4 space-y-3">
-                                    {references.map((ref, index) => (
-                                        <div
-                                            key={index}
-                                            className="p-3 rounded-lg relative shadow-md border-1 border-gray-200"
-                                        >
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute right-2 top-2 h-6 w-6"
-                                                onClick={() =>
-                                                    handleRemoveReference(index)
-                                                }
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                            <p className="font-medium text-sm truncate pr-8">
-                                                {ref.name}
-                                            </p>
-                                            <a
-                                                href={ref.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm text-blue-500 mt-1 hover:underline"
-                                            >
-                                                {ref.url}
-                                            </a>
-                                            <p className="text-sm text-subtext-in-white-bg mt-1">
-                                                {ref.context}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            <div className="grid gap-2">
-                                <Input
-                                    placeholder="Reference name"
-                                    value={newReference.name}
-                                    onChange={(e) =>
-                                        setNewReference({
-                                            ...newReference,
-                                            name: e.target.value,
-                                        })
-                                    }
-                                />
-                                <Input
-                                    placeholder="URL"
-                                    value={newReference.url}
-                                    onChange={(e) =>
-                                        setNewReference({
-                                            ...newReference,
-                                            url: e.target.value,
-                                        })
-                                    }
-                                />
-                                <Textarea
-                                    placeholder="give context for how to use this reference for this page"
-                                    className="min-h-[60px]"
-                                    value={newReference.context}
-                                    onChange={(e) =>
-                                        setNewReference({
-                                            ...newReference,
-                                            context: e.target.value,
-                                        })
-                                    }
-                                />
-                                <Button
-                                    className="w-fit"
-                                    variant="secondary"
-                                    onClick={handleAddReference}
-                                    disabled={isUploadingReference}
-                                >
-                                    <span>Add Reference</span>
-                                    {isUploadingReference && (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold mb-2">
-                                Files
-                            </h3>
-                            <p className="text-sm text-subtext-in-white-bg mb-4">
-                                Upload files those aim to use in this page
-                            </p>
-                            {files.length > 0 && (
-                                <div className="mb-4 space-y-3">
-                                    {files.map((file, index) => (
-                                        <div
-                                            key={index}
-                                            className="p-3 rounded-lg relative shadow-md border-1 border-gray-200"
-                                        >
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute right-2 top-2 h-6 w-6"
-                                                onClick={() =>
-                                                    handleRemoveFile(index)
-                                                }
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                            <p className="font-medium text-sm truncate pr-8">
-                                                {file.name}
-                                            </p>
-                                            <p className="text-sm text-subtext-in-white-bg mt-1">
-                                                {file.context}
-                                            </p>
-                                            <a
-                                                href={file.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm text-blue-500 mt-1 hover:underline"
-                                            >
-                                                {file.url}
-                                            </a>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            <div className="grid gap-2">
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="file"
-                                        id="file-upload"
-                                        onChange={handleFileUpload}
-                                    />
-                                    <Label
-                                        htmlFor="file-upload"
-                                        className="cursor-pointer"
-                                    >
-                                        <Button
-                                            variant="outline"
-                                            className="w-fit"
-                                            type="button"
-                                            onClick={() =>
-                                                document
-                                                    .getElementById(
-                                                        "file-upload",
-                                                    )
-                                                    ?.click()
-                                            }
-                                        >
-                                            <Upload className="mr-2 h-4 w-4" />
-                                            Upload file
-                                        </Button>
-                                    </Label>
-                                    {newFile.url && (
-                                        <p className="text-sm text-subtext-in-white-bg mt-1">
-                                            {newFile.url}
-                                        </p>
-                                    )}
-                                </div>
-                                <Input
-                                    placeholder="File name"
-                                    value={newFile.name}
-                                    onChange={(e) =>
-                                        setNewFile({
-                                            ...newFile,
-                                            name: e.target.value,
-                                        })
-                                    }
-                                />
-                                <Textarea
-                                    placeholder="give context for how to use this file for this page"
-                                    className="min-h-[60px]"
-                                    value={newFile.context}
-                                    onChange={(e) =>
-                                        setNewFile({
-                                            ...newFile,
-                                            context: e.target.value,
-                                        })
-                                    }
-                                />
-                                <Button
-                                    className="w-fit flex items-center gap-2"
-                                    variant="secondary"
-                                    onClick={handleAddFile}
-                                    disabled={isUploadingFile}
-                                >
-                                    <span>Add File</span>
-                                    {isUploadingFile && (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -461,12 +265,13 @@ export function AddPageDialog({
                 )}
 
                 <Button
-                    className="w-fit self-center bg-genesoft text-white px-2 py-4"
+                    className={`w-fit self-center px-2 py-4 ${!name || !description ? "bg-gray-300 text-gray-500" : "bg-genesoft text-white hover:bg-genesoft/80 hover:text-white"}`}
                     size="lg"
+                    disabled={!name || !description}
                     onClick={handleAddPage}
                 >
                     <Plus className="mr-1 h-4 w-4" />
-                    Add Page
+                    <span className="text-xs md:text-base">Add Page</span>
                 </Button>
             </DialogContent>
         </Dialog>

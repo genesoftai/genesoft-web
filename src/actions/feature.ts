@@ -5,7 +5,7 @@ import axios from "axios";
 import { genesoftCoreApiServiceBaseUrl } from "@/constants/api-service/url";
 import { AxiosError } from "axios";
 
-export type CreatePageDto = {
+export type CreateFeatureDto = {
     project_id: string;
     name: string;
     description: string;
@@ -13,12 +13,12 @@ export type CreatePageDto = {
     reference_link_ids?: string[];
 };
 
-export async function getPageById(pageId: string) {
-    const url = `${genesoftCoreApiServiceBaseUrl}/page/${pageId}`;
+export async function getFeatureById(featureId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/feature/${featureId}`;
 
     console.log({
-        message: "getPageById",
-        pageId,
+        message: "getFeatureById",
+        featureId,
         url,
     });
 
@@ -38,11 +38,11 @@ export async function getPageById(pageId: string) {
     }
 }
 
-export async function createPage(payload: CreatePageDto) {
-    const url = `${genesoftCoreApiServiceBaseUrl}/page`;
+export async function createFeature(payload: CreateFeatureDto) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/feature`;
 
     console.log({
-        message: "createPage",
+        message: "createFeature",
         payload,
         url,
     });
@@ -55,10 +55,10 @@ export async function createPage(payload: CreatePageDto) {
         });
         return res.data;
     } catch (error) {
-        console.error("Error creating page:", error);
+        console.error("Error creating feature:", error);
         if (error instanceof AxiosError) {
             throw new Error(error.response?.data.message);
         }
-        throw new Error("Failed to create page");
+        throw new Error("Failed to create feature");
     }
 }

@@ -21,6 +21,7 @@ import {
 import { DevelopmentStatusBadge } from "../web-application/DevelopmentStatus";
 import { DeploymentStatusBadge } from "../web-application/DeploymentStatus";
 import posthog from "posthog-js";
+import { formatDateToHumanReadable } from "@/utils/common/time";
 
 interface WebPreviewProps {
     project: Project | null;
@@ -136,7 +137,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                     {/* {
                         "See web application information and manage your web application here by trigger AI Agent to build your web application or add feedback to improve your web application"
                     } */}
-                    <div className="flex items-center gap-x-8">
+                    <div className="flex items-center gap-x-2">
                         <div className="text-sm font-medium text-gray-300">
                             URL
                         </div>
@@ -189,53 +190,61 @@ export function WebPreview({ project }: WebPreviewProps) {
                     )}
                 </div>
 
-                <div className="flex flex-col gap-4 w-full p-4 bg-primary-dark/30 rounded-lg border border-white/10">
-                    <div className="flex items-center gap-x-8">
+                <div className="flex flex-col gap-4 w-full p-4">
+                    <div className="flex flex-col gap-1  w-fit">
                         <div className="text-sm font-medium text-gray-300">
                             Web Application Status
                         </div>
-                        <DeploymentStatusBadge
-                            status={
-                                webApplicationInfo?.status ||
-                                DeploymentStatus.NOT_DEPLOYED
-                            }
-                        />
-                        {webApplicationInfo?.status ===
-                            DeploymentStatus.DEPLOYED && (
-                            <span className="text-xs text-white">
-                                at{" "}
-                                {new Date(
-                                    webApplicationInfo?.readyAt,
-                                ).toLocaleString()}
-                            </span>
-                        )}
+                        <div className="flex items-center gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
+                            <DeploymentStatusBadge
+                                status={
+                                    webApplicationInfo?.status ||
+                                    DeploymentStatus.NOT_DEPLOYED
+                                }
+                            />
+                            {webApplicationInfo?.status ===
+                                DeploymentStatus.DEPLOYED && (
+                                <span className="text-xs text-white">
+                                    at{" "}
+                                    {webApplicationInfo?.readyAt
+                                        ? formatDateToHumanReadable(
+                                              webApplicationInfo.readyAt,
+                                          )
+                                        : "Not available"}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-x-8">
+                    <div className="flex flex-col gap-1 w-fit">
                         <div className="text-sm font-medium text-gray-300">
                             Software Development Status
                         </div>
-                        <DevelopmentStatusBadge
-                            status={
-                                webApplicationInfo?.developmentStatus ||
-                                DevelopmentStatus.DEVELOPMENT_DONE
-                            }
-                        />
-                        {isInProgress && (
-                            <span className="text-xs text-white">
-                                We will send email information to your email
-                                when development is done
-                            </span>
-                        )}
-                        {webApplicationInfo?.developmentStatus ===
-                            DevelopmentStatus.DEVELOPMENT_DONE && (
-                            <span className="text-xs text-white">
-                                at{" "}
-                                {new Date(
-                                    webApplicationInfo?.developmentDoneAt,
-                                ).toLocaleString()}
-                            </span>
-                        )}
+                        <div className="flex items-center gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10 ">
+                            <DevelopmentStatusBadge
+                                status={
+                                    webApplicationInfo?.developmentStatus ||
+                                    DevelopmentStatus.DEVELOPMENT_DONE
+                                }
+                            />
+                            {isInProgress && (
+                                <span className="text-xs text-white">
+                                    We will send email information to your email
+                                    when development is done
+                                </span>
+                            )}
+                            {webApplicationInfo?.developmentStatus ===
+                                DevelopmentStatus.DEVELOPMENT_DONE && (
+                                <span className="text-xs text-white">
+                                    at{" "}
+                                    {webApplicationInfo?.developmentDoneAt
+                                        ? formatDateToHumanReadable(
+                                              webApplicationInfo.developmentDoneAt,
+                                          )
+                                        : "Not available"}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
 

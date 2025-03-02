@@ -23,17 +23,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { AddPageDialog } from "@/components/project/pages/AddPageDialog";
 import { AddFeatureDialog } from "@/components/project/features/AddFeatureDialog";
-import { addFeature, addPage } from "@/actions/project";
 import { Feature, Page } from "@/types/project";
+import { useChannelStore } from "@/stores/channel-store";
+import { sleep } from "@/utils/common/time";
+import { createPage } from "@/actions/page";
+import { createFeature } from "@/actions/feature";
 
 export function NavProject() {
     const { id, name, pages, features, branding } = useProjectStore();
+    const { id: channelId, category, updateChannelStore } = useChannelStore();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-
-    if (!id || !name || !pages || !features) {
-        return null;
-    }
 
     console.log({
         message: "NavProject: branding",
@@ -41,49 +41,59 @@ export function NavProject() {
     });
 
     const handleAddPage = async (page: Page) => {
+        let pageId = "";
         try {
             setIsLoading(true);
-            const newPage = await addPage({
-                projectId: id,
-                payload: {
-                    name: page.name,
-                    description: page.description,
-                    file_ids: page.files.map((file) => file.id || ""),
-                    reference_link_ids: page.references.map(
-                        (ref) => ref.id || "",
-                    ),
-                },
+            const newPage = await createPage({
+                project_id: id,
+                name: page.name,
+                description: page.description,
             });
-            router.push(`/dashboard/project/manage/${id}/pages/${newPage.id}`);
+            pageId = newPage.id;
+            updateChannelStore({ id: newPage.id, category: "page" });
+            sleep(1000);
         } catch (error) {
             console.error("Error adding page:", error);
         } finally {
             setIsLoading(false);
+            router.push(`/dashboard/project/manage/${id}/pages/${pageId}`);
         }
     };
 
     const handleAddFeature = async (feature: Feature) => {
+        let featureId = "";
         try {
             setIsLoading(true);
-            const newFeature = await addFeature({
-                projectId: id,
-                payload: {
-                    name: feature.name,
-                    description: feature.description,
-                    file_ids: feature.files?.map((file) => file.id || "") || [],
-                    reference_link_ids:
-                        feature.references?.map((ref) => ref.id || "") || [],
-                },
+            const newFeature = await createFeature({
+                project_id: id,
+                name: feature.name,
+                description: feature.description,
             });
-            router.push(
-                `/dashboard/project/manage/${id}/features/${newFeature.id}`,
-            );
+            featureId = newFeature.id;
+            updateChannelStore({ id: newFeature.id, category: "feature" });
+            sleep(1000);
         } catch (error) {
             console.error("Error adding feature:", error);
         } finally {
             setIsLoading(false);
+            router.push(
+                `/dashboard/project/manage/${id}/features/${featureId}`,
+            );
         }
     };
+
+    const handleSelectPage = (pageId: string) => {
+        updateChannelStore({ id: pageId, category: "page" });
+        router.push(`/dashboard/project/manage/${id}/pages/${pageId}`);
+    };
+    const handleSelectFeature = (featureId: string) => {
+        updateChannelStore({ id: featureId, category: "feature" });
+        router.push(`/dashboard/project/manage/${id}/features/${featureId}`);
+    };
+
+    if (!id) {
+        return null;
+    }
 
     return (
         <SidebarGroup>
@@ -152,15 +162,19 @@ export function NavProject() {
                                                 >
                                                     <SidebarMenuSubButton
                                                         asChild
-                                                        className="text-subtext-in-dark-bg hover:bg-secondary-dark hover:text-white"
+                                                        className={`cursor-pointer text-subtext-in-dark-bg hover:bg-secondary-dark hover:text-white ${category === "page" && channelId === page.id ? "bg-genesoft text-white" : ""}`}
                                                     >
-                                                        <a
-                                                            href={`/dashboard/project/manage/${id}/pages/${page.id}`}
+                                                        <p
+                                                            onClick={() =>
+                                                                handleSelectPage(
+                                                                    page.id,
+                                                                )
+                                                            }
                                                         >
                                                             <span>
                                                                 {page.name}
                                                             </span>
-                                                        </a>
+                                                        </p>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>
                                             ))}
@@ -171,10 +185,6 @@ export function NavProject() {
                         </SidebarMenuItem>
                     </Collapsible>
                     <button className="flex items-center justify-center gap-1.5 p-2 rounded-lg transition-colors hover:bg-secondary-dark/20 group">
-                        {/* <PlusCircleIcon className="w-5 h-5 text-genesoft group-hover:text-white transition-colors" />
-                    <span className="text-subtext-in-dark-bg text-xs font-medium group-hover:text-white transition-colors">
-                        Add Page
-                    </span> */}
                         <AddPageDialog
                             onAddPage={handleAddPage}
                             type="update"
@@ -216,15 +226,19 @@ export function NavProject() {
                                                 >
                                                     <SidebarMenuSubButton
                                                         asChild
-                                                        className="text-subtext-in-dark-bg hover:bg-secondary-dark hover:text-white"
+                                                        className={`cursor-pointer text-subtext-in-dark-bg hover:bg-secondary-dark hover:text-white ${category === "feature" && channelId === feature.id ? "bg-genesoft text-white" : ""}`}
                                                     >
-                                                        <a
-                                                            href={`/dashboard/project/manage/${id}/features/${feature.id}`}
+                                                        <p
+                                                            onClick={() =>
+                                                                handleSelectFeature(
+                                                                    feature.id,
+                                                                )
+                                                            }
                                                         >
                                                             <span>
                                                                 {feature.name}
                                                             </span>
-                                                        </a>
+                                                        </p>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>
                                             ))}
