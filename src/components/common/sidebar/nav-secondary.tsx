@@ -31,7 +31,7 @@ export function NavSecondary({
                                 className="text-white hover:bg-secondary-dark bg-primary-dark"
                             >
                                 <a href={item.url}>
-                                    <item.icon className="text-subtext-in-dark-bg" />
+                                    {/* <item.icon className="text-subtext-in-dark-bg" /> */}
                                     <span className="text-subtext-in-dark-bg">
                                         {item.title}
                                     </span>

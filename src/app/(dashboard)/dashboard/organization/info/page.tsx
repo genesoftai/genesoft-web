@@ -121,14 +121,14 @@ const OrganizationInfoPage = () => {
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
                 {hasOrganization && (
                     <div className="min-h-[100vh] flex-1 rounded-xl bg-secondary-dark md:min-h-min p-4 w-full flex flex-col">
-                        <p className="text-2xl p-4 text-subtext-in-dark-bg font-bold">
+                        <p className="text-xl md:text-2xl p-4 text-subtext-in-dark-bg font-bold">
                             Organization Information
                         </p>
 
                         <div className="flex flex-col items-start gap-y-8 p-4 self-center w-10/12 sm:w-8/12 md:w-6/12">
                             <div className="grid w-full max-w-sm items-center gap-1.5 text-subtext-in-dark-bg">
                                 <Label
-                                    className="text-xl font-bold"
+                                    className="text-base md:text-xl font-bold"
                                     htmlFor="name"
                                 >
                                     Organization Name
@@ -137,7 +137,7 @@ const OrganizationInfoPage = () => {
                                     type="text"
                                     id="name"
                                     placeholder="Enter name of your organization"
-                                    className="border-tertiary-dark bg-neutral-700 w-8/12"
+                                    className="border-tertiary-dark bg-neutral-700 w-full md:w-8/12 text-sm md:text-base"
                                     required
                                     value={organizationName}
                                     onChange={(e) =>
@@ -147,7 +147,7 @@ const OrganizationInfoPage = () => {
                             </div>
                             <div className="grid w-full gap-1.5 text-subtext-in-dark-bg">
                                 <Label
-                                    className="text-xl font-bold"
+                                    className="text-base md:text-xl font-bold"
                                     htmlFor="description"
                                 >
                                     Organization Description
@@ -155,7 +155,7 @@ const OrganizationInfoPage = () => {
                                 <Textarea
                                     placeholder="Enter description of your organization"
                                     id="description"
-                                    className="border-tertiary-dark bg-neutral-700 w-full"
+                                    className="border-tertiary-dark bg-neutral-700 w-full text-sm md:text-base h-24 md:h-32"
                                     required
                                     value={organizationDescription}
                                     onChange={(e) =>

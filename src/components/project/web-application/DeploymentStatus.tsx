@@ -1,14 +1,18 @@
 "use client";
 
-import { CheckCircle2, TriangleAlert } from "lucide-react";
-import { DeploymentStatus } from "@/types/web-application";
+import { CircleCheck, Loader2, TriangleAlert } from "lucide-react";
+import { DeploymentStatus, ReadyStatus } from "@/types/web-application";
 import { useEffect, useState } from "react";
 
 interface DeploymentStatusProps {
     status: DeploymentStatus;
+    readyStatus: ReadyStatus;
 }
 
-export function DeploymentStatusBadge({ status }: DeploymentStatusProps) {
+export function DeploymentStatusBadge({
+    status,
+    readyStatus,
+}: DeploymentStatusProps) {
     const [textToShow, setTextToShow] = useState("");
     const [bgColor, setBgColor] = useState("");
 
@@ -18,17 +22,21 @@ export function DeploymentStatusBadge({ status }: DeploymentStatusProps) {
     }, [status]);
 
     const setupTextToShow = () => {
-        if (status === DeploymentStatus.DEPLOYED) {
+        if (readyStatus === ReadyStatus.READY) {
             setTextToShow("Deployment successful");
-        } else if (status === DeploymentStatus.NOT_DEPLOYED) {
+        } else if (readyStatus === ReadyStatus.BUILDING) {
+            setTextToShow("Deployment in progress");
+        } else {
             setTextToShow("Deployment failed");
         }
     };
 
     const setupColor = () => {
-        if (status === DeploymentStatus.DEPLOYED) {
+        if (readyStatus === ReadyStatus.READY) {
             setBgColor("bg-emerald-400/50");
-        } else if (status === DeploymentStatus.NOT_DEPLOYED) {
+        } else if (readyStatus === ReadyStatus.BUILDING) {
+            setBgColor("bg-genesoft-blue/50");
+        } else {
             setBgColor("bg-red-500/50");
         }
     };
@@ -37,10 +45,13 @@ export function DeploymentStatusBadge({ status }: DeploymentStatusProps) {
         <div
             className={`flex items-center gap-2 text-sm ${bgColor} px-3 py-1 rounded-full`}
         >
-            {status === DeploymentStatus.DEPLOYED && (
-                <CheckCircle2 className="h-4 w-4" />
+            {readyStatus === ReadyStatus.BUILDING && (
+                <Loader2 className="h-4 w-4 animate-spin" />
             )}
-            {status === DeploymentStatus.NOT_DEPLOYED && (
+            {readyStatus === ReadyStatus.READY && (
+                <CircleCheck className="h-4 w-4" />
+            )}
+            {readyStatus === ReadyStatus.FAILED && (
                 <TriangleAlert className="h-4 w-4" />
             )}
             <span>{textToShow}</span>

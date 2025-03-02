@@ -11,6 +11,7 @@ export interface GenesoftUserStore {
     organization: GenesoftOrganization | null;
     created_at: string;
     updated_at: string;
+    project_id: string | null;
     updateGenesoftUser: (user: Partial<GenesoftUserStore>) => void;
     clearGenesoftUserStore: () => void;
 }
@@ -24,6 +25,7 @@ const initialUserStoreStates = {
     organization: null,
     created_at: "",
     updated_at: "",
+    project_id: null,
 };
 
 export const useGenesoftUserStore = create<GenesoftUserStore>()(

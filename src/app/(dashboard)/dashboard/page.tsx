@@ -129,13 +129,13 @@ export default function Dashboard() {
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
                 {hasOrganization ? (
-                    <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
+                    <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl bg-secondary-dark">
                         <div>
                             <div className="flex flex-col gap-y-2 mb-8">
-                                <p className="text-2xl text-subtext-in-dark-bg font-bold">
+                                <p className="text-xl md:text-2xl text-subtext-in-dark-bg font-bold">
                                     Organization Projects
                                 </p>
-                                <p className="text-base text-subtext-in-dark-bg">
+                                <p className="text-sm md:text-base text-subtext-in-dark-bg">
                                     List of all projects in your organization to
                                     develop and managed by software development
                                     team of AI Agents
@@ -144,7 +144,7 @@ export default function Dashboard() {
 
                             {/* TODO: list all projects in organization */}
                             {organizationProjects.length > 0 ? (
-                                <div className="flex flex-col gap-4 p-4 pt-0 w-full items-center rounded-xl bg-secondary-dark">
+                                <div className="flex flex-col gap-4 pt-0 w-full items-center rounded-xl bg-secondary-dark">
                                     {organizationProjects.map(
                                         (project: Project) => (
                                             <ProjectCard
@@ -173,7 +173,9 @@ export default function Dashboard() {
                             className="flex items-center p-4 self-center w-fit bg-genesoft font-medium hover:bg-genesoft/80"
                             onClick={handleCreateProject}
                         >
-                            <span>Create Project</span>
+                            <span className="text-xs md:text-base">
+                                Create Project
+                            </span>
                         </Button>
 
                         <div className="min-h-[100vh] flex-1 rounded-xl bg-secondary-dark md:min-h-min" />

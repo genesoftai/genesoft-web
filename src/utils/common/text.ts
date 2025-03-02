@@ -15,3 +15,10 @@ export const getTextSeparatedByHyphen = (text: string | undefined): string => {
         )
         .join(" ");
 };
+
+export const getFirstCharacterUppercase = (
+    text: string | undefined,
+): string => {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1);
+};

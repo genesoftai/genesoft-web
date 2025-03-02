@@ -64,7 +64,7 @@ export default function LandingPage() {
     const [heroStage, setHeroStage] = useState(0);
 
     const heroContent = [
-        "Your software development team in the AI era",
+        "Software development team for your startup in the AI Agent era",
         "Collaborate with our AI agent team to build your startup web application - our agents work 24/7 to turn your requirements into reality",
         "Perfect for entrepreneurs and founders without technical expertise who want to turn ideas into reality on a low budget",
     ];
@@ -83,7 +83,7 @@ export default function LandingPage() {
                 {/* Hero Section */}
                 <section className="text-center px-5 md:px-10 lg:px-20 flex flex-col lg:flex-row space-y-2 lg:space-y-2 mb-20 lg:mb-40">
                     <div className="text-center md:text-start px-4 flex flex-col space-y-6 md:space-y-10 mb-10 md:mb-0">
-                        <h1 className="text-2xl font-bold tracking-tight sm:text-2xl md:text-4xl h-20 text-genesoft">
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-2xl md:text-5xl h-20 text-genesoft">
                             {heroStage === 0 && (
                                 <StreamingText
                                     text={heroContent[0]}
