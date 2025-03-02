@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Info, Loader2, Send } from "lucide-react";
 import PageLoading from "@/components/common/PageLoading";
-import Conversation from "@/components/project/feedback/Converation";
+import FeedbackConversation from "@/components/project/feedback/FeedbackConveration";
 import { SelectConversation } from "@/components/project/feedback/SelectConversation";
 import posthog from "posthog-js";
 
@@ -229,7 +229,9 @@ const FeedbackPage = () => {
                             <CardContent className="bg-primary-dark mx-8 rounded-xl">
                                 <div className="flex flex-col gap-y-4 w-full">
                                     <div className="my-4 space-y-2">
-                                        <Conversation feedback={feedback} />
+                                        <FeedbackConversation
+                                            feedback={selectedFeedback}
+                                        />
                                     </div>
                                     {!selectedFeedback?.is_submit && (
                                         <div className="flex items-center gap-x-2">

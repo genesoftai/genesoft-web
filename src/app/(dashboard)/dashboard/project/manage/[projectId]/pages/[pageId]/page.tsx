@@ -5,11 +5,12 @@ import {
     getConversationById,
     getConversationsByPageId,
 } from "@/actions/conversation";
-import { getOrganizationById } from "@/actions/organization";
 import { getPageById } from "@/actions/page";
 import { getProjectById } from "@/actions/project";
 import PageLoading from "@/components/common/PageLoading";
-import Conversation from "@/components/conversation/Conversation";
+import Conversation, {
+    SprintOption,
+} from "@/components/conversation/Conversation";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import {
     Breadcrumb,
@@ -22,7 +23,6 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
-import { GenesoftOrganization } from "@/types/organization";
 import { Page, Project } from "@/types/project";
 import { AppWindow, ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -33,16 +33,11 @@ import {
     Message,
 } from "@/types/message";
 
-type Props = {
-    pageId: string;
-};
-
-const ManagePagePage = ({ pageId }: Props) => {
+const ManagePagePage = () => {
     const pathParams = useParams();
     const { id: projectId, updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
-    const [organization, setOrganization] =
-        useState<GenesoftOrganization | null>(null);
+
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState<Page | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -53,16 +48,13 @@ const ManagePagePage = ({ pageId }: Props) => {
     const [isLoadingSetupPageConversation, setIsLoadingSetupPageConversation] =
         useState<boolean>(false);
 
-    const [sprintOptions, setSprintOptions] = useState<
-        { id: string; name: string }[]
-    >([]);
+    const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
 
     const setupProject = async () => {
         setLoading(true);
         try {
             const projectData = await getProjectById(projectId);
             setProject(projectData);
-            setupOrganization(projectData.organization_id);
             updateProjectStore(projectData);
         } catch (error) {
             console.error("Error fetching project:", error);
@@ -90,11 +82,6 @@ const ManagePagePage = ({ pageId }: Props) => {
     useEffect(() => {
         setupProject();
     }, [projectId]);
-
-    const setupOrganization = async (organizationId: string) => {
-        const organizationData = await getOrganizationById(organizationId);
-        setOrganization(organizationData);
-    };
 
     const setupActivePageConversation = async (pageId: string) => {
         setIsLoadingSetupPageConversation(true);
@@ -125,20 +112,6 @@ const ManagePagePage = ({ pageId }: Props) => {
         setSprintOptions(sprintOptions);
     };
 
-    const setupConversation = async (conversationId: string) => {
-        setIsLoadingSetupPageConversation(true);
-        try {
-            const conversationForWeb =
-                await getConversationById(conversationId);
-            setConversation(conversationForWeb);
-            setMessages(conversationForWeb.messages);
-        } catch (error) {
-            console.error("Error fetching conversation:", error);
-        } finally {
-            setIsLoadingSetupPageConversation(false);
-        }
-    };
-
     const handleSubmitConversation = async () => {
         window.location.reload();
     };
@@ -152,7 +125,7 @@ const ManagePagePage = ({ pageId }: Props) => {
 
     console.log({
         message: "ManagePagePage",
-        pageId,
+
         page,
         conversation,
         messages,

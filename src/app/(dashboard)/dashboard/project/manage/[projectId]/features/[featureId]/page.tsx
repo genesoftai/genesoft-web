@@ -9,7 +9,9 @@ import {
 import { getFeatureById } from "@/actions/feature";
 import { getProjectById } from "@/actions/project";
 import PageLoading from "@/components/common/PageLoading";
-import Conversation from "@/components/conversation/Conversation";
+import Conversation, {
+    SprintOption,
+} from "@/components/conversation/Conversation";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import {
     Breadcrumb,
@@ -32,11 +34,7 @@ import {
     Message,
 } from "@/types/message";
 
-type Props = {
-    featureId: string;
-};
-
-const ManageFeaturePage = ({ featureId }: Props) => {
+const ManageFeaturePage = () => {
     const pathParams = useParams();
     const { id: projectId, updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
@@ -52,9 +50,7 @@ const ManageFeaturePage = ({ featureId }: Props) => {
         setIsLoadingSetupFeatureConversation,
     ] = useState<boolean>(false);
 
-    const [sprintOptions, setSprintOptions] = useState<
-        { id: string; name: string }[]
-    >([]);
+    const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
 
     const setupProject = async () => {
         setLoading(true);
@@ -158,7 +154,6 @@ const ManageFeaturePage = ({ featureId }: Props) => {
 
     console.log({
         message: "ManageFeaturePage",
-        featureId,
         feature,
         conversation,
         messages,
