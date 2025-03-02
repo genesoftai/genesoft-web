@@ -18,20 +18,16 @@ export function DevelopmentStatusBadge({ status }: DevelopmentStatusProps) {
     }, [status]);
 
     const setupTextToShow = () => {
-        if (status === DevelopmentStatus.DEVELOPMENT_DONE) {
+        if (status === DevelopmentStatus.PAGE_ITERATION_IN_PROGRESS) {
+            setTextToShow(
+                "Page Development In Progress by Software Development team of AI Agents",
+            );
+        } else if (status === DevelopmentStatus.FEATURE_ITERATION_IN_PROGRESS) {
+            setTextToShow(
+                "Feature Development In Progress by Software Development team of AI Agents",
+            );
+        } else if (status === DevelopmentStatus.DEVELOPMENT_DONE) {
             setTextToShow("Development Done");
-        } else if (
-            status === DevelopmentStatus.FEEDBACK_ITERATION_IN_PROGRESS
-        ) {
-            setTextToShow(
-                "Feedback Development In Progress by Software Development team of AI Agents",
-            );
-        } else if (
-            status === DevelopmentStatus.REQUIREMENTS_ITERATION_IN_PROGRESS
-        ) {
-            setTextToShow(
-                "Requirements Development In Progress by Software Development team of AI Agents",
-            );
         }
     };
 
@@ -39,16 +35,16 @@ export function DevelopmentStatusBadge({ status }: DevelopmentStatusProps) {
         if (status === DevelopmentStatus.DEVELOPMENT_DONE) {
             setBgColor("bg-emerald-400/50");
         } else if (
-            status === DevelopmentStatus.FEEDBACK_ITERATION_IN_PROGRESS ||
-            status === DevelopmentStatus.REQUIREMENTS_ITERATION_IN_PROGRESS
+            status === DevelopmentStatus.PAGE_ITERATION_IN_PROGRESS ||
+            status === DevelopmentStatus.FEATURE_ITERATION_IN_PROGRESS
         ) {
             setBgColor("bg-amber-400/50");
         }
     };
 
     const isInProgress =
-        status === DevelopmentStatus.FEEDBACK_ITERATION_IN_PROGRESS ||
-        status === DevelopmentStatus.REQUIREMENTS_ITERATION_IN_PROGRESS;
+        status === DevelopmentStatus.PAGE_ITERATION_IN_PROGRESS ||
+        status === DevelopmentStatus.FEATURE_ITERATION_IN_PROGRESS;
 
     return (
         <div
@@ -58,8 +54,8 @@ export function DevelopmentStatusBadge({ status }: DevelopmentStatusProps) {
                 <CheckCircle2 className="h-4 w-4" />
             )}
             {[
-                DevelopmentStatus.FEEDBACK_ITERATION_IN_PROGRESS,
-                DevelopmentStatus.REQUIREMENTS_ITERATION_IN_PROGRESS,
+                DevelopmentStatus.PAGE_ITERATION_IN_PROGRESS,
+                DevelopmentStatus.FEATURE_ITERATION_IN_PROGRESS,
             ].includes(status) && <Code className="h-4 w-4 animate-pulse" />}
             <span>{textToShow}</span>
         </div>
