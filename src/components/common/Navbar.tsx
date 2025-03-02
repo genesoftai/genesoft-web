@@ -13,6 +13,7 @@ import UserNav from "./UserNav";
 import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
 import posthog from "posthog-js";
+import { updateUserImage, updateUserImageByEmail } from "@/actions/user";
 
 type UserData = { user: User } | { user: null };
 
@@ -53,6 +54,13 @@ export default function Navbar() {
             setUserEmail(user?.email ?? "");
         }
         setUserData(data);
+        // update user image
+        if (data?.user?.user_metadata?.avatar_url) {
+            updateUserImageByEmail({
+                email: data.user.email ?? "",
+                imageUrl: data.user.user_metadata.avatar_url,
+            });
+        }
     };
 
     return (

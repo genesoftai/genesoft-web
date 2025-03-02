@@ -16,6 +16,7 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { NavProject } from "./nav-project";
 
 const data = {
     user: {
@@ -33,14 +34,14 @@ const data = {
                     title: "Info",
                     url: "/dashboard/organization/info",
                 },
-                {
-                    title: "Usage",
-                    url: "/dashboard/organization/usage",
-                },
-                {
-                    title: "Invoices",
-                    url: "/dashboard/organization/invoices",
-                },
+                // {
+                //     title: "Usage",
+                //     url: "/dashboard/organization/usage",
+                // },
+                // {
+                //     title: "Invoices",
+                //     url: "/dashboard/organization/invoices",
+                // },
             ],
         },
         {
@@ -58,46 +59,45 @@ const data = {
                 },
             ],
         },
-        {
-            title: "Documentation",
-            url: "/documentation/introduction",
-            icon: BookOpen,
-            items: [
-                {
-                    title: "Introduction",
-                    url: "/documentation/introduction",
-                },
-                {
-                    title: "Get Started",
-                    url: "/documentation/get-started",
-                },
-                {
-                    title: "Tutorials",
-                    url: "/documentation/tutorials",
-                },
-                {
-                    title: "Pricing",
-                    url: "/documentation/pricing",
-                },
-            ],
-        },
+        // {
+        //     title: "Documentation",
+        //     url: "/documentation/introduction",
+        //     icon: BookOpen,
+        //     items: [
+        //         {
+        //             title: "Introduction",
+        //             url: "/documentation/introduction",
+        //         },
+        //         {
+        //             title: "Get Started",
+        //             url: "/documentation/get-started",
+        //         },
+        //         {
+        //             title: "Tutorials",
+        //             url: "/documentation/tutorials",
+        //         },
+        //         {
+        //             title: "Pricing",
+        //             url: "/documentation/pricing",
+        //         },
+        //     ],
+        // },
     ],
     navSecondary: [
         {
-            title: "Support",
+            title: "support@genesoftai.com",
             url: "mailto:support@genesoftai.com",
             icon: LifeBuoy,
-        },
-        {
-            title: "Feedback",
-            url: "mailto:support@genesoftai.com",
-            icon: Send,
         },
     ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { organization } = useGenesoftUserStore();
+    const { organization, project_id } = useGenesoftUserStore();
+    console.log({
+        message: "AppSidebar",
+        project_id,
+    });
     return (
         <Sidebar
             variant="inset"
@@ -127,15 +127,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
+                <NavProject />
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
-                <div className="flex flex-col items-start justify-center mb-8">
-                    <p className="text-xs text-muted-foreground">
-                        Support Email
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        support@genesoftai.com
-                    </p>
-                </div>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser />

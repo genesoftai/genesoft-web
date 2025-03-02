@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
                 hostname:
                     "genesoft-customer-project-dev.s3.ap-southeast-1.amazonaws.com",
             },
+            {
+                protocol: "https",
+                hostname: "lh3.googleusercontent.com",
+            },
         ],
     },
 };
