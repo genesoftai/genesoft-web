@@ -140,9 +140,7 @@ const ManagePagePage = ({ pageId }: Props) => {
     };
 
     const handleSubmitConversation = async () => {
-        // TODO: get latest active conversation and rerender conversation, also set latest sprints
-        setupSprintOptions(pageId as string);
-        setupConversation(selectedSprint as string);
+        window.location.reload();
     };
 
     const handleSprintChange = async (sprintId: string) => {

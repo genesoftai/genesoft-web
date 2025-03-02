@@ -51,3 +51,22 @@ export const checkBuildErrors = async (projectId: string) => {
         throw new Error("Failed to check build errors");
     }
 };
+
+export const getLatestIteration = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/development/iteration/project/${projectId}/latest`;
+    console.log({
+        message: "Getting latest iteration",
+        url,
+    });
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error getting latest iteration:", error);
+        throw new Error("Failed to get latest iteration");
+    }
+};

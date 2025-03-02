@@ -20,6 +20,13 @@ export type TalkToProjectManagerDto = {
     message: Partial<Message>;
 };
 
+export type CreateConversationDto = {
+    project_id: string;
+    name?: string;
+    page_id?: string;
+    feature_id?: string;
+};
+
 export async function getConversationById(conversationId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/conversation/${conversationId}`;
 
@@ -87,11 +94,14 @@ export async function getActiveConversationByFeatureId(featureId: string) {
         });
         return res.data;
     } catch (error) {
-        console.error("Error getting active conversation by page id:", error);
+        console.error(
+            "Error getting active conversation by feature id:",
+            error,
+        );
         if (error instanceof AxiosError) {
             throw new Error(error.response?.data.message);
         }
-        throw new Error("Failed to get active conversation by page id");
+        throw new Error("Failed to get active conversation by feature id");
     }
 }
 
@@ -240,5 +250,57 @@ export async function getConversationsByPageId(pageId: string) {
             throw new Error(error.response?.data.message);
         }
         throw new Error("Failed to get conversations by page id");
+    }
+}
+
+export async function getConversationsByFeatureId(featureId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/feature/${featureId}`;
+
+    console.log({
+        message: "getConversationsByFeatureId",
+        featureId,
+        url,
+    });
+
+    try {
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+
+        return res.data;
+    } catch (error) {
+        console.error("Error getting conversations by feature id:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error("Failed to get conversations by feature id");
+    }
+}
+
+export async function createConversation(payload: CreateConversationDto) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation`;
+
+    console.log({
+        message: "createConversation",
+        payload,
+        url,
+    });
+
+    try {
+        const res = await axios.post(url, payload, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+
+        return res.data;
+    } catch (error) {
+        console.error("Error creating conversation:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error("Failed to create conversation");
     }
 }

@@ -1,11 +1,15 @@
 "use client";
 
-import { getOrganizationById } from "@/actions/organization";
+import {
+    createConversation,
+    getActiveConversationByFeatureId,
+    getConversationById,
+    getConversationsByFeatureId,
+} from "@/actions/conversation";
 import { getFeatureById } from "@/actions/feature";
 import { getProjectById } from "@/actions/project";
 import PageLoading from "@/components/common/PageLoading";
 import Conversation from "@/components/conversation/Conversation";
-import { ConversationMessageForWeb, Message } from "@/types/message";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import {
     Breadcrumb,
@@ -18,15 +22,15 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
-import { GenesoftOrganization } from "@/types/organization";
 import { Feature, Project } from "@/types/project";
 import { AppWindow, ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
-    getActiveConversationByFeatureId,
-    getConversationById,
-} from "@/actions/conversation";
+    ConversationByFeatureId,
+    ConversationMessageForWeb,
+    Message,
+} from "@/types/message";
 
 type Props = {
     featureId: string;
@@ -36,8 +40,6 @@ const ManageFeaturePage = ({ featureId }: Props) => {
     const pathParams = useParams();
     const { id: projectId, updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
-    const [organization, setOrganization] =
-        useState<GenesoftOrganization | null>(null);
     const [loading, setLoading] = useState(false);
     const [feature, setFeature] = useState<Feature | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -45,20 +47,20 @@ const ManageFeaturePage = ({ featureId }: Props) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [conversation, setConversation] =
         useState<ConversationMessageForWeb | null>(null);
+    const [
+        isLoadingSetupFeatureConversation,
+        setIsLoadingSetupFeatureConversation,
+    ] = useState<boolean>(false);
 
-    const sprintOptions = [
-        { id: "sprint-1", name: "Sprint 1: Initial Design" },
-        { id: "sprint-2", name: "Sprint 2: Feature Implementation" },
-        { id: "sprint-3", name: "Sprint 3: Testing & Refinement" },
-        { id: "sprint-4", name: "Sprint 4: Final Integration" },
-    ];
+    const [sprintOptions, setSprintOptions] = useState<
+        { id: string; name: string }[]
+    >([]);
 
     const setupProject = async () => {
         setLoading(true);
         try {
             const projectData = await getProjectById(projectId);
             setProject(projectData);
-            setupOrganization(projectData.organization_id);
             updateProjectStore(projectData);
         } catch (error) {
             console.error("Error fetching project:", error);
@@ -74,39 +76,82 @@ const ManageFeaturePage = ({ featureId }: Props) => {
 
     useEffect(() => {
         const { featureId } = pathParams;
-        console.log({
-            message: "ManageFeaturePage: Feature id from path params",
-            featureId,
-        });
-        setupFeature(featureId as string);
-        setupActiveFeatureConversation(featureId as string);
-    }, [pathParams]);
+
+        // Only proceed if featureId exists and is a string
+        if (featureId && typeof featureId === "string") {
+            console.log({
+                message: "ManageFeaturePage: Feature id from path params",
+                featureId,
+            });
+
+            // Run these in sequence to avoid race conditions
+            const setupData = async () => {
+                try {
+                    await setupFeature(featureId);
+                    await setupActiveFeatureConversation(featureId);
+                    await setupSprintOptions(featureId);
+                } catch (error) {
+                    console.error("Error setting up feature data:", error);
+                }
+            };
+
+            setupData();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathParams]); // Add a proper dependency array
 
     useEffect(() => {
-        setupProject();
-    }, [projectId]);
-
-    const setupOrganization = async (organizationId: string) => {
-        const organizationData = await getOrganizationById(organizationId);
-        setOrganization(organizationData);
-    };
-
-    console.log({
-        message: "ManageFeaturePage",
-        featureId,
-        feature,
-    });
-
-    if (loading) {
-        return <PageLoading text="Loading feature information..." />;
-    }
+        if (projectId) {
+            setupProject();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId]); // Ensure this doesn't run unnecessarily
 
     const setupActiveFeatureConversation = async (featureId: string) => {
-        const activeConversation =
-            await getActiveConversationByFeatureId(featureId);
-        const conversationForWeb = await getConversationById(
-            activeConversation.id,
+        setIsLoadingSetupFeatureConversation(true);
+        try {
+            const activeConversation =
+                await getActiveConversationByFeatureId(featureId);
+            if (activeConversation) {
+                const conversationForWeb = await getConversationById(
+                    activeConversation.id,
+                );
+                setConversation(conversationForWeb);
+                setMessages(conversationForWeb.messages);
+            } else {
+                const conversationForWeb = await createConversation({
+                    feature_id: featureId,
+                    project_id: projectId,
+                });
+                setConversation(conversationForWeb);
+                setMessages(conversationForWeb.messages);
+            }
+        } catch (error) {
+            console.error("Error fetching active feature conversation:", error);
+        } finally {
+            setIsLoadingSetupFeatureConversation(false);
+        }
+    };
+
+    const setupSprintOptions = async (featureId: string) => {
+        const conversations = await getConversationsByFeatureId(featureId);
+        const sprintOptions = conversations.map(
+            (conversation: ConversationByFeatureId, index: number) => ({
+                id: conversation.id,
+                name: `Sprint ${index + 1}: ${conversation.name || "untitled"}`,
+                status: conversation.status,
+            }),
         );
+        setSprintOptions(sprintOptions);
+    };
+
+    const handleSubmitConversation = async () => {
+        window.location.reload();
+    };
+
+    const handleSprintChange = async (sprintId: string) => {
+        setSelectedSprint(sprintId);
+        const conversationForWeb = await getConversationById(sprintId);
         setConversation(conversationForWeb);
         setMessages(conversationForWeb.messages);
     };
@@ -118,6 +163,10 @@ const ManageFeaturePage = ({ featureId }: Props) => {
         conversation,
         messages,
     });
+
+    if (loading) {
+        return <PageLoading text="Loading feature information..." />;
+    }
 
     return (
         <div className="flex flex-col w-full h-full relative px-2">
@@ -139,7 +188,6 @@ const ManageFeaturePage = ({ featureId }: Props) => {
                     </div>
                 )}
             </div>
-
             <header className="flex h-16 shrink-0 items-center gap-2">
                 <div className="flex items-center gap-2 px-4">
                     <SidebarTrigger className="-ml-1 text-white" />
@@ -167,26 +215,29 @@ const ManageFeaturePage = ({ featureId }: Props) => {
                     </Breadcrumb>
                 </div>
             </header>
-            <div className="flex w-full gap-x-4">
+            <div className="flex flex-col items-center md:flex-row w-full gap-x-2">
                 {/* Conversation */}
                 <div
                     className={`transition-all duration-300 ease-in-out ${
                         isCollapsed ? "w-full" : "w-[640px] shrink-0"
-                    }`}
+                    } pb-4`}
                 >
                     <Conversation
                         type="feature"
                         channelName={feature?.name || ""}
                         channelDescription={feature?.description || ""}
                         initialMessages={messages}
-                        sprintSelection={sprintOptions}
+                        sprintOptions={sprintOptions}
                         selectedSprint={selectedSprint || undefined}
-                        onSprintChange={setSelectedSprint}
+                        onSprintChange={handleSprintChange}
                         conversationId={conversation?.id || ""}
+                        isLoading={isLoadingSetupFeatureConversation}
+                        onSubmitConversation={handleSubmitConversation}
+                        status={conversation?.status || ""}
                     />
                 </div>
                 {/* Web Development - Collapsible */}
-                <div className="relative flex-1">
+                <div className="relative flex-1 w-full">
                     <Collapsible
                         className={`transition-all duration-300 ease-in-out ${
                             isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"

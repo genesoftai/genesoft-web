@@ -49,7 +49,7 @@ export interface ConversationProps {
     selectedSprint?: string;
     onSprintChange?: (sprintId: string) => void;
     conversationId: string;
-    onSubmitConversation?: () => void;
+    onSubmitConversation?: () => Promise<void>;
     status: string;
 }
 
@@ -87,7 +87,9 @@ const Conversation: React.FC<ConversationProps> = ({
 
     // Add sample messages if none provided
     useEffect(() => {
-        setMessages(initialMessages);
+        if (initialMessages.length > 0) {
+            setMessages(initialMessages);
+        }
     }, [initialMessages]);
 
     // Auto scroll to bottom on new messages
@@ -229,6 +231,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                             className={`py-2 px-3 cursor-pointer hover:bg-[#2c3235] text-sm ${selectedSprint === sprint.id ? "bg-[#1e62d0] text-white" : "text-gray-300"}`}
                                             onClick={() => {
                                                 if (onSprintChange) {
+                                                    setMessages([]);
                                                     onSprintChange(sprint.id);
                                                 }
                                                 setIsSprintMenuOpen(false);
@@ -344,7 +347,9 @@ const Conversation: React.FC<ConversationProps> = ({
                             <Textarea
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="Message #channel-name"
+                                placeholder={
+                                    "Send a message to your own software development team..."
+                                }
                                 className="min-h-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white conversation-textarea"
                             />
 

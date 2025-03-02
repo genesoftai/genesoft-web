@@ -45,3 +45,15 @@ export interface ConversationByPageId {
     created_at: Date;
     updated_at: Date;
 }
+
+export interface ConversationByFeatureId {
+    id: string;
+    name: string | null;
+    project_id: string;
+    page_id: string;
+    feature_id: string | null;
+    iteration_id: string | null;
+    status: string;
+    created_at: Date;
+    updated_at: Date;
+}
