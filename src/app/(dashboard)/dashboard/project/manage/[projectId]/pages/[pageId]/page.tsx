@@ -201,6 +201,7 @@ const ManagePagePage = () => {
                         isLoading={isLoadingSetupPageConversation}
                         onSubmitConversation={handleSubmitConversation}
                         status={conversation?.status || ""}
+                        pageId={page?.id || ""}
                     />
                 </div>
                 {/* Web Development - Collapsible */}

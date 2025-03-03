@@ -51,6 +51,8 @@ export interface ConversationProps {
     conversationId: string;
     onSubmitConversation?: () => Promise<void>;
     status: string;
+    featureId?: string;
+    pageId?: string;
 }
 
 const Conversation: React.FC<ConversationProps> = ({
@@ -65,6 +67,8 @@ const Conversation: React.FC<ConversationProps> = ({
     onSprintChange,
     onSubmitConversation,
     status,
+    featureId,
+    pageId,
 }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState("");
@@ -132,6 +136,8 @@ const Conversation: React.FC<ConversationProps> = ({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
+                feature_id: featureId,
+                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
