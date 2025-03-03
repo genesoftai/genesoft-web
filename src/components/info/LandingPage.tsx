@@ -12,16 +12,16 @@ import {
     Laptop,
     AppWindow,
     FilePenLine,
+    Sparkles,
+    Command,
+    Code,
+    Search,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
-// import HeroSectionBanner from "@public/image/showcase/project-page-example.png";
 import HeroSectionBanner from "@public/image/showcase/manage-project-example.png";
 import Image from "next/image";
 import posthog from "posthog-js";
-import GenesoftEcommerce from "@public/image/showcase/project/genesoft-e-commerce.png";
 import KhonkaenUnknown from "@public/image/showcase/project/khonkaen-unknown.png";
-
 import Curlent from "@public/image/showcase/project/curlent.png";
 import {
     Carousel,
@@ -30,6 +30,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "../ui/carousel";
+import BangkokExplorerUsage from "@public/image/genesoft-usage/bangkok-explorer-mange-page.png";
 
 const StreamingText = ({
     text,
@@ -78,12 +79,25 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg">
             <main className="flex-grow">
                 {/* Hero Section */}
-                <section className="text-center px-5 md:px-10 lg:px-20 flex flex-col lg:flex-row space-y-2 lg:space-y-2 mb-20 lg:mb-40">
-                    <div className="text-center md:text-start px-4 flex flex-col space-y-6 md:space-y-10 mb-10 md:mb-0">
-                        <h1 className="text-2xl font-bold tracking-tight sm:text-2xl md:text-5xl h-20 text-genesoft">
+                <section className="relative text-center px-5 md:px-10 lg:px-20 pt-16 md:pt-24 pb-24 md:pb-32 overflow-hidden">
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+                        <div className="absolute top-0 left-1/4 w-1/3 h-1/3 bg-genesoft/10 rounded-full blur-[120px] transform -translate-y-1/2"></div>
+                        <div className="absolute bottom-0 right-1/4 w-1/3 h-1/3 bg-genesoft/10 rounded-full blur-[120px] transform translate-y-1/2"></div>
+                    </div>
+
+                    <div className="max-w-5xl mx-auto mb-16">
+                        <div className="inline-flex items-center bg-tertiary-dark rounded-full px-4 py-2 mb-8 border border-line-in-dark-bg">
+                            <Sparkles className="h-4 w-4 mr-2 text-genesoft" />
+                            <span className="text-sm">
+                                AI-Powered Web Development for Startups
+                            </span>
+                        </div>
+
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
                             {heroStage === 0 && (
                                 <StreamingText
                                     text={heroContent[0]}
@@ -93,16 +107,18 @@ export default function LandingPage() {
                             )}
                             {heroStage > 0 && heroContent[0]}
                         </h1>
-                        <h2 className="text-lg sm:text-xl md:text-2xl">
+
+                        <p className="text-lg md:text-xl text-subtext-in-dark-bg/90 max-w-3xl mx-auto mb-8">
                             {heroContent[1]}
-                        </h2>
-                        <p className="text-xs sm:text-sm md:text-base font-semibold text-muted-foreground max-w-2xl mb-12">
+                        </p>
+
+                        <p className="text-base text-subtext-in-dark-bg/80 max-w-2xl mx-auto mb-12">
                             {heroContent[2]}
                         </p>
 
-                        <div className="flex flex-col items-center gap-x-1 gap-y-4 md:gap-x-4 w-full md:w-5/6">
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-16">
                             <Button
-                                className="px-6 py-4 md:px-8 md:py-6 bg-genesoft hover:bg-genesoft/90 text-xs md:text-xl font-medium"
+                                className="w-64 md:w-auto px-8 py-6 text-base md:text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
                                 onClick={handleStartNow}
                             >
                                 Get your web application now
@@ -110,204 +126,191 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    <div className="w-full flex flex-col items-center">
-                        <Image
-                            src={HeroSectionBanner}
-                            width={800}
-                            height={800}
-                            alt="genesoft-service"
-                            className="hidden md:flex rounded-lg"
-                        />
-
-                        <Image
-                            src={HeroSectionBanner}
-                            width={420}
-                            height={420}
-                            alt="genesoft-service"
-                            className="hidden sm:flex md:hidden rounded-lg"
-                        />
-
-                        <Image
-                            src={HeroSectionBanner}
-                            width={360}
-                            height={360}
-                            alt="genesoft-service"
-                            className="flex sm:hidden rounded-lg"
-                        />
-                    </div>
-                </section>
-
-                <Separator />
-                {/* Video Section */}
-                <div className="px-8 py-12 md:py-16 text-center flex flex-col gap-y-10 bg-gradient-to-b from-background to-secondary-dark/10">
-                    <div className="space-y-4">
-                        <p className="text-genesoft text-base sm:text-lg md:text-2xl font-bold bg-clip-text">
-                            Transform Your Vision into Reality
-                        </p>
-                        <p className="text-base sm:text-lg md:text-2xl font-bold bg-clip-text  text-genesoft/90">
-                            Our AI Agents develop your web application
-                        </p>
-                        <p className="text-base sm:text-lg md:text-2xl font-bold bg-clip-text  text-genesoft/80">
-                            While You Focus on Your Business and Customers
-                        </p>
-                    </div>
-
-                    <div className="relative flex justify-center">
-                        <div className="absolute -inset-1 bg-gradient-to-r rounded-lg blur opacity-25"></div>
-                        <iframe
-                            className="self-center hidden md:flex relative rounded-lg shadow-xl"
-                            width="560"
-                            height="315"
-                            src="https://www.youtube.com/embed/j5xhscX7Uj8?si=Hy2e1CkMyIEaZdza"
-                            title="YouTube video player"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerPolicy="strict-origin-when-cross-origin"
-                            allowFullScreen
-                        ></iframe>
-
-                        <iframe
-                            className="self-center flex md:hidden relative rounded-lg shadow-xl"
-                            width="320"
-                            height="180"
-                            src="https://www.youtube.com/embed/j5xhscX7Uj8?si=Hy2e1CkMyIEaZdza"
-                            title="YouTube video player"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerPolicy="strict-origin-when-cross-origin"
-                            allowFullScreen
-                        ></iframe>
-                    </div>
-                </div>
-
-                <Separator />
-
-                {/* Showcase Section */}
-                <section className="py-8 md:py-16 rounded flex flex-col items-center">
-                    <div className="container mx-auto px-4">
-                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-12 text-genesoft text-center">
-                            Showcases
-                        </h2>
-                    </div>
-
-                    <div className="flex items-center justify-center">
-                        <Carousel className="w-full max-w-4xl">
-                            <CarouselContent>
-                                <CarouselItem>
-                                    <div className="p-1">
-                                        <div
-                                            className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
-                                            onClick={() => {
-                                                window.open(
-                                                    "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app/about",
-                                                    "_blank",
-                                                );
-                                            }}
-                                        >
-                                            <p className="text-base sm:text-lg md:text-2xl font-medium bg-clip-text">
-                                                Khonkaen Unknown
-                                            </p>
-                                            <Image
-                                                src={KhonkaenUnknown}
-                                                alt="Showcase Image"
-                                                width={500}
-                                                height={500}
-                                            />
-                                        </div>
-                                    </div>
-                                </CarouselItem>
-
-                                <CarouselItem>
-                                    <div className="p-1">
-                                        <div
-                                            className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 hover:text-genesoft"
-                                            onClick={() => {
-                                                window.open(
-                                                    "https://nextjs-web91e1305e-d5ff-40e9-8a47-10eeb7ebb97b.vercel.app/",
-                                                    "_blank",
-                                                );
-                                            }}
-                                        >
-                                            <p className="text-base sm:text-lg md:text-2xl font-medium bg-clip-text">
-                                                Curlent
-                                            </p>
-                                            <Image
-                                                src={Curlent}
-                                                alt="Showcase Image"
-                                                width={500}
-                                                height={500}
-                                            />
-                                        </div>
-                                    </div>
-                                </CarouselItem>
-                            </CarouselContent>
-                            <CarouselPrevious />
-                            <CarouselNext />
-                        </Carousel>
-                    </div>
-                </section>
-
-                <Separator />
-
-                {/* Why genesoft Section */}
-                <section className="py-8 md:py-16 rounded">
-                    <div className="container mx-auto px-4">
-                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-12 text-genesoft">
-                            How it work
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {[
-                                {
-                                    title: "Create Project",
-                                    description:
-                                        "Create project with your idea and requirements by filling structured form: branding, pages, features",
-                                    icon: SquarePen,
-                                },
-                                {
-                                    title: "Software Development team of AI Agent working",
-                                    description:
-                                        "Software Development team of AI Agent working on your project with your requirements for a while without need you to stay to control them every details",
-                                    icon: Laptop,
-                                },
-                                {
-                                    title: "Get your web application",
-                                    description:
-                                        "Get your web application after software development team of AI Agent finish working on your project, Genesoft will inform you through email and you can see the web application live on the web",
-                                    icon: AppWindow,
-                                },
-                                {
-                                    title: "Add feedback or Update Requirements",
-                                    description:
-                                        "You can add feedback or update requirements anytime you want to, and Genesoft software development team of AI Agent will update the web application accordingly and inform you through email",
-                                    icon: FilePenLine,
-                                },
-                            ].map((advantages, index) => (
-                                <Card key={index}>
-                                    <CardHeader>
-                                        <advantages.icon className="w-8 md:w-10 h-8 md:h-10 mb-0 md:mb-2 text-genesoft" />
-                                        <CardTitle className="text-sm md:text-base">
-                                            {advantages.title}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
-                                            {advantages.description}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            ))}
+                    <div className="relative max-w-4xl mx-auto">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 to-genesoft/5 opacity-70 blur-lg rounded-xl"></div>
+                        <div className="relative bg-tertiary-dark rounded-xl p-1 border border-line-in-dark-bg overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-8 bg-secondary-dark flex items-center px-4 gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            </div>
+                            <Image
+                                src={BangkokExplorerUsage}
+                                alt="Genesoft AI-powered web development"
+                                className="w-full rounded-lg mt-8 transform hover:scale-[1.02] transition-all duration-500"
+                                priority
+                            />
                         </div>
                     </div>
                 </section>
 
-                <Separator />
+                {/* Keyboard-like section inspired by Raycast */}
+                <section className="relative py-16 md:py-24 bg-gradient-to-b from-primary-dark to-secondary-dark overflow-hidden">
+                    <div className="container mx-auto px-4 text-center mb-16">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-12 bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                            Software development team at your fingertips
+                        </h2>
 
-                {/* Why genesoft Section */}
-                <section className="py-8 md:py-16 rounded">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-colors duration-300 group">
+                                <div className="w-12 h-12 rounded-full bg-genesoft/20 flex items-center justify-center mb-4 mx-auto group-hover:bg-genesoft/30 transition-colors duration-300">
+                                    <Code className="w-6 h-6 text-genesoft" />
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2 text-white">
+                                    24/7 Development
+                                </h3>
+                                <p className="text-subtext-in-dark-bg">
+                                    AI agents work around the clock to build
+                                    your web application
+                                </p>
+                            </div>
+
+                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-colors duration-300 group">
+                                <div className="w-12 h-12 rounded-full bg-genesoft/20 flex items-center justify-center mb-4 mx-auto group-hover:bg-genesoft/30 transition-colors duration-300">
+                                    <Command className="w-6 h-6 text-genesoft" />
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2 text-white">
+                                    Simple Requirements
+                                </h3>
+                                <p className="text-subtext-in-dark-bg">
+                                    Just tell us what you need - no technical
+                                    knowledge required
+                                </p>
+                            </div>
+
+                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-colors duration-300 group">
+                                <div className="w-12 h-12 rounded-full bg-genesoft/20 flex items-center justify-center mb-4 mx-auto group-hover:bg-genesoft/30 transition-colors duration-300">
+                                    <Search className="w-6 h-6 text-genesoft" />
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2 text-white">
+                                    Cost Effective
+                                </h3>
+                                <p className="text-subtext-in-dark-bg">
+                                    10x cheaper than hiring traditional
+                                    development teams
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="relative max-w-5xl mx-auto px-4">
+                        <div className="bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-4 md:p-6">
+                            <p className="text-lg md:text-xl font-bold bg-gradient-to-r from-genesoft to-genesoft/80 bg-clip-text text-transparent mb-6">
+                                Collaborate with your team to work with our AI
+                                Agent team for your business web application
+                            </p>
+                            <p className="text-base md:text-lg text-white/90 mb-10">
+                                Our AI Agents develop your web application while
+                                you focus on your business
+                            </p>
+
+                            <iframe
+                                className="w-full aspect-video rounded-lg shadow-xl z-10 transition-transform duration-300"
+                                src="https://www.youtube.com/embed/io0Hz_IS4Dg?si=Ubs9J88hK3HvWyHn"
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Showcase Section */}
+                <section className="py-16 md:py-24 bg-tertiary-dark">
                     <div className="container mx-auto px-4">
-                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-12 text-genesoft">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                            Showcases
+                        </h2>
+                        <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-16 max-w-3xl mx-auto">
+                            Take a look at some of the websites built by our AI
+                            agents
+                        </p>
+
+                        <div className="flex items-center justify-center">
+                            <Carousel className="w-full max-w-4xl">
+                                <CarouselContent>
+                                    <CarouselItem>
+                                        <div className="p-1">
+                                            <div
+                                                className="flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+                                                onClick={() => {
+                                                    window.open(
+                                                        "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app/about",
+                                                        "_blank",
+                                                    );
+                                                }}
+                                            >
+                                                <div className="relative w-full mb-6 overflow-hidden rounded-xl border border-line-in-dark-bg">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-genesoft/20 to-genesoft/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                                                    <Image
+                                                        src={KhonkaenUnknown}
+                                                        alt="Khonkaen Unknown"
+                                                        width={500}
+                                                        height={500}
+                                                        className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                </div>
+                                                <h3 className="text-xl md:text-2xl font-medium text-white group-hover:text-genesoft transition-colors">
+                                                    Khonkaen Unknown
+                                                </h3>
+                                                <p className="text-sm text-subtext-in-dark-bg mt-2">
+                                                    City depvelopment platform
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CarouselItem>
+
+                                    <CarouselItem>
+                                        <div className="p-1">
+                                            <div
+                                                className="flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+                                                onClick={() => {
+                                                    window.open(
+                                                        "https://nextjs-webeddd871e-17d9-46d9-95b1-7054ed002ae5.vercel.app",
+                                                        "_blank",
+                                                    );
+                                                }}
+                                            >
+                                                <div className="relative w-full mb-6 overflow-hidden rounded-xl border border-line-in-dark-bg">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-genesoft/20 to-genesoft/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                                                    <Image
+                                                        src={Curlent}
+                                                        alt="Curlent"
+                                                        width={500}
+                                                        height={500}
+                                                        className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                </div>
+                                                <h3 className="text-xl md:text-2xl font-medium text-white group-hover:text-genesoft transition-colors">
+                                                    Curlent
+                                                </h3>
+                                                <p className="text-sm text-subtext-in-dark-bg mt-2">
+                                                    AI-Powered US Stock Research
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CarouselItem>
+                                </CarouselContent>
+                                <CarouselPrevious className="bg-secondary-dark border-line-in-dark-bg text-white hover:bg-genesoft/20 transition-colors duration-300" />
+                                <CarouselNext className="bg-secondary-dark border-line-in-dark-bg text-white hover:bg-genesoft/20 transition-colors duration-300" />
+                            </Carousel>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Why Genesoft Section */}
+                <section className="py-16 md:py-24 bg-tertiary-dark">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                             Why Genesoft
                         </h2>
+                        <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-16 max-w-3xl mx-auto">
+                            Benefits that set us apart from traditional
+                            development
+                        </p>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {[
                                 {
@@ -334,17 +337,22 @@ export default function LandingPage() {
                                         "No need to worry about ownership problem, all code and data is yours, you can get them anytime you want to leave Genesoft.",
                                     icon: FileCheck,
                                 },
-                            ].map((advantages, index) => (
-                                <Card key={index}>
-                                    <CardHeader>
-                                        <advantages.icon className="w-8 md:w-10 h-8 md:h-10 mb-0 md:mb-2 text-genesoft" />
-                                        <CardTitle className="text-sm md:text-base">
-                                            {advantages.title}
+                            ].map((advantage, index) => (
+                                <Card
+                                    key={index}
+                                    className="bg-secondary-dark border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px]"
+                                >
+                                    <CardHeader className="pb-2">
+                                        <div className="w-12 h-12 rounded-full bg-genesoft/20 flex items-center justify-center mb-4 group-hover:bg-genesoft/30 transition-colors duration-300">
+                                            <advantage.icon className="w-6 h-6 text-genesoft" />
+                                        </div>
+                                        <CardTitle className="text-lg md:text-xl text-white">
+                                            {advantage.title}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
-                                            {advantages.description}
+                                        <p className="text-subtext-in-dark-bg">
+                                            {advantage.description}
                                         </p>
                                     </CardContent>
                                 </Card>
@@ -353,21 +361,170 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* CTA Section */}
-                <section className="py-8 md:py-20 text-center">
-                    <Button
-                        onClick={() => {
-                            posthog.capture(
-                                "click_landing_page_bottom_cta_button",
-                            );
-                            router.push("/signup");
-                        }}
-                        size="lg"
-                        className="text-lg px-8 py-6 cursor-pointer bg-genesoft hover:bg-genesoft/90"
-                    >
-                        {"Get your web now !"}
-                    </Button>
+                {/* Subscription Section */}
+                <section className="py-16 md:py-24 bg-gradient-to-b from-tertiary-dark to-secondary-dark overflow-hidden">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                            Subscription Plans
+                        </h2>
+                        <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-8 max-w-3xl mx-auto">
+                            Choose the plan that best fits your project needs
+                        </p>
+
+                        <div className="flex justify-center">
+                            <Button
+                                className="px-6 py-5 text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
+                                onClick={() => router.push("/subscription")}
+                            >
+                                View All Plans
+                            </Button>
+                        </div>
+                    </div>
                 </section>
+
+                {/* Testimonials - added as inspired by Raycast */}
+                {/* <section className="py-16 md:py-24 bg-gradient-to-b from-secondary-dark to-primary-dark overflow-hidden">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                            Built for businesses like yours
+                        </h2>
+                        <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-16 max-w-3xl mx-auto">
+                            Trusted by startups and small businesses to bring
+                            their ideas to life
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300">
+                                <p className="text-subtext-in-dark-bg mb-4">
+                                    "Genesoft helped us launch our e-commerce
+                                    platform in just two weeks. Their AI agents
+                                    understood exactly what we needed and
+                                    delivered beyond our expectations."
+                                </p>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-genesoft/20 flex items-center justify-center mr-3">
+                                        <span className="text-genesoft font-bold">
+                                            JM
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-white font-medium">
+                                            John Miller
+                                        </h4>
+                                        <p className="text-xs text-subtext-in-dark-bg/70">
+                                            Founder, ShopEasy
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300">
+                                <p className="text-subtext-in-dark-bg mb-4">
+                                    "As someone with zero technical knowledge, I
+                                    was amazed at how easy it was to get my
+                                    business website up and running with
+                                    Genesoft."
+                                </p>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-genesoft/20 flex items-center justify-center mr-3">
+                                        <span className="text-genesoft font-bold">
+                                            SP
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-white font-medium">
+                                            Sarah Parker
+                                        </h4>
+                                        <p className="text-xs text-subtext-in-dark-bg/70">
+                                            Owner, Wellness Studio
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300">
+                                <p className="text-subtext-in-dark-bg mb-4">
+                                    "The cost savings compared to traditional
+                                    development are incredible. We got a
+                                    professional web app at a fraction of what
+                                    we were quoted elsewhere."
+                                </p>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-genesoft/20 flex items-center justify-center mr-3">
+                                        <span className="text-genesoft font-bold">
+                                            RJ
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-white font-medium">
+                                            Robert Johnson
+                                        </h4>
+                                        <p className="text-xs text-subtext-in-dark-bg/70">
+                                            CEO, TechStart
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section> */}
+
+                {/* CTA Section */}
+                <section className="py-16 md:py-24 text-center bg-gradient-to-b from-tertiary-dark to-primary-dark relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+                        <div className="absolute top-0 right-1/4 w-1/3 h-1/3 bg-genesoft/15 rounded-full blur-[120px] transform -translate-y-1/2"></div>
+                        <div className="absolute bottom-0 left-1/4 w-1/3 h-1/3 bg-genesoft/15 rounded-full blur-[120px] transform translate-y-1/2"></div>
+                    </div>
+
+                    <div className="container mx-auto px-4">
+                        <div className="max-w-3xl mx-auto">
+                            <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
+                                Ready to transform your business?
+                            </h2>
+                            <p className="text-lg text-subtext-in-dark-bg/90 mb-8 max-w-2xl mx-auto">
+                                Get started with your web application today and
+                                see results in days, not months
+                            </p>
+
+                            <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                                <Button
+                                    onClick={() => {
+                                        posthog.capture(
+                                            "click_landing_page_bottom_cta_button",
+                                        );
+                                        router.push("/signup");
+                                    }}
+                                    size="lg"
+                                    className="w-64 md:w-auto px-8 py-6 text-xl bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
+                                >
+                                    <Sparkles className="mr-2 h-5 w-5" /> Get
+                                    your web now!
+                                </Button>
+
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="w-64 md:w-auto px-8 py-6 text-xl border-line-in-dark-bg text-black hover:bg-tertiary-dark hover:text-white rounded-full transition-all duration-300"
+                                    onClick={() => router.push("/contact")}
+                                >
+                                    Contact us
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Keyboard-inspired visual decoration at the bottom */}
+                <div className="py-8 px-4 bg-primary-dark overflow-hidden">
+                    <div className="max-w-5xl mx-auto grid grid-cols-10 md:grid-cols-20 gap-1">
+                        {Array.from({ length: 20 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className={`h-3 rounded-sm ${i % 3 === 0 ? "bg-tertiary-dark" : i % 4 === 0 ? "bg-genesoft/30" : "bg-secondary-dark"}`}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
             </main>
         </div>
     );

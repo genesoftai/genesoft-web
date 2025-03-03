@@ -11,6 +11,7 @@ import {
     ExternalLink,
     Monitor,
     Smartphone,
+    RotateCcw,
 } from "lucide-react";
 import { Project } from "@/types/project";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,7 @@ import {
     getLatestIteration,
 } from "@/actions/development";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getWebApplicationInfo } from "@/actions/web-application";
 import {
     DeploymentStatus,
@@ -32,6 +33,7 @@ import { DevelopmentStatusBadge } from "../web-application/DevelopmentStatus";
 import { DeploymentStatusBadge } from "../web-application/DeploymentStatus";
 import posthog from "posthog-js";
 import { formatDateToHumanReadable } from "@/utils/common/time";
+import { Button } from "@/components/ui/button";
 
 interface WebPreviewProps {
     project: Project | null;
@@ -46,6 +48,7 @@ export function WebPreview({ project }: WebPreviewProps) {
     const [isCheckingBuildErrors, setIsCheckingBuildErrors] = useState(false);
     const [latestIteration, setLatestIteration] = useState<any>(null);
     const [pollingCount, setPollingCount] = useState(0);
+    const iframeRef = useRef<HTMLIFrameElement>(null);
     const handleAddFeedback = () => {
         posthog.capture("click_add_feedback_from_manage_project_web_preview");
         router.push(`/dashboard/project/manage/${project?.id}/feedback`);
@@ -130,7 +133,7 @@ export function WebPreview({ project }: WebPreviewProps) {
             interval = setInterval(() => {
                 fetchLatestData();
                 setPollingCount((prev) => prev + 1);
-            }, 10000);
+            }, 5000);
         }
 
         return () => {
@@ -159,6 +162,17 @@ export function WebPreview({ project }: WebPreviewProps) {
         } catch (error) {
             console.error("Error fetching latest data:", error);
         }
+    };
+
+    const refreshIframe = () => {
+        if (iframeRef.current) {
+            iframeRef.current.src = iframeRef.current.src;
+        }
+    };
+
+    const handleRefresh = () => {
+        fetchLatestData();
+        refreshIframe();
     };
 
     const isInProgress = [
@@ -203,8 +217,20 @@ export function WebPreview({ project }: WebPreviewProps) {
                     This is a UI preview of your web application. For full
                     functionality, please visit the web application link above
                 </p>
+
+                <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={handleRefresh}
+                >
+                    <RotateCcw className="h-4 w-4 text-black" />
+                    <span className="text-xs md:text-sm text-black">
+                        Refresh
+                    </span>
+                </Button>
+
                 <div
-                    className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] w-[420px]" : "h-[620px]"}`}
+                    className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] w-[420px]" : "h-[820px]"}`}
                 >
                     <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
                         {/* Browser controls */}
@@ -242,10 +268,11 @@ export function WebPreview({ project }: WebPreviewProps) {
                             <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
                             <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                             <iframe
+                                ref={iframeRef}
                                 className={`relative shadow-xl border border-white/10 ${
                                     viewMode === "mobile"
                                         ? "w-[420px] h-[720px] rounded-b-lg mx-auto"
-                                        : "w-full h-[620px] rounded-b-lg"
+                                        : "w-full h-[720px] rounded-b-lg"
                                 }`}
                                 src={webApplicationInfo.url}
                                 title="Web Application Preview"
@@ -342,7 +369,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                             </div>
                             {pollingCount > 0 && (
                                 <span className="text-xs text-gray-400 animate-pulse">
-                                    (next update in {10 - (pollingCount % 10)}s)
+                                    (next update in {5 - (pollingCount % 5)}s)
                                 </span>
                             )}
                         </div>
@@ -461,28 +488,6 @@ export function WebPreview({ project }: WebPreviewProps) {
                                         </div>
 
                                         {/* Visual Activity Indicator */}
-                                        {latestIteration.status ===
-                                            "in_progress" && (
-                                            <div className="mt-4 mb-2">
-                                                <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 animate-[progress_2s_ease-in-out_infinite]"
-                                                        style={{
-                                                            width: `${(pollingCount % 5) * 20 + 20}%`,
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                                    <span>
-                                                        Development in progress
-                                                    </span>
-                                                    <span>
-                                                        AI agents working...
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        )}
-
                                         {latestIteration.status === "done" && (
                                             <div className="flex items-center gap-2 text-green-300 bg-green-500/10 p-2 rounded-md text-sm mt-2">
                                                 <CircleCheck className="h-4 w-4" />

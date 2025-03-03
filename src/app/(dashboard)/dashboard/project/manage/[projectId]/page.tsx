@@ -120,121 +120,91 @@ export default function ManageProjectPage() {
             </header>
 
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
-                {/* <div className="flex flex-row gap-4">
-                        <ProjectSidebar />
-                    </div> */}
                 <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
                     <div className="space-y-6">
                         <Card className="bg-primary-dark border-none text-white shadow-lg hover:shadow-xl transition-shadow duration-300">
-                            <CardHeader className="flex flex-row items-start justify-between space-y-0 p-8">
+                            <CardHeader className="flex flex-col items-start justify-between space-y-0 p-8">
                                 <div className="space-y-6">
-                                    <div>
-                                        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                                            {project?.name}
-                                        </CardTitle>
-                                        <CardDescription className="mt-3 max-w-2xl text-gray-300 leading-relaxed">
-                                            {project?.description}
-                                        </CardDescription>
-                                    </div>
+                                    <div className="flex items-center gap-x-8">
+                                        <div className="flex items-center gap-4">
+                                            {project?.branding?.logo_url && (
+                                                <Image
+                                                    src={
+                                                        project.branding
+                                                            .logo_url
+                                                    }
+                                                    alt={`${project?.name} logo`}
+                                                    width={50}
+                                                    height={50}
+                                                    className="rounded-full mr-4"
+                                                />
+                                            )}
+                                            <CardTitle
+                                                className="text-3xl font-bold"
+                                                style={{
+                                                    color:
+                                                        project?.branding
+                                                            ?.color ||
+                                                        "#2563EB", // Default color if branding color is not available
+                                                }}
+                                            >
+                                                {project?.name}
+                                            </CardTitle>
+                                        </div>
 
-                                    <div className="space-y-4 bg-black/20 rounded-lg p-6">
-                                        <div className="space-y-2">
-                                            <Label className="text-sm uppercase tracking-wider text-blue-400 font-bold">
-                                                Purpose
-                                            </Label>
-                                            <p className="text-gray-300 leading-relaxed pl-4 border-l-2 border-blue-400/30">
-                                                {project?.purpose}
-                                            </p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-sm uppercase tracking-wider text-purple-400 font-bold">
-                                                Target Audience
-                                            </Label>
-                                            <p className="text-gray-300 leading-relaxed pl-4 border-l-2 border-purple-400/30">
-                                                {project?.target_audience}
-                                            </p>
-                                        </div>
+                                        <EditProjectInfoDialog
+                                            projectId={projectId}
+                                            projectName={project?.name || ""}
+                                            projectDescription={
+                                                project?.description || ""
+                                            }
+                                            projectPurpose={
+                                                project?.purpose || ""
+                                            }
+                                            projectTargetAudience={
+                                                project?.target_audience || ""
+                                            }
+                                            onSuccess={setupProject}
+                                        />
                                     </div>
+                                    <CardDescription className="mt-3 max-w-2xl text-gray-300 leading-relaxed">
+                                        {project?.description}
+                                    </CardDescription>
                                 </div>
 
-                                <EditProjectInfoDialog
-                                    projectId={projectId}
-                                    projectName={project?.name || ""}
-                                    projectDescription={
-                                        project?.description || ""
-                                    }
-                                    projectPurpose={project?.purpose || ""}
-                                    projectTargetAudience={
-                                        project?.target_audience || ""
-                                    }
-                                    onSuccess={setupProject}
-                                />
+                                <div className="space-y-4 bg-black/20 rounded-lg p-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm uppercase tracking-wider text-blue-400 font-bold">
+                                            Purpose
+                                        </Label>
+                                        <p className="text-gray-300 leading-relaxed pl-4 border-l-2 border-blue-400/30">
+                                            {project?.purpose}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm uppercase tracking-wider text-purple-400 font-bold">
+                                            Target Audience
+                                        </Label>
+                                        <p className="text-gray-300 leading-relaxed pl-4 border-l-2 border-purple-400/30">
+                                            {project?.target_audience}
+                                        </p>
+                                    </div>
+                                </div>
                             </CardHeader>
                         </Card>
                     </div>
 
-                    {/* Project Requirements
-                    <Card className="bg-primary-dark border-none text-white">
-                        <CardHeader className="flex flex-col space-y-4">
-                            <div>
-                                <CardTitle className="text-2xl">
-                                    Project Requirements
-                                </CardTitle>
-                                <CardDescription className="mt-2 text-subtext-in-dark-bg">
-                                    Click button to view and update each section
-                                    requirements of this project
-                                </CardDescription>
-                            </div>
-
-                            <div className="flex flex-row gap-4">
-                                <Button
-                                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
-                                    onClick={() =>
-                                        router.push(
-                                            `/dashboard/project/manage/${projectId}/branding`,
-                                        )
-                                    }
-                                >
-                                    <Eye className="w-6 h-6" />
-                                    <span>Branding</span>
-                                </Button>
-
-                                <Button
-                                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
-                                    onClick={() =>
-                                        router.push(
-                                            `/dashboard/project/manage/${projectId}/pages`,
-                                        )
-                                    }
-                                >
-                                    <Files className="w-6 h-6" />
-                                    <span>Pages</span>
-                                </Button>
-
-                                <Button
-                                    className="flex items-center gap-2 bg-genesoft text-white hover:text-black hover:bg-white"
-                                    onClick={() =>
-                                        router.push(
-                                            `/dashboard/project/manage/${projectId}/features`,
-                                        )
-                                    }
-                                >
-                                    <MonitorCog className="w-6 h-6" />
-                                    <span>Features</span>
-                                </Button>
-                            </div>
-                        </CardHeader>
-                    </Card> */}
-
                     <WebPreview project={project} />
 
-                    <div className="flex flex-col gap-4  p-8 w-full rounded-xl bg-primary-dark">
-                        <h2 className="text-2xl font-bold">Project Members</h2>
-                        <div className="flex flex-row gap-4">
+                    <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl bg-primary-dark">
+                        <h2 className="text-xl md:text-2xl font-bold">
+                            Project Members
+                        </h2>
+                        <div className="flex flex-col gap-4 md:flex-row md:gap-6">
                             {organization?.users?.map((user) => (
                                 <div
                                     key={user.id}
-                                    className="flex items-center gap-2 p-4 border rounded-lg"
+                                    className="flex items-center gap-2 p-4 border rounded-lg bg-gray-800 hover:bg-gray-700 transition duration-200"
                                 >
                                     {user.image ? (
                                         <Image
@@ -250,7 +220,7 @@ export default function ManageProjectPage() {
                                         </div>
                                     )}
                                     <div>
-                                        <p className="text-sm text-white">
+                                        <p className="text-sm md:text-base text-white">
                                             {user.email}
                                         </p>
                                     </div>
