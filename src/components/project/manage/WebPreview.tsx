@@ -5,7 +5,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Globe, CircleCheck } from "lucide-react";
+import {
+    Globe,
+    CircleCheck,
+    ExternalLink,
+    Monitor,
+    Smartphone,
+} from "lucide-react";
 import { Project } from "@/types/project";
 import { useRouter } from "next/navigation";
 import {
@@ -44,6 +50,7 @@ export function WebPreview({ project }: WebPreviewProps) {
         posthog.capture("click_add_feedback_from_manage_project_web_preview");
         router.push(`/dashboard/project/manage/${project?.id}/feedback`);
     };
+    const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
 
     const handleBuildWebApplication = async () => {
         posthog.capture(
@@ -168,21 +175,14 @@ export function WebPreview({ project }: WebPreviewProps) {
 
     return (
         <Card className="bg-primary-dark text-white border-none">
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <CardTitle className="text-white text-2xl">
-                        {/* Web preview */}
-                        {"Web Application Information"}
+            <CardHeader className="flex flex-col md:flex-row items-center justify-between">
+                <div className="flex flex-col md:flex-row items-center justify-between">
+                    <CardTitle className="text-white text-lg md:text-2xl">
+                        <p>Web Application Information</p>
                     </CardTitle>
                 </div>
                 <CardDescription className="text-subtext-in-dark-bg">
-                    {/* {
-                        "See web application information and manage your web application here by trigger AI Agent to build your web application or add feedback to improve your web application"
-                    } */}
-                    <div className="flex items-center gap-x-2">
-                        <div className="text-sm font-medium text-gray-300">
-                            URL
-                        </div>
+                    <div className="flex flex-col md:flex-row items-center gap-x-2 gap-y-2 w-full">
                         <a
                             href={webApplicationInfo?.url}
                             target="_blank"
@@ -190,36 +190,63 @@ export function WebPreview({ project }: WebPreviewProps) {
                             className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
                         >
                             <Globe className="h-4 w-4" />
-                            {webApplicationInfo?.url}
+                            <span className="text-xs md:text-sm">
+                                {"Web application"}
+                            </span>
+                            <ExternalLink className="h-4 w-4" />
                         </a>
                     </div>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6 ">
-                <p className="text-sm text-gray-400">
+                <p className="text-xs md:text-sm text-gray-400">
                     This is a UI preview of your web application. For full
-                    functionality, please visit the web url above
+                    functionality, please visit the web application link above
                 </p>
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                    <div className="w-full bg-gray-800 border-b border-white/10 p-2 flex items-center gap-2">
+                <div
+                    className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] w-[420px]" : "h-[620px]"}`}
+                >
+                    <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
                         {/* Browser controls */}
                         <div className="flex gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-red-500 transition-all hover:animate-pulse"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-500 transition-all hover:animate-pulse"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-500 transition-all hover:animate-pulse"></div>
                         </div>
-                        {/* URL bar */}
-                        {/* <div className="flex-1 bg-gray-700 rounded px-3 py-1 text-sm text-gray-300 flex items-center">
-                            <Globe className="h-3 w-3 mr-2 text-gray-400" />
-                            {webApplicationInfo?.url || "No URL available"}
-                        </div> */}
+                        <div className="flex items-center gap-2">
+                            <div className=" hidden sm:flex items-center bg-gray-700/50 rounded-full overflow-hidden">
+                                <button
+                                    className={`px-3 py-1 text-xs transition-colors ${viewMode === "desktop" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-600/50"}`}
+                                    onClick={() => setViewMode("desktop")}
+                                >
+                                    <Monitor className="h-3 w-3" />
+                                </button>
+                                <button
+                                    className={`px-3 py-1 text-xs transition-colors ${viewMode === "mobile" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-600/50"}`}
+                                    onClick={() => setViewMode("mobile")}
+                                >
+                                    <Smartphone className="h-3 w-3" />
+                                </button>
+                            </div>
+                            <div className="hidden sm:flex items-center px-3 py-1 bg-gray-700/50 rounded-full text-xs text-gray-300">
+                                <Globe className="h-3 w-3 mr-1 text-blue-400" />
+                                {webApplicationInfo?.url
+                                    ? "Live Preview"
+                                    : "Preview Unavailable"}
+                            </div>
+                        </div>
                     </div>
 
                     {webApplicationInfo?.url ? (
                         <div className="relative flex justify-center w-full h-[calc(100%-40px)]">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/20 to-blue-500/20 rounded-lg blur opacity-25"></div>
+                            <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
+                            <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                             <iframe
-                                className="relative w-full h-full rounded-b-lg shadow-xl border border-white/10"
+                                className={`relative shadow-xl border border-white/10 ${
+                                    viewMode === "mobile"
+                                        ? "w-[420px] h-[720px] rounded-b-lg mx-auto"
+                                        : "w-full h-[620px] rounded-b-lg"
+                                }`}
                                 src={webApplicationInfo.url}
                                 title="Web Application Preview"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -228,21 +255,28 @@ export function WebPreview({ project }: WebPreviewProps) {
                             ></iframe>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center w-full h-[calc(100%-40px)] bg-primary-dark/30 rounded-b-lg border border-white/10">
-                            <p className="text-gray-400">
-                                No preview available
-                            </p>
+                        <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-primary-dark/40 to-primary-dark/60 rounded-b-lg border border-white/10">
+                            <div className="p-6 rounded-xl bg-black/30 border border-white/5 flex flex-col items-center gap-3">
+                                <Globe className="h-10 w-10 text-gray-500 opacity-50" />
+                                <p className="text-gray-400 text-center text-sm sm:text-base">
+                                    No preview available yet
+                                </p>
+                                <div className="text-xs text-gray-500 max-w-[250px] text-center mt-1">
+                                    Your web application will appear here once
+                                    deployed
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Web Application and Latest Iteration Status */}
                 <div className="flex flex-col gap-4 w-full p-4">
-                    <div className="flex flex-col gap-1  w-fit">
+                    <div className="flex flex-col gap-1  w-full sm:w-fit">
                         <div className="text-sm font-medium text-gray-300">
                             Web Application Status
                         </div>
-                        <div className="flex items-center gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
+                        <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
                             <DeploymentStatusBadge
                                 status={
                                     webApplicationInfo?.status ||
@@ -268,11 +302,11 @@ export function WebPreview({ project }: WebPreviewProps) {
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-1 w-fit">
+                    <div className="flex flex-col gap-1 w-full sm:w-fit">
                         <div className="text-sm font-medium text-gray-300">
                             Software Development Status
                         </div>
-                        <div className="flex items-center gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10 ">
+                        <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10 ">
                             <DevelopmentStatusBadge
                                 status={
                                     webApplicationInfo?.developmentStatus ||
@@ -301,9 +335,11 @@ export function WebPreview({ project }: WebPreviewProps) {
 
                     {/* Development Activity Live Feed */}
                     <div className="flex flex-col gap-3 w-full">
-                        <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                            Development Activity for latest sprint
+                        <div className="text-sm font-medium text-gray-300 flex flex-col md:flex-row items-center gap-2 mt-8">
+                            <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                                Development Activity for latest sprint
+                            </div>
                             {pollingCount > 0 && (
                                 <span className="text-xs text-gray-400 animate-pulse">
                                     (next update in {10 - (pollingCount % 10)}s)
@@ -315,8 +351,8 @@ export function WebPreview({ project }: WebPreviewProps) {
                             {latestIteration ? (
                                 <div className="relative">
                                     {/* Activity Header */}
-                                    <div className="flex justify-between items-center p-4 border-b border-white/10">
-                                        <div className="flex items-center gap-2">
+                                    <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-white/10">
+                                        <div className="flex flex-col md:flex-row items-center gap-2">
                                             <span
                                                 className={`px-2 py-1 text-xs rounded-full ${
                                                     latestIteration.status ===
@@ -365,9 +401,11 @@ export function WebPreview({ project }: WebPreviewProps) {
                                                 {latestIteration.conversation && (
                                                     <div className="bg-white/5 p-3 rounded-md">
                                                         <div className="font-medium text-gray-300 mb-1">
-                                                            Sprint
+                                                            <span className="text-xs">
+                                                                Sprint
+                                                            </span>
                                                         </div>
-                                                        <div className="text-white">
+                                                        <div className="text-white font-bold">
                                                             {
                                                                 latestIteration
                                                                     .conversation
@@ -382,7 +420,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                                                         <div className="font-medium text-gray-300 mb-1">
                                                             Page
                                                         </div>
-                                                        <div className="text-white">
+                                                        <div className="text-white font-bold">
                                                             {
                                                                 latestIteration
                                                                     .page.name
@@ -399,11 +437,11 @@ export function WebPreview({ project }: WebPreviewProps) {
                                                 )}
 
                                                 {latestIteration.feature && (
-                                                    <div className="bg-white/5 p-3 rounded-md">
+                                                    <div className="bg-white/5 p-3 rounded-md gap-2">
                                                         <div className="font-medium text-gray-300 mb-1">
                                                             Feature
                                                         </div>
-                                                        <div className="text-white">
+                                                        <div className="text-white font-bold">
                                                             {
                                                                 latestIteration
                                                                     .feature
@@ -419,22 +457,6 @@ export function WebPreview({ project }: WebPreviewProps) {
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                {/* <div className="bg-white/5 p-3 rounded-md">
-                                                    <div className="font-medium text-gray-300 mb-1">
-                                                        Development Time
-                                                    </div>
-                                                    <div className="text-white">
-                                                        {parseFloat(
-                                                            latestIteration.working_time,
-                                                        ) > 0
-                                                            ? `${latestIteration.working_time} hours`
-                                                            : latestIteration.status ===
-                                                                "done"
-                                                              ? "Completed rapidly"
-                                                              : "In progress..."}
-                                                    </div>
-                                                </div> */}
                                             </div>
                                         </div>
 
