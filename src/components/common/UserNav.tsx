@@ -39,10 +39,10 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="relative w-fit md:w-full max-w-xs rounded-full p-4 border shadow-sm hover:shadow-md transition-shadow duration-200 ease-in-out"
+                    className="relative w-fit md:w-full max-w-xs rounded-full p-4 border border-line-in-dark-bg shadow-sm hover:shadow-md transition-shadow duration-200 ease-in-out hover:bg-tertiary-dark/70"
                 >
                     {avatarUrl ? (
-                        <Avatar className="h-8 w-8 md:h-9 md:w-9">
+                        <Avatar className="h-4 w-4 md:h-7 md:w-7">
                             <AvatarImage src={avatarUrl} alt={name} />
                             <AvatarFallback>
                                 {name?.charAt(0).toUpperCase()}
@@ -51,7 +51,7 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
                     ) : (
                         <div className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-primary/10 flex items-center justify-center">
                             {email && email.length >= 2 ? (
-                                <Avatar className="h-8 w-8 md:h-9 md:w-9">
+                                <Avatar className="h-4 w-4 md:h-5 md:w-5">
                                     <AvatarFallback>
                                         {emailInitials}
                                     </AvatarFallback>
@@ -62,10 +62,10 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
                         </div>
                     )}
                     <div className="ml-2 flex-1 text-left">
-                        <p className="text-sm font-medium leading-none">
+                        <p className="text-sm font-medium leading-none text-white">
                             {name}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-xs text-muted-foreground truncate text-white">
                             {email}
                         </p>
                     </div>
@@ -73,24 +73,28 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
                     <span className="sr-only">Open user menu</span>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent
+                className="w-56 bg-primary-dark border-line-in-dark-bg"
+                align="end"
+                forceMount
+            >
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
+                        <p className="text-sm font-medium leading-none text-white">
                             {name}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground">
+                        <p className="text-xs leading-none text-muted-foreground text-white">
                             {email}
                         </p>
                     </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-line-in-dark-bg" />
                 <DropdownMenuItem
                     className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
                     onClick={signOut}
                 >
-                    <LogOutIcon className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <LogOutIcon className="mr-2 h-4 w-4 text-white" />
+                    <span className="text-white">Log out</span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

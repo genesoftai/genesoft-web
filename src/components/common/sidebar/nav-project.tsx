@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronRight, Files, Layers, Loader2 } from "lucide-react";
+import {
+    ChevronRight,
+    Files,
+    Layers,
+    Loader2,
+    ScanEye,
+    Info,
+} from "lucide-react";
 import React, { useState } from "react";
 import {
     Collapsible,
@@ -95,6 +102,11 @@ export function NavProject() {
         return null;
     }
 
+    console.log({
+        message: "NavProject: branding",
+        branding,
+    });
+
     return (
         <SidebarGroup>
             <SidebarGroupLabel
@@ -111,7 +123,12 @@ export function NavProject() {
                     className="rounded-full"
                 />
                 <span
-                    className={`truncate ${branding?.color ? `text-[${branding?.color}]` : "text-genesoft"}`}
+                    className={`truncate`}
+                    style={
+                        branding?.color
+                            ? { color: branding.color }
+                            : { color: "white" }
+                    }
                 >
                     {name}
                 </span>
@@ -127,6 +144,30 @@ export function NavProject() {
                 </div>
             ) : (
                 <SidebarMenu>
+                    <SidebarMenuButton
+                        asChild
+                        tooltip="Overview"
+                        className="text-white hover:bg-secondary-dark"
+                    >
+                        <a href={`/dashboard/project/manage/${id}`}>
+                            <Info className="text-subtext-in-dark-bg" />
+                            <span className="text-subtext-in-dark-bg">
+                                Overview
+                            </span>
+                        </a>
+                    </SidebarMenuButton>
+                    <SidebarMenuButton
+                        asChild
+                        tooltip="Branding"
+                        className="text-white hover:bg-secondary-dark"
+                    >
+                        <a href={`/dashboard/project/manage/${id}/branding`}>
+                            <ScanEye className="text-subtext-in-dark-bg" />
+                            <span className="text-subtext-in-dark-bg">
+                                Branding
+                            </span>
+                        </a>
+                    </SidebarMenuButton>
                     {/* Pages */}
                     <Collapsible asChild defaultOpen>
                         <SidebarMenuItem>
