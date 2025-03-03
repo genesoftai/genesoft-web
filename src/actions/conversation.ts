@@ -18,6 +18,8 @@ export type TalkToProjectManagerDto = {
     project_id: string;
     conversation_id: string;
     message: Partial<Message>;
+    feature_id?: string;
+    page_id?: string;
 };
 
 export type CreateConversationDto = {
