@@ -8,6 +8,7 @@ export interface Project {
     branding_id: string | null;
     created_at: string;
     updated_at: string;
+    branding: Branding;
 }
 
 export interface Page {
