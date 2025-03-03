@@ -229,6 +229,7 @@ const ManageFeaturePage = () => {
                         isLoading={isLoadingSetupFeatureConversation}
                         onSubmitConversation={handleSubmitConversation}
                         status={conversation?.status || ""}
+                        featureId={feature?.id || ""}
                     />
                 </div>
                 {/* Web Development - Collapsible */}
