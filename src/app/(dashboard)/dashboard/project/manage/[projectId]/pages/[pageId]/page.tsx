@@ -18,13 +18,20 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
+    BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
 import { Page, Project } from "@/types/project";
-import { AppWindow, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    AppWindow,
+    ChevronLeft,
+    ChevronRight,
+    MessageSquare,
+    MonitorPlay,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
@@ -32,6 +39,8 @@ import {
     ConversationMessageForWeb,
     Message,
 } from "@/types/message";
+import { ToggleButton } from "@/components/ui/toggle-button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ManagePagePage = () => {
     const pathParams = useParams();
@@ -49,6 +58,7 @@ const ManagePagePage = () => {
         useState<boolean>(false);
 
     const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
+    const [activeTab, setActiveTab] = useState("conversation");
 
     const setupProject = async () => {
         setLoading(true);
@@ -136,76 +146,134 @@ const ManagePagePage = () => {
     }
 
     return (
-        <div className="flex flex-col w-full h-full relative px-2">
-            <div
-                className="absolute top-4 right-2 z-10 bg-white text-primary-dark p-1 rounded-md hover:bg-white/80 cursor-pointer"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-            >
-                {isCollapsed ? (
-                    <div className="flex items-center gap-x-2">
-                        <ChevronLeft className="h-5 w-5 text-primary-dark" />
-                        <p className="text-sm text-primary-dark">Open</p>
-                        <AppWindow className="h-5 w-5 text-primary-dark" />
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-x-2">
-                        <ChevronRight className="h-5 w-5 text-primary-dark" />
-                        <p className="text-sm text-primary-dark">Close</p>
-                        <AppWindow className="h-5 w-5 text-primary-dark" />
-                    </div>
-                )}
-            </div>
-            <header className="flex h-16 shrink-0 items-center gap-2">
-                <div className="flex items-center gap-2 px-4">
+        <div className="flex flex-col min-h-screen">
+            <div className="p-2 md:p-4 lg:p-6 flex-1 flex flex-col gap-4">
+                {/* Breadcrumb Section */}
+                <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                     <SidebarTrigger className="-ml-1 text-white" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
-                    <Breadcrumb>
+                    <Breadcrumb className="flex-1">
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbPage className="text-white">
+                                <BreadcrumbLink
+                                    href="/dashboard"
+                                    className="text-subtext-in-dark-bg"
+                                >
                                     Project
-                                </BreadcrumbPage>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbPage className="text-white">
-                                    Manage
-                                </BreadcrumbPage>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbPage className="text-white">
-                                    Page
-                                </BreadcrumbPage>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbPage className="text-white">
-                                    {page?.name || ""}
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbLink
+                                    href={`/dashboard/project/manage/${pathParams?.projectId}`}
+                                    className="text-subtext-in-dark-bg"
+                                >
+                                    {project?.name}
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage className="text-subtext-in-dark-bg">
+                                    {page?.name}
                                 </BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
+
+                    {/* Toggle Button - Only visible on md and up */}
+                    <div className="hidden md:block">
+                        <ToggleButton
+                            isCollapsed={isCollapsed}
+                            setIsCollapsed={setIsCollapsed}
+                            className="ml-auto"
+                        />
+                    </div>
                 </div>
-            </header>
-            <div className="flex w-full gap-x-2">
-                {/* Conversation */}
-                <div
-                    className={`transition-all duration-300 ease-in-out ${
-                        isCollapsed ? "w-full" : "w-[640px] shrink-0"
-                    } pb-4`}
-                >
-                    <Conversation
-                        type="page"
-                        channelName={page?.name || ""}
-                        channelDescription={page?.description || ""}
-                        initialMessages={messages}
-                        sprintOptions={sprintOptions}
-                        selectedSprint={selectedSprint || undefined}
-                        onSprintChange={handleSprintChange}
-                        conversationId={conversation?.id || ""}
-                        isLoading={isLoadingSetupPageConversation}
-                        onSubmitConversation={handleSubmitConversation}
-                        status={conversation?.status || ""}
-                        pageId={page?.id || ""}
-                    />
+
+                {/* Mobile View (Tabs) - Only visible below md breakpoint */}
+                <div className="md:hidden flex-1 flex flex-col">
+                    <Tabs
+                        value={activeTab}
+                        onValueChange={setActiveTab}
+                        className="flex-1 flex flex-col"
+                    >
+                        <TabsList className="grid w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
+                            <TabsTrigger
+                                value="conversation"
+                                className="flex items-center gap-2"
+                            >
+                                <MessageSquare className="h-4 w-4" />
+                                <span>Conversation</span>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="preview"
+                                className="flex items-center gap-2"
+                            >
+                                <MonitorPlay className="h-4 w-4" />
+                                <span>Preview</span>
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent
+                            value="conversation"
+                            className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
+                        >
+                            <div className="flex-1">
+                                <Conversation
+                                    type="page"
+                                    channelName={page?.name || ""}
+                                    channelDescription={page?.description || ""}
+                                    conversationId={conversation?.id || ""}
+                                    initialMessages={messages || []}
+                                    isLoading={isLoadingSetupPageConversation}
+                                    sprintOptions={sprintOptions || []}
+                                    selectedSprint={selectedSprint || ""}
+                                    onSprintChange={handleSprintChange}
+                                    onSubmitConversation={
+                                        handleSubmitConversation
+                                    }
+                                    status={conversation?.status || ""}
+                                    pageId={pathParams?.pageId as string}
+                                />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent
+                            value="preview"
+                            className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
+                        >
+                            <div className="flex-1">
+                                <WebPreview project={project} />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
                 </div>
-                {/* Web Development - Collapsible */}
-                <div className="relative flex-1">
+
+                {/* Desktop View - Only visible at md breakpoint and up */}
+                <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-4">
+                    {/* Conversation Section */}
+                    <div
+                        className={`flex-1 min-w-0 ${
+                            isCollapsed ? "lg:w-full" : "lg:max-w-[60%]"
+                        }`}
+                    >
+                        <Conversation
+                            type="page"
+                            channelName={page?.name || ""}
+                            channelDescription={page?.description || ""}
+                            conversationId={conversation?.id || ""}
+                            initialMessages={messages || []}
+                            isLoading={isLoadingSetupPageConversation}
+                            sprintOptions={sprintOptions || []}
+                            selectedSprint={selectedSprint || ""}
+                            onSprintChange={handleSprintChange}
+                            onSubmitConversation={handleSubmitConversation}
+                            status={conversation?.status || ""}
+                            pageId={pathParams?.pageId as string}
+                        />
+                    </div>
+
+                    {/* WebPreview Section - Collapsible */}
                     <Collapsible
                         className={`transition-all duration-300 ease-in-out ${
                             isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"
@@ -214,10 +282,12 @@ const ManagePagePage = () => {
                         onOpenChange={(open) => setIsCollapsed(!open)}
                     >
                         <CollapsibleContent
-                            className="w-full data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
+                            className="w-full h-full data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
                             forceMount
                         >
-                            <WebPreview project={project} />
+                            <div className="h-full overflow-auto">
+                                <WebPreview project={project} />
+                            </div>
                         </CollapsibleContent>
                     </Collapsible>
                 </div>

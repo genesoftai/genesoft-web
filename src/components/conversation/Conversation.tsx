@@ -255,7 +255,7 @@ const Conversation: React.FC<ConversationProps> = ({
 
             {/* Messages Area */}
             {!isLoading ? (
-                <CardContent className="flex-grow p-0 overflow-hidden">
+                <CardContent className="flex-grow p-0 overflow-hidden h-full">
                     <ScrollArea className="h-[calc(100vh-200px)] w-full conversation-scrollarea">
                         <div className="flex flex-col p-4 gap-4">
                             {messages.map((message, index) => (
@@ -286,7 +286,7 @@ const Conversation: React.FC<ConversationProps> = ({
                     </ScrollArea>
                 </CardContent>
             ) : (
-                <CardContent className="flex-grow p-0 overflow-hidden">
+                <CardContent className="flex-grow p-0 overflow-hidden h-full">
                     <ScrollArea className="h-[calc(100vh-200px)] w-full conversation-scrollarea">
                         <div className="flex flex-col p-4 gap-4">
                             {messages.length === 0 && (
