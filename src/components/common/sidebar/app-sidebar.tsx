@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { AppWindow, Building, LifeBuoy } from "lucide-react";
+import { AppWindow, Building, ChevronLeft, LifeBuoy } from "lucide-react";
 
 import { NavMain } from "@/components/common/sidebar/nav-main";
 import { NavSecondary } from "@/components/common/sidebar/nav-secondary";
@@ -14,9 +14,11 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { NavProject } from "./nav-project";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 
 const data = {
     user: {
@@ -93,7 +95,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { organization, project_id } = useGenesoftUserStore();
+    const { project_id } = useGenesoftUserStore();
+    const { name: organization_name } = useGenesoftOrganizationStore();
     console.log({
         message: "AppSidebar",
         project_id,
@@ -114,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        {organization?.name}
+                                        {organization_name}
                                     </span>
                                     <span className="truncate text-xs">
                                         {"Free tier"}
@@ -122,6 +125,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </div>
                             </a>
                         </SidebarMenuButton>
+
+                        <div className="flex items-center cursor-pointer text-xs my-4">
+                            <ChevronLeft className="size-4" />
+                            <SidebarTrigger />
+                            <p>{"close sidebar"}</p>
+                        </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>

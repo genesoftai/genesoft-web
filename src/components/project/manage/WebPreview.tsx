@@ -14,6 +14,9 @@ import {
     RotateCcw,
     Laptop,
     Activity,
+    Wrench,
+    Loader2,
+    TriangleAlert,
 } from "lucide-react";
 import { Project } from "@/types/project";
 import { useRouter } from "next/navigation";
@@ -43,9 +46,7 @@ interface WebPreviewProps {
 }
 
 export function WebPreview({ project }: WebPreviewProps) {
-    const router = useRouter();
     const { toast } = useToast();
-    const [isBuilding, setIsBuilding] = useState(false);
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
     const [isCheckingBuildErrors, setIsCheckingBuildErrors] = useState(false);
@@ -54,46 +55,7 @@ export function WebPreview({ project }: WebPreviewProps) {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [activeTab, setActiveTab] = useState("preview");
 
-    const handleAddFeedback = () => {
-        posthog.capture("click_add_feedback_from_manage_project_web_preview");
-        router.push(`/dashboard/project/manage/${project?.id}/feedback`);
-    };
     const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
-
-    const handleBuildWebApplication = async () => {
-        posthog.capture(
-            "click_build_web_application_from_manage_project_web_preview",
-        );
-        if (!project?.id) {
-            toast({
-                title: "Project ID is required",
-                description: "Please select a project",
-            });
-            return;
-        }
-
-        try {
-            setIsBuilding(true);
-            await buildWebApplication(project?.id);
-            toast({
-                title: "Software Development team of AI Agent working on new version of your web application",
-                description:
-                    "Please waiting for email notification when new version of your web application is ready",
-                duration: 10000,
-            });
-        } catch (error) {
-            console.error("Error building web application:", error);
-            toast({
-                title: "Failed to build web application",
-                description:
-                    "Please try again, Make sure that you build new version of your web application when you updated requirements in pages, features, and branding only.",
-                variant: "destructive",
-                duration: 10000,
-            });
-        } finally {
-            setIsBuilding(false);
-        }
-    };
 
     const handleFixErrors = async () => {
         posthog.capture("click_fix_errors_from_manage_project_web_preview");
@@ -109,7 +71,7 @@ export function WebPreview({ project }: WebPreviewProps) {
         try {
             await checkBuildErrors(project?.id);
             toast({
-                title: "Genesoft and AI Agent team working on fixing errors in your web application",
+                title: "Genesoft software development AI Agent team working on fixing errors of your web application to help you deploy latest version",
                 description:
                     "Please waiting for email notification when errors are fixed",
                 duration: 10000,
@@ -180,20 +142,15 @@ export function WebPreview({ project }: WebPreviewProps) {
         refreshIframe();
     };
 
-    const isInProgress = [
-        DevelopmentStatus.FEEDBACK_ITERATION_IN_PROGRESS,
-        DevelopmentStatus.REQUIREMENTS_ITERATION_IN_PROGRESS,
-        DevelopmentStatus.PAGE_ITERATION_IN_PROGRESS,
-        DevelopmentStatus.FEATURE_ITERATION_IN_PROGRESS,
-    ].includes(webApplicationInfo?.developmentStatus as DevelopmentStatus);
-
     console.log({
         webApplicationInfo,
         latestIteration,
     });
 
     return (
-        <Card className="bg-primary-dark text-white border-none">
+        <Card
+            className={`bg-primary-dark text-white border-none  max-w-[380px] md:max-w-[1024px] `}
+        >
             <CardHeader className="flex flex-col md:flex-row items-center justify-between">
                 <div className="flex flex-col md:flex-row items-center justify-between">
                     <CardTitle className="text-white text-lg md:text-2xl">
@@ -253,7 +210,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                         </p>
 
                         <div
-                            className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] w-[380px]" : "h-[100vh] max-w-[850px]"}`}
+                            className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] max-w-[380px]" : "h-[100vh] max-w-[850px]"}`}
                         >
                             <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
                                 {/* Browser controls */}
@@ -294,14 +251,16 @@ export function WebPreview({ project }: WebPreviewProps) {
                             </div>
 
                             {webApplicationInfo?.url ? (
-                                <div className="relative flex justify-center w-full h-[calc(100%-40px)]">
+                                <div
+                                    className={`relative flex justify-center w-full h-[calc(100%-40px)] `}
+                                >
                                     <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
                                     <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                                     <iframe
                                         ref={iframeRef}
                                         className={`relative shadow-xl border border-white/10 ${
                                             viewMode === "mobile"
-                                                ? "w-[420px] h-[720px] rounded-b-lg mx-auto"
+                                                ? "w-[380px] h-[720px] rounded-b-lg mx-auto"
                                                 : "w-full h-[720px] rounded-b-lg"
                                         }`}
                                         src={webApplicationInfo.url}
@@ -336,12 +295,8 @@ export function WebPreview({ project }: WebPreviewProps) {
                                 <div className="text-sm font-medium text-gray-300">
                                     Web Application Status
                                 </div>
-                                <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
+                                <div className="flex flex-col items-center justify-between md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
                                     <DeploymentStatusBadge
-                                        status={
-                                            webApplicationInfo?.status ||
-                                            DeploymentStatus.NOT_DEPLOYED
-                                        }
                                         readyStatus={
                                             webApplicationInfo?.readyStatus ||
                                             ReadyStatus.BUILDING
@@ -363,45 +318,205 @@ export function WebPreview({ project }: WebPreviewProps) {
                                         </span>
                                     )}
                                 </div>
+
+                                <div className="flex flex-col items-center md:flex-row w-full gap-2 p-4">
+                                    {webApplicationInfo?.readyStatus ===
+                                        ReadyStatus.ERROR &&
+                                        !webApplicationInfo?.repositoryBuild
+                                            .fix_triggered && (
+                                            <div className="flex flex-col items-start gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="text-xs bg-red-700 font-bold text-white py-1 rounded-sm"
+                                                    onClick={handleFixErrors}
+                                                >
+                                                    <Wrench className="h-4 w-4" />
+                                                    <span className="text-sm font-medium flex items-center gap-2">
+                                                        Fix errors
+                                                        {isCheckingBuildErrors && (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        )}
+                                                    </span>
+                                                </Button>
+
+                                                <p className="text-xs text-gray-400">
+                                                    We found some error for
+                                                    deploying your latest
+                                                    version of web application.
+                                                    Please click fix errors in
+                                                    your web application to
+                                                    redeploy
+                                                </p>
+                                            </div>
+                                        )}
+                                </div>
                             </div>
 
-                            <div className="flex flex-col gap-1 w-full sm:w-fit">
-                                <div className="text-sm font-medium text-gray-300">
-                                    Software Development Status
-                                </div>
-                                <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10 ">
-                                    <DevelopmentStatusBadge
-                                        status={
-                                            webApplicationInfo?.developmentStatus ||
-                                            DevelopmentStatus.DEVELOPMENT_DONE
-                                        }
-                                    />
-                                    {isInProgress && (
-                                        <span className="text-xs text-white">
-                                            We will send email information to
-                                            your email when development is done
+                            {/* Repository Build Info */}
+                            {webApplicationInfo?.repositoryBuild && (
+                                <div className="flex flex-col gap-1 w-full mt-4">
+                                    <div className="text-sm font-medium text-white flex items-center gap-2">
+                                        <span className="text-sm text-white font-bold">
+                                            Build Status
                                         </span>
-                                    )}
-                                    {webApplicationInfo?.developmentStatus ===
-                                        DevelopmentStatus.DEVELOPMENT_DONE && (
-                                        <span className="text-xs text-white">
-                                            at{" "}
-                                            {webApplicationInfo?.developmentDoneAt
-                                                ? formatDateToHumanReadable(
-                                                      webApplicationInfo.developmentDoneAt,
-                                                  )
-                                                : "Not available"}
-                                        </span>
-                                    )}
+                                        {webApplicationInfo.repositoryBuild
+                                            .status === "failed" && (
+                                            <TriangleAlert className="h-4 w-4 text-red-400" />
+                                        )}
+                                        {webApplicationInfo.repositoryBuild
+                                            .status === "pending" && (
+                                            <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
+                                        )}
+                                        {webApplicationInfo.repositoryBuild
+                                            .status === "in_progress" && (
+                                            <Wrench className="h-4 w-4 animate-pulse text-genesoft" />
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col p-4 bg-primary-dark/30 rounded-lg border border-white/10">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-gray-400">
+                                                    Status
+                                                </span>
+                                                <span
+                                                    className={`text-sm font-medium ${
+                                                        (webApplicationInfo
+                                                            .repositoryBuild
+                                                            .status as string) ===
+                                                        "deployed"
+                                                            ? "text-green-400"
+                                                            : (webApplicationInfo
+                                                                    .repositoryBuild
+                                                                    .status as string) ===
+                                                                    "pending" ||
+                                                                (webApplicationInfo
+                                                                    .repositoryBuild
+                                                                    .status as string) ===
+                                                                    "in_progress"
+                                                              ? "text-yellow-400"
+                                                              : "text-red-400"
+                                                    }`}
+                                                >
+                                                    {(webApplicationInfo
+                                                        .repositoryBuild
+                                                        .status as string) ===
+                                                    "deployed"
+                                                        ? "Successfully Deployed"
+                                                        : (webApplicationInfo
+                                                                .repositoryBuild
+                                                                .status as string) ===
+                                                            "pending"
+                                                          ? "Deployment in Progress"
+                                                          : (webApplicationInfo
+                                                                  .repositoryBuild
+                                                                  .status as string) ===
+                                                              "in_progress"
+                                                            ? "AI Agent Fixing Errors for deployment failed"
+                                                            : "Deployment Failed"}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-gray-400">
+                                                    Started On
+                                                </span>
+                                                <span className="text-sm text-white">
+                                                    {new Date(
+                                                        webApplicationInfo.repositoryBuild.created_at,
+                                                    ).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-gray-400">
+                                                    Last Updated
+                                                </span>
+                                                <span className="text-sm text-white">
+                                                    {new Date(
+                                                        webApplicationInfo.repositoryBuild.updated_at,
+                                                    ).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-gray-400">
+                                                    Fix Attempts
+                                                </span>
+                                                <span className="text-sm text-white">
+                                                    {
+                                                        webApplicationInfo
+                                                            .repositoryBuild
+                                                            .fix_attempts
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {webApplicationInfo.repositoryBuild
+                                            .status === "failed" && (
+                                            <div className="mt-4 p-3 bg-red-900/30 border border-red-500/30 rounded-md">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm font-medium text-red-300">
+                                                            We couldn&apos;t
+                                                            deploy your website
+                                                        </span>
+                                                        <span className="text-xs text-gray-400">
+                                                            Fix attempts:{" "}
+                                                            {
+                                                                webApplicationInfo
+                                                                    .repositoryBuild
+                                                                    .fix_attempts
+                                                            }
+                                                        </span>
+                                                    </div>
+
+                                                    {webApplicationInfo
+                                                        .repositoryBuild
+                                                        .error_logs && (
+                                                        <div className="mt-2 p-2 bg-black/50 rounded border border-white/10 max-h-32 overflow-y-auto">
+                                                            <pre className="text-xs text-red-300 font-mono whitespace-pre-wrap">
+                                                                {
+                                                                    webApplicationInfo
+                                                                        .repositoryBuild
+                                                                        .error_logs
+                                                                }
+                                                            </pre>
+                                                        </div>
+                                                    )}
+
+                                                    {/* <div className="flex justify-end mt-2">
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            className="bg-red-700 hover:bg-red-600 text-white"
+                                                            onClick={
+                                                                handleFixErrors
+                                                            }
+                                                        >
+                                                            <Wrench className="h-4 w-4 mr-2" />
+                                                            {"Fix errors"}
+                                                            {isCheckingBuildErrors && (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            )}
+                                                        </Button>
+                                                    </div> */}
+
+                                                    <p className="text-xs text-gray-400 self-end">
+                                                        Please contact support
+                                                        at support@genesoft.com
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Development Activity Live Feed */}
                             <div className="flex flex-col gap-3 w-full">
                                 <div className="text-sm font-medium text-gray-300 flex flex-col md:flex-row items-center gap-2 mt-8">
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                                        Development Activity for latest sprint
+                                        Software Development Activity for latest
+                                        sprint
                                     </div>
                                     {pollingCount > 0 && (
                                         <span className="text-xs text-gray-400 animate-pulse">

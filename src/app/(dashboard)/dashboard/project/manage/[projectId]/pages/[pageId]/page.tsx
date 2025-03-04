@@ -13,14 +13,6 @@ import Conversation, {
 } from "@/components/conversation/Conversation";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-    BreadcrumbLink,
-} from "@/components/ui/breadcrumb";
-import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
@@ -30,8 +22,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
 import { Page, Project } from "@/types/project";
 import {
-    ArrowDown,
-    ArrowRight,
     ChevronDown,
     ChevronUp,
     MessageSquare,
@@ -46,12 +36,6 @@ import {
 } from "@/types/message";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const ManagePagePage = () => {
     const pathParams = useParams();

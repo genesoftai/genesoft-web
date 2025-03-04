@@ -182,7 +182,7 @@ const Conversation: React.FC<ConversationProps> = ({
     });
 
     return (
-        <Card className="flex flex-col w-full max-h-[120vh] h-full sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg overflow-y-auto">
+        <Card className="flex flex-col w-full max-h-[120vh] h-full sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
             {/* Channel Header */}
             <CardHeader className="flex flex-row items-center justify-between px-4 py-2 bg-[#222529] border-b border-[#383838]">
                 <CardTitle className="text-lg font-semibold text-white flex items-center gap-2 justify-between w-full">
@@ -283,7 +283,7 @@ const Conversation: React.FC<ConversationProps> = ({
                             {messages.map((message, index) => (
                                 <div
                                     key={message.id}
-                                    className={`group ${index === messages.length - 1 ? "message-new" : ""}`}
+                                    className={`group max-w-full w-full overflow-hidden ${index === messages.length - 1 ? "message-new" : ""}`}
                                 >
                                     {message.sender_type === "system" ? (
                                         <SystemMessage message={message} />
@@ -305,6 +305,35 @@ const Conversation: React.FC<ConversationProps> = ({
                                 </div>
                             )}
                         </div>
+                        <style jsx global>{`
+                            .conversation-scrollarea pre,
+                            .conversation-scrollarea code {
+                                white-space: pre-wrap;
+                                word-break: break-word;
+                                overflow-wrap: break-word;
+                                max-width: 100%;
+                                overflow-x: auto;
+                            }
+
+                            .conversation-scrollarea p,
+                            .conversation-scrollarea div,
+                            .conversation-scrollarea span {
+                                max-width: 100%;
+                                overflow-wrap: break-word;
+                                word-wrap: break-word;
+                            }
+
+                            .conversation-scrollarea img {
+                                max-width: 100%;
+                                height: auto;
+                            }
+
+                            .conversation-scrollarea table {
+                                display: block;
+                                overflow-x: auto;
+                                max-width: 100%;
+                            }
+                        `}</style>
                     </ScrollArea>
                 </CardContent>
             ) : (
@@ -378,10 +407,10 @@ const Conversation: React.FC<ConversationProps> = ({
                                 placeholder={
                                     "Send a message to your own software development team..."
                                 }
-                                className="text-xs md:text-sm min-h-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white conversation-textarea"
+                                className="text-xs md:text-sm min-h-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white conversation-textarea w-full"
                             />
 
-                            <div className="flex items-center gap-1">
+                            <div className="flex-shrink-0 flex items-center gap-1">
                                 <Button
                                     onClick={handleSendMessage}
                                     disabled={

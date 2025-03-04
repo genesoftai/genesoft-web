@@ -1,33 +1,33 @@
 "use client";
 
 import { CircleCheck, Loader2, TriangleAlert } from "lucide-react";
-import { DeploymentStatus, ReadyStatus } from "@/types/web-application";
-import { useEffect, useState } from "react";
+import { ReadyStatus } from "@/types/web-application";
+import React, { useEffect, useState } from "react";
 
 interface DeploymentStatusProps {
-    status: DeploymentStatus;
     readyStatus: ReadyStatus;
 }
 
-export function DeploymentStatusBadge({
-    status,
-    readyStatus,
-}: DeploymentStatusProps) {
+export function DeploymentStatusBadge({ readyStatus }: DeploymentStatusProps) {
     const [textToShow, setTextToShow] = useState("");
     const [bgColor, setBgColor] = useState("");
-
+    const [additionalText, setAdditionalText] = useState("");
     useEffect(() => {
         setupTextToShow();
         setupColor();
-    }, [status]);
+    }, [readyStatus]);
 
     const setupTextToShow = () => {
         if (readyStatus === ReadyStatus.READY) {
             setTextToShow("Deployment successful");
         } else if (readyStatus === ReadyStatus.BUILDING) {
             setTextToShow("Deployment in progress");
-        } else {
-            setTextToShow("Deployment failed");
+        } else if (readyStatus === ReadyStatus.ERROR) {
+            setTextToShow(`Deployment failed`);
+            setAdditionalText(
+                `Please click Fix Errors to fix the deployment failed\n\
+                or Please contact support at support@genesoft.com`,
+            );
         }
     };
 
@@ -36,25 +36,29 @@ export function DeploymentStatusBadge({
             setBgColor("bg-emerald-400/50");
         } else if (readyStatus === ReadyStatus.BUILDING) {
             setBgColor("bg-genesoft-blue/50");
-        } else {
+        } else if (readyStatus === ReadyStatus.ERROR) {
             setBgColor("bg-red-500/50");
         }
     };
 
     return (
-        <div
-            className={`flex items-center gap-2 text-sm ${bgColor} px-3 py-1 rounded-full`}
-        >
-            {readyStatus === ReadyStatus.BUILDING && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-            )}
-            {readyStatus === ReadyStatus.READY && (
-                <CircleCheck className="h-4 w-4" />
-            )}
-            {readyStatus === ReadyStatus.FAILED && (
-                <TriangleAlert className="h-4 w-4" />
-            )}
-            <span>{textToShow}</span>
+        <div>
+            <div
+                className={`flex items-center gap-2 text-sm ${bgColor} px-3 py-1 rounded-full w-fit`}
+            >
+                {readyStatus === ReadyStatus.BUILDING && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                {readyStatus === ReadyStatus.READY && (
+                    <CircleCheck className="h-4 w-4" />
+                )}
+                {readyStatus === ReadyStatus.ERROR && (
+                    <TriangleAlert className="h-4 w-4" />
+                )}
+                <span>{textToShow}</span>
+            </div>
+
+            <span className="text-xs text-gray-400">{additionalText}</span>
         </div>
     );
 }

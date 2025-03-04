@@ -36,8 +36,8 @@ const AIAgentMessage = ({ message }: { message: Message }) => {
     };
 
     return (
-        <div className="flex items-start gap-3 group p-2 rounded-md">
-            <Avatar className="h-8 w-8 sm:h-9 sm:w-9 rounded-md">
+        <div className="flex items-start gap-3 group p-2 rounded-md w-full overflow-hidden">
+            <Avatar className="h-8 w-8 sm:h-9 sm:w-9 rounded-md flex-shrink-0">
                 <Image
                     src={GenesoftLogo}
                     alt="Genesoft Logo"
@@ -54,7 +54,7 @@ const AIAgentMessage = ({ message }: { message: Message }) => {
                 />
             </Avatar>
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex items-baseline">
                     <span className={`font-semibold text-sm text-genesoft`}>
                         {message.sender?.name}
@@ -67,7 +67,7 @@ const AIAgentMessage = ({ message }: { message: Message }) => {
                 </div>
 
                 <div
-                    className={`text-white text-sm rounded-lg self-start`}
+                    className={`text-white text-sm rounded-lg self-start break-words overflow-hidden max-w-full`}
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(htmlContent),
                     }}
