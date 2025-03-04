@@ -33,7 +33,7 @@ const UserMessage = ({ message }: { message: Message }) => {
             </Avatar>
 
             <div className="flex-1">
-                <div className="flex items-baseline">
+                <div className="flex flex-col items-baseline">
                     <span
                         className={`font-semibold text-sm text-subtext-in-dark-bg `}
                     >

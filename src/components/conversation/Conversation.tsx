@@ -31,6 +31,12 @@ import AIAgentMessage from "./message/AIAgentMessage";
 import UserMessage from "./message/UserMessage";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import {
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+} from "@/components/ui/accordion";
 
 export type SprintOption = {
     id: string;
@@ -185,16 +191,27 @@ const Conversation: React.FC<ConversationProps> = ({
     });
 
     return (
-        <Card className="flex flex-col w-full h-full bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
+        <Card className="flex flex-col w-full h-full sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
             {/* Channel Header */}
             <CardHeader className="flex flex-row items-center justify-between px-4 py-2 bg-[#222529] border-b border-[#383838]">
                 <CardTitle className="text-lg font-semibold text-white flex items-center gap-2 justify-between w-full">
-                    <div className="flex flex-col gap-1 w-6/12">
+                    {/* <div className="flex flex-col gap-1 w-6/12">
                         <p className=" text-white">{channelName}</p>
-                        <p className=" text-gray-400 text-xs">
-                            {channelDescription}
-                        </p>
-                    </div>
+                        <Accordion
+                            type="single"
+                            collapsible
+                            className="w-full text-gray-400 text-xs border-none"
+                        >
+                            <AccordionItem value="item-1 border-none py-0">
+                                <AccordionTrigger className="text-white border-none">
+                                    {"Description"}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-gray-400 text-xs border-none">
+                                    {channelDescription}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div> */}
 
                     {sprintOptions.length > 0 && (
                         <div className="relative min-w-[100px]">
@@ -234,7 +251,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     {sprintOptions.map((sprint) => (
                                         <div
                                             key={sprint.id}
-                                            className={`py-2 px-3 cursor-pointer hover:bg-[#2c3235] text-sm ${selectedSprint === sprint.id ? "bg-[#1e62d0] text-white" : "text-gray-300"}`}
+                                            className={`py-2 px-3 cursor-pointer hover:bg-[#2c3235] text-sm ${selectedSprint === sprint.id ? "bg-[#1e62d0] text-white" : "text-gray-300"} flex items-center gap-2`}
                                             onClick={() => {
                                                 if (onSprintChange) {
                                                     setMessages([]);
@@ -243,7 +260,18 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 setIsSprintMenuOpen(false);
                                             }}
                                         >
-                                            {sprint.name}
+                                            {sprint?.status === "submitted" ? (
+                                                <CircleCheck
+                                                    size={16}
+                                                    className="text-green-500"
+                                                />
+                                            ) : (
+                                                <MessageCircleMore
+                                                    size={16}
+                                                    className="text-blue-500"
+                                                />
+                                            )}
+                                            <span>{sprint.name}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -256,12 +284,15 @@ const Conversation: React.FC<ConversationProps> = ({
             {/* Messages Area */}
             {!isLoading ? (
                 <CardContent className="flex-grow p-0 overflow-hidden h-full">
-                    <ScrollArea className="h-[calc(100vh-200px)] w-full conversation-scrollarea">
-                        <div className="flex flex-col p-4 gap-4">
+                    <ScrollArea
+                        className="min-h-[60vh] h-fit md:min-h-[40vh] w-full conversation-scrollarea overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+                        scrollHideDelay={0}
+                    >
+                        <div className="flex flex-col p-4 gap-4 pb-0 h-full">
                             {messages.map((message, index) => (
                                 <div
                                     key={message.id}
-                                    className={`group conversation-message ${index === messages.length - 1 ? "message-new" : ""}`}
+                                    className={`group ${index === messages.length - 1 ? "message-new" : ""}`}
                                 >
                                     {message.sender_type === "system" ? (
                                         <SystemMessage message={message} />
@@ -272,10 +303,10 @@ const Conversation: React.FC<ConversationProps> = ({
                                     )}
                                 </div>
                             ))}
-                            <div ref={messagesEndRef} />
+                            <div className="h-0" />
 
                             {isLoadingSendMessage && (
-                                <div className="flex justify-center my-2">
+                                <div className="flex justify-center mb-4">
                                     <div className="bg-[#252a2e] text-gray-400 text-xs py-1 px-3 rounded-md flex items-center gap-2 animate-pulse">
                                         <Loader2 className="h-3 w-3 animate-spin" />
                                         Project Manager is thinking...
@@ -287,10 +318,10 @@ const Conversation: React.FC<ConversationProps> = ({
                 </CardContent>
             ) : (
                 <CardContent className="flex-grow p-0 overflow-hidden h-full">
-                    <ScrollArea className="h-[calc(100vh-200px)] w-full conversation-scrollarea">
-                        <div className="flex flex-col p-4 gap-4">
+                    <ScrollArea className="h-[calc(100vh-280px)] w-full conversation-scrollarea">
+                        <div className="flex flex-col p-4 gap-3">
                             {messages.length === 0 && (
-                                <div className="flex flex-col items-center justify-center h-[calc(100vh-300px)]">
+                                <div className="flex flex-col items-center justify-center h-[calc(100vh-350px)]">
                                     <div className="relative w-20 h-20 mb-4">
                                         <div className="absolute inset-0 bg-genesoft/10 rounded-full animate-[spin_3s_linear_infinite]"></div>
                                         <div className="absolute inset-2 bg-genesoft/20 rounded-full animate-[spin_4s_linear_infinite_reverse]"></div>
@@ -356,7 +387,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                 placeholder={
                                     "Send a message to your own software development team..."
                                 }
-                                className="min-h-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white conversation-textarea"
+                                className="text-xs md:text-sm min-h-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white conversation-textarea"
                             />
 
                             <div className="flex items-center gap-1">
@@ -369,7 +400,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     className={`rounded-md conversation-send-button ${inputValue.trim() === "" ? "bg-[#4b4b4b] text-gray-400" : "bg-[#1e62d0] hover:bg-[#1a56b8] text-white"}`}
                                 >
                                     {isLoadingSendMessage ? (
-                                        <div className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin conversation-loading"></div>
+                                        <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-t-transparent border-white rounded-full animate-spin conversation-loading"></div>
                                     ) : (
                                         <Send size={16} />
                                     )}
@@ -378,7 +409,7 @@ const Conversation: React.FC<ConversationProps> = ({
                         </div>
 
                         <div className="flex flex-col items-center gap-3 mt-2 bg-[#1e2124] p-3 rounded-lg border border-[#383838]/50">
-                            <div className="flex items-center gap-4 w-full justify-between">
+                            <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
                                 <div className="flex flex-col gap-1.5 w-full">
                                     <Label className="text-gray-300 text-xs font-medium">
                                         Sprint name
@@ -389,7 +420,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                             setSprintName(e.target.value)
                                         }
                                         placeholder="Enter sprint name to help you remember conversation ..."
-                                        className="w-full bg-[#2b2d31] border-[#383838] focus:border-[#1e62d0] text-white placeholder:text-gray-500 transition-colors"
+                                        className="text-xs md:text-sm w-full bg-[#2b2d31] border-[#383838] focus:border-[#1e62d0] text-white placeholder:text-gray-500 transition-colors"
                                     />
                                 </div>
 
@@ -418,12 +449,26 @@ const Conversation: React.FC<ConversationProps> = ({
                                     {errorStartSprint}
                                 </div>
                             ) : (
-                                <div className="px-2 py-1 text-sm text-gray-400 italic w-full">
+                                <div className="px-2 py-1 text-xs md:text-sm text-gray-400 italic w-full">
                                     {isLoadingSubmitConversation
                                         ? "Genesoft Project Manager is summarizing and submitting tasks to the development team..."
                                         : "Submit the conversation to the software development team to begin implementation"}
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </CardFooter>
+            )}
+
+            {status === "submitted" && (
+                <CardFooter className="flex items-center justify-between p-3 bg-[#222529] border-t border-[#383838]">
+                    <div className="flex flex-col w-full gap-2">
+                        <div className="flex items-center gap-2 w-full bg-[#2b2d31] rounded-md p-1">
+                            <p className="text-gray-400 text-xs">
+                                {
+                                    "This conversation has been submitted to the development team. If you need to talk to Genesoft Project Manager, please talk on next sprint conversation."
+                                }
+                            </p>
                         </div>
                     </div>
                 </CardFooter>

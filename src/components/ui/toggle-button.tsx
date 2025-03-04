@@ -39,7 +39,7 @@ export function ToggleButton({
                         <MonitorPlay className="h-4 w-4" />
                         {showLabel && (
                             <span className="text-sm text-black">
-                                {isCollapsed ? "Show Preview" : "Hide Preview"}
+                                {isCollapsed ? "Show web app" : "Hide web app"}
                             </span>
                         )}
                         {isCollapsed ? (
@@ -51,7 +51,7 @@ export function ToggleButton({
                 </TooltipTrigger>
                 <TooltipContent>
                     <p className="text-white text-xs">
-                        {isCollapsed ? "Show web preview" : "Hide web preview"}
+                        {isCollapsed ? "Show web app" : "Hide web app"}
                     </p>
                 </TooltipContent>
             </Tooltip>

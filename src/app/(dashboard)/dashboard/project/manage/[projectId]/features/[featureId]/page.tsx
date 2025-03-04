@@ -1,7 +1,6 @@
 "use client";
 
 import {
-    createConversation,
     getActiveConversationByFeatureId,
     getConversationById,
     getConversationsByFeatureId,
@@ -14,19 +13,22 @@ import Conversation, {
 } from "@/components/conversation/Conversation";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-    BreadcrumbLink,
-} from "@/components/ui/breadcrumb";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ToggleButton } from "@/components/ui/toggle-button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProjectStore } from "@/stores/project-store";
 import { Feature, Project } from "@/types/project";
-import { MessageSquare, MonitorPlay } from "lucide-react";
+import {
+    ChevronDown,
+    ChevronUp,
+    MessageSquare,
+    MonitorPlay,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
@@ -34,13 +36,12 @@ import {
     ConversationMessageForWeb,
     Message,
 } from "@/types/message";
-import { ToggleButton } from "@/components/ui/toggle-button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ManageFeaturePage = () => {
     const pathParams = useParams();
     const { id: projectId, updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
+
     const [loading, setLoading] = useState(false);
     const [feature, setFeature] = useState<Feature | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -52,6 +53,7 @@ const ManageFeaturePage = () => {
         isLoadingSetupFeatureConversation,
         setIsLoadingSetupFeatureConversation,
     ] = useState<boolean>(false);
+    const [isFeatureCollapsed, setIsFeatureCollapsed] = useState(true);
 
     const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
     const [activeTab, setActiveTab] = useState("conversation");
@@ -76,56 +78,29 @@ const ManageFeaturePage = () => {
 
     useEffect(() => {
         const { featureId } = pathParams;
-
-        // Only proceed if featureId exists and is a string
-        if (featureId && typeof featureId === "string") {
-            console.log({
-                message: "ManageFeaturePage: Feature id from path params",
-                featureId,
-            });
-
-            // Run these in sequence to avoid race conditions
-            const setupData = async () => {
-                try {
-                    await setupFeature(featureId);
-                    await setupActiveFeatureConversation(featureId);
-                    await setupSprintOptions(featureId);
-                } catch (error) {
-                    console.error("Error setting up feature data:", error);
-                }
-            };
-
-            setupData();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pathParams]); // Add a proper dependency array
+        console.log({
+            message: "ManageFeaturePage: Feature id from path params",
+            featureId,
+        });
+        setupFeature(featureId as string);
+        setupActiveFeatureConversation(featureId as string);
+        setupSprintOptions(featureId as string);
+    }, [pathParams]);
 
     useEffect(() => {
-        if (projectId) {
-            setupProject();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectId]); // Ensure this doesn't run unnecessarily
+        setupProject();
+    }, [projectId]);
 
     const setupActiveFeatureConversation = async (featureId: string) => {
         setIsLoadingSetupFeatureConversation(true);
         try {
             const activeConversation =
                 await getActiveConversationByFeatureId(featureId);
-            if (activeConversation) {
-                const conversationForWeb = await getConversationById(
-                    activeConversation.id,
-                );
-                setConversation(conversationForWeb);
-                setMessages(conversationForWeb.messages);
-            } else {
-                const conversationForWeb = await createConversation({
-                    feature_id: featureId,
-                    project_id: projectId,
-                });
-                setConversation(conversationForWeb);
-                setMessages(conversationForWeb.messages);
-            }
+            const conversationForWeb = await getConversationById(
+                activeConversation.id,
+            );
+            setConversation(conversationForWeb);
+            setMessages(conversationForWeb.messages);
         } catch (error) {
             console.error("Error fetching active feature conversation:", error);
         } finally {
@@ -170,37 +145,46 @@ const ManageFeaturePage = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <div className="p-2 md:p-4 lg:p-6 flex-1 flex flex-col gap-4">
-                {/* Breadcrumb Section */}
+                {/* Breadcrumb Section -> change to Navbar */}
                 <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
-                    <SidebarTrigger className="-ml-1 text-white" />
-                    <Separator orientation="vertical" className="mr-2 h-4" />
-                    <Breadcrumb className="flex-1">
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink
-                                    href="/dashboard"
-                                    className="text-subtext-in-dark-bg"
-                                >
-                                    Project
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink
-                                    href={`/dashboard/project/manage/${pathParams?.projectId}`}
-                                    className="text-subtext-in-dark-bg"
-                                >
-                                    {project?.name}
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage className="text-subtext-in-dark-bg">
-                                    {feature?.name}
-                                </BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+                    <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-center gap-1">
+                            <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
+                        </div>
+                        <Separator
+                            orientation="vertical"
+                            className="mr-2 h-4"
+                        />
+                        <Collapsible
+                            className="w-full text-gray-400 text-xs"
+                            open={!isFeatureCollapsed}
+                            onOpenChange={(open) =>
+                                setIsFeatureCollapsed(!open)
+                            }
+                        >
+                            <CollapsibleTrigger className="text-white border-none font-bold text-lg">
+                                <div className="flex flex-col gap-2 items-start">
+                                    <span className="text-gray-400 text-xs">
+                                        {"Feature"}
+                                    </span>
+
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-white text-sm">
+                                            {feature?.name}
+                                        </span>
+                                        {isFeatureCollapsed ? (
+                                            <ChevronDown className="h-4 w-4" />
+                                        ) : (
+                                            <ChevronUp className="h-4 w-4" />
+                                        )}
+                                    </div>
+                                </div>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="text-gray-400 text-xs">
+                                {feature?.description}
+                            </CollapsibleContent>
+                        </Collapsible>
+                    </div>
 
                     {/* Toggle Button - Only visible on md and up */}
                     <div className="hidden md:block">

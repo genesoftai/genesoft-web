@@ -176,19 +176,17 @@ export function NavProject() {
                                 tooltip="Pages"
                                 className="text-white hover:bg-secondary-dark"
                             >
-                                <a
-                                    href={`/dashboard/project/manage/${id}/pages`}
-                                >
+                                <div>
                                     <Files className="text-subtext-in-dark-bg" />
                                     <span className="text-subtext-in-dark-bg">
                                         Pages
                                     </span>
-                                </a>
+                                </div>
                             </SidebarMenuButton>
                             {pages && pages.length > 0 && (
                                 <>
                                     <CollapsibleTrigger asChild>
-                                        <SidebarMenuAction className="data-[state=open]:rotate-90 text-subtext-in-dark-bg">
+                                        <SidebarMenuAction className="data-[state=open]:rotate-90 text-subtext-in-dark-bg ">
                                             <ChevronRight />
                                             <span className="sr-only">
                                                 Toggle
@@ -240,14 +238,12 @@ export function NavProject() {
                                 tooltip="Features"
                                 className="text-white hover:bg-secondary-dark"
                             >
-                                <a
-                                    href={`/dashboard/project/manage/${id}/features`}
-                                >
+                                <div>
                                     <Layers className="text-subtext-in-dark-bg" />
                                     <span className="text-subtext-in-dark-bg">
                                         Features
                                     </span>
-                                </a>
+                                </div>
                             </SidebarMenuButton>
                             {features && features.length > 0 && (
                                 <>

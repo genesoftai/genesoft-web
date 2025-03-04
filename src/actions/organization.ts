@@ -78,3 +78,84 @@ export async function getOrganizationById(organizationId: string) {
     });
     return res.data;
 }
+
+export async function getOrganizationUsers(organizationId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/organization/${organizationId}/users`;
+    const res = await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+        },
+    });
+    return res.data;
+}
+
+export async function addOrganizationUser(
+    organizationId: string,
+    email: string,
+    role: string,
+) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/organization/user`;
+    const res = await axios.post(
+        url,
+        {
+            email,
+            role,
+            organizationId,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        },
+    );
+    return res.data;
+}
+
+export async function removeOrganizationUser(
+    organizationId: string,
+    userId: string,
+) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/organization/user`;
+    const res = await axios.delete(url, {
+        data: {
+            organizationId,
+            userId,
+        },
+        headers: {
+            Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+        },
+    });
+    return res.data;
+}
+
+export async function updateOrganizationUserRole(
+    organizationId: string,
+    email: string,
+    role: string,
+) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/organization/user`;
+    const res = await axios.patch(
+        url,
+        {
+            role,
+            organizationId,
+            email,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        },
+    );
+    return res.data;
+}
+
+export async function getOrganizationsByUserId(userId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/organization/user/${userId}`;
+    const res = await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+        },
+    });
+    return res.data;
+}
