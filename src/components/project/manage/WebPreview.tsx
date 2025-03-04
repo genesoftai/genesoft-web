@@ -14,6 +14,7 @@ import {
     RotateCcw,
     Laptop,
     Activity,
+    Wrench,
 } from "lucide-react";
 import { Project } from "@/types/project";
 import { useRouter } from "next/navigation";
@@ -336,7 +337,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                                 <div className="text-sm font-medium text-gray-300">
                                     Web Application Status
                                 </div>
-                                <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
+                                <div className="flex flex-col items-center justify-between md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
                                     <DeploymentStatusBadge
                                         status={
                                             webApplicationInfo?.status ||
@@ -362,6 +363,37 @@ export function WebPreview({ project }: WebPreviewProps) {
                                                 : "Not available"}
                                         </span>
                                     )}
+                                    <div className="flex flex-col items-center md:flex-row w-full md:w-6/12 gap-2 p-4">
+                                        {webApplicationInfo?.readyStatus !==
+                                            ReadyStatus.READY &&
+                                            webApplicationInfo?.readyStatus !==
+                                                ReadyStatus.BUILDING && (
+                                                <div className="flex flex-col items-start gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="text-xs text-white bg-genesoft py-1 rounded-sm"
+                                                        onClick={
+                                                            handleFixErrors
+                                                        }
+                                                    >
+                                                        <Wrench className="h-4 w-4" />
+                                                        <span className="text-sm font-medium">
+                                                            Fix errors
+                                                        </span>
+                                                    </Button>
+
+                                                    <p className="text-xs text-gray-400">
+                                                        We found some error for
+                                                        deploying your latest
+                                                        version of web
+                                                        application. Please
+                                                        click fix errors in your
+                                                        web application to
+                                                        redeploy
+                                                    </p>
+                                                </div>
+                                            )}
+                                    </div>
                                 </div>
                             </div>
 
