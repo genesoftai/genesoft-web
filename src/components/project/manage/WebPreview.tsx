@@ -323,7 +323,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                                     {webApplicationInfo?.readyStatus ===
                                         ReadyStatus.ERROR &&
                                         !webApplicationInfo?.repositoryBuild
-                                            .fix_triggered && (
+                                            ?.fix_triggered && (
                                             <div className="flex flex-col items-start gap-2">
                                                 <Button
                                                     variant="ghost"
@@ -359,15 +359,15 @@ export function WebPreview({ project }: WebPreviewProps) {
                                         <span className="text-sm text-white font-bold">
                                             Build Status
                                         </span>
-                                        {webApplicationInfo.repositoryBuild
+                                        {webApplicationInfo?.repositoryBuild
                                             .status === "failed" && (
                                             <TriangleAlert className="h-4 w-4 text-red-400" />
                                         )}
-                                        {webApplicationInfo.repositoryBuild
+                                        {webApplicationInfo?.repositoryBuild
                                             .status === "pending" && (
                                             <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
                                         )}
-                                        {webApplicationInfo.repositoryBuild
+                                        {webApplicationInfo?.repositoryBuild
                                             .status === "in_progress" && (
                                             <Wrench className="h-4 w-4 animate-pulse text-genesoft" />
                                         )}
