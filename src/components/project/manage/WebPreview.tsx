@@ -12,6 +12,8 @@ import {
     Monitor,
     Smartphone,
     RotateCcw,
+    Laptop,
+    Activity,
 } from "lucide-react";
 import { Project } from "@/types/project";
 import { useRouter } from "next/navigation";
@@ -34,6 +36,7 @@ import { DeploymentStatusBadge } from "../web-application/DeploymentStatus";
 import posthog from "posthog-js";
 import { formatDateToHumanReadable } from "@/utils/common/time";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface WebPreviewProps {
     project: Project | null;
@@ -49,6 +52,8 @@ export function WebPreview({ project }: WebPreviewProps) {
     const [latestIteration, setLatestIteration] = useState<any>(null);
     const [pollingCount, setPollingCount] = useState(0);
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [activeTab, setActiveTab] = useState("preview");
+
     const handleAddFeedback = () => {
         posthog.capture("click_add_feedback_from_manage_project_web_preview");
         router.push(`/dashboard/project/manage/${project?.id}/feedback`);
@@ -212,304 +217,341 @@ export function WebPreview({ project }: WebPreviewProps) {
                     </div>
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center gap-6 ">
-                <p className="text-xs md:text-sm text-gray-400">
-                    This is a UI preview of your web application. For full
-                    functionality, please visit the web application link above
-                </p>
-
-                <Button
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={handleRefresh}
+            <CardContent className="flex flex-col items-center gap-6">
+                {/* Tabs for Preview and Status */}
+                <Tabs
+                    value={activeTab}
+                    onValueChange={setActiveTab}
+                    className="w-full"
                 >
-                    <RotateCcw className="h-4 w-4 text-black" />
-                    <span className="text-xs md:text-sm text-black">
-                        Refresh
-                    </span>
-                </Button>
+                    <TabsList className="grid w-full grid-cols-2 mb-4 bg-secondary-dark text-subtext-in-dark-bg">
+                        <TabsTrigger
+                            value="preview"
+                            className="flex items-center gap-2"
+                        >
+                            <Laptop className="h-4 w-4" />
+                            <span>Web Preview</span>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="status"
+                            className="flex items-center gap-2"
+                        >
+                            <Activity className="h-4 w-4" />
+                            <span>Development Status</span>
+                        </TabsTrigger>
+                    </TabsList>
 
-                <div
-                    className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] w-[420px]" : "h-[820px]"}`}
-                >
-                    <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
-                        {/* Browser controls */}
-                        <div className="flex gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-red-500 transition-all hover:animate-pulse"></div>
-                            <div className="w-3 h-3 rounded-full bg-yellow-500 transition-all hover:animate-pulse"></div>
-                            <div className="w-3 h-3 rounded-full bg-green-500 transition-all hover:animate-pulse"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className=" hidden sm:flex items-center bg-gray-700/50 rounded-full overflow-hidden">
-                                <button
-                                    className={`px-3 py-1 text-xs transition-colors ${viewMode === "desktop" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-600/50"}`}
-                                    onClick={() => setViewMode("desktop")}
-                                >
-                                    <Monitor className="h-3 w-3" />
-                                </button>
-                                <button
-                                    className={`px-3 py-1 text-xs transition-colors ${viewMode === "mobile" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-600/50"}`}
-                                    onClick={() => setViewMode("mobile")}
-                                >
-                                    <Smartphone className="h-3 w-3" />
-                                </button>
-                            </div>
-                            <div className="hidden sm:flex items-center px-3 py-1 bg-gray-700/50 rounded-full text-xs text-gray-300">
-                                <Globe className="h-3 w-3 mr-1 text-blue-400" />
-                                {webApplicationInfo?.url
-                                    ? "Live Preview"
-                                    : "Preview Unavailable"}
-                            </div>
-                        </div>
-                    </div>
+                    {/* Preview Tab Content */}
+                    <TabsContent
+                        value="preview"
+                        className="w-full flex flex-col items-center"
+                    >
+                        <p className="text-xs md:text-sm text-gray-400 mb-4">
+                            This is a UI preview of your web application. For
+                            full functionality, please visit the web application
+                            link above
+                        </p>
 
-                    {webApplicationInfo?.url ? (
-                        <div className="relative flex justify-center w-full h-[calc(100%-40px)]">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
-                            <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
-                            <iframe
-                                ref={iframeRef}
-                                className={`relative shadow-xl border border-white/10 ${
-                                    viewMode === "mobile"
-                                        ? "w-[420px] h-[720px] rounded-b-lg mx-auto"
-                                        : "w-full h-[720px] rounded-b-lg"
-                                }`}
-                                src={webApplicationInfo.url}
-                                title="Web Application Preview"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                referrerPolicy="strict-origin-when-cross-origin"
-                                sandbox="allow-scripts allow-same-origin"
-                            ></iframe>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-primary-dark/40 to-primary-dark/60 rounded-b-lg border border-white/10">
-                            <div className="p-6 rounded-xl bg-black/30 border border-white/5 flex flex-col items-center gap-3">
-                                <Globe className="h-10 w-10 text-gray-500 opacity-50" />
-                                <p className="text-gray-400 text-center text-sm sm:text-base">
-                                    No preview available yet
-                                </p>
-                                <div className="text-xs text-gray-500 max-w-[250px] text-center mt-1">
-                                    Your web application will appear here once
-                                    deployed
+                        <div
+                            className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] w-[380px]" : "h-[100vh] max-w-[850px]"}`}
+                        >
+                            <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
+                                {/* Browser controls */}
+                                <div className="flex gap-1.5 items-center">
+                                    <div className="w-3 h-3 rounded-full bg-red-500 transition-all hover:animate-pulse"></div>
+                                    <div className="w-3 h-3 rounded-full bg-yellow-500 transition-all hover:animate-pulse"></div>
+                                    <div className="w-3 h-3 rounded-full bg-green-500 transition-all hover:animate-pulse"></div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        className="flex items-center bg-primary-dark border-secondary-dark hover:bg-secondary-dark"
+                                        onClick={handleRefresh}
+                                    >
+                                        <RotateCcw className="h-4 w-4 text-white" />
+                                    </Button>
+
+                                    <div className="hidden sm:flex items-center bg-gray-700/50 rounded-full overflow-hidden">
+                                        <button
+                                            className={`px-4 py-2 text-sm transition-colors ${viewMode === "desktop" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-600/50"}`}
+                                            onClick={() =>
+                                                setViewMode("desktop")
+                                            }
+                                        >
+                                            <Monitor className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            className={`px-4 py-2 text-sm transition-colors ${viewMode === "mobile" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-600/50"}`}
+                                            onClick={() =>
+                                                setViewMode("mobile")
+                                            }
+                                        >
+                                            <Smartphone className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
 
-                {/* Web Application and Latest Iteration Status */}
-                <div className="flex flex-col gap-4 w-full p-4">
-                    <div className="flex flex-col gap-1  w-full sm:w-fit">
-                        <div className="text-sm font-medium text-gray-300">
-                            Web Application Status
-                        </div>
-                        <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
-                            <DeploymentStatusBadge
-                                status={
-                                    webApplicationInfo?.status ||
-                                    DeploymentStatus.NOT_DEPLOYED
-                                }
-                                readyStatus={
-                                    webApplicationInfo?.readyStatus ||
-                                    ReadyStatus.BUILDING
-                                }
-                            />
-                            {[ReadyStatus.READY, ReadyStatus.BUILDING].includes(
-                                webApplicationInfo?.readyStatus as ReadyStatus,
-                            ) && (
-                                <span className="text-xs text-white">
-                                    at{" "}
-                                    {webApplicationInfo?.readyAt
-                                        ? formatDateToHumanReadable(
-                                              webApplicationInfo.readyAt,
-                                          )
-                                        : "Not available"}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1 w-full sm:w-fit">
-                        <div className="text-sm font-medium text-gray-300">
-                            Software Development Status
-                        </div>
-                        <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10 ">
-                            <DevelopmentStatusBadge
-                                status={
-                                    webApplicationInfo?.developmentStatus ||
-                                    DevelopmentStatus.DEVELOPMENT_DONE
-                                }
-                            />
-                            {isInProgress && (
-                                <span className="text-xs text-white">
-                                    We will send email information to your email
-                                    when development is done
-                                </span>
-                            )}
-                            {webApplicationInfo?.developmentStatus ===
-                                DevelopmentStatus.DEVELOPMENT_DONE && (
-                                <span className="text-xs text-white">
-                                    at{" "}
-                                    {webApplicationInfo?.developmentDoneAt
-                                        ? formatDateToHumanReadable(
-                                              webApplicationInfo.developmentDoneAt,
-                                          )
-                                        : "Not available"}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Development Activity Live Feed */}
-                    <div className="flex flex-col gap-3 w-full">
-                        <div className="text-sm font-medium text-gray-300 flex flex-col md:flex-row items-center gap-2 mt-8">
-                            <div className="flex items-center gap-2">
-                                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                                Development Activity for latest sprint
-                            </div>
-                            {pollingCount > 0 && (
-                                <span className="text-xs text-gray-400 animate-pulse">
-                                    (next update in {5 - (pollingCount % 5)}s)
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="bg-primary-dark/30 rounded-lg border border-white/10 overflow-hidden">
-                            {latestIteration ? (
-                                <div className="relative">
-                                    {/* Activity Header */}
-                                    <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-white/10">
-                                        <div className="flex flex-col md:flex-row items-center gap-2">
-                                            <span
-                                                className={`px-2 py-1 text-xs rounded-full ${
-                                                    latestIteration.status ===
-                                                    "in_progress"
-                                                        ? "bg-blue-500/20 text-blue-300"
-                                                        : latestIteration.status ===
-                                                            "done"
-                                                          ? "bg-green-500/20 text-green-300"
-                                                          : "bg-yellow-500/20 text-yellow-300"
-                                                }`}
-                                            >
-                                                {latestIteration.status ===
-                                                "in_progress"
-                                                    ? "In Progress"
-                                                    : latestIteration.status ===
-                                                        "done"
-                                                      ? "Completed"
-                                                      : "Pending"}
-                                            </span>
-                                            <span className="text-sm font-medium">
-                                                {latestIteration.type ===
-                                                "page_development"
-                                                    ? "Page Development"
-                                                    : latestIteration.type ===
-                                                        "feature_development"
-                                                      ? "Feature Development"
-                                                      : "Application Development"}
-                                            </span>
-                                        </div>
-                                        <div className="text-xs text-gray-400">
-                                            {latestIteration.created_at
-                                                ? formatDateToHumanReadable(
-                                                      latestIteration.created_at,
-                                                  )
-                                                : ""}
-                                        </div>
-                                    </div>
-
-                                    {/* Activity Content */}
-                                    <div className="p-4">
-                                        <div className="mb-3">
-                                            <h4 className="text-sm font-medium mb-2">
-                                                Development Details
-                                            </h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                                                {latestIteration.conversation && (
-                                                    <div className="bg-white/5 p-3 rounded-md">
-                                                        <div className="font-medium text-gray-300 mb-1">
-                                                            <span className="text-xs">
-                                                                Sprint
-                                                            </span>
-                                                        </div>
-                                                        <div className="text-white font-bold">
-                                                            {
-                                                                latestIteration
-                                                                    .conversation
-                                                                    .name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {latestIteration.page && (
-                                                    <div className="bg-white/5 p-3 rounded-md">
-                                                        <div className="font-medium text-gray-300 mb-1">
-                                                            Page
-                                                        </div>
-                                                        <div className="text-white font-bold">
-                                                            {
-                                                                latestIteration
-                                                                    .page.name
-                                                            }
-                                                        </div>
-                                                        <div className="text-xs text-gray-400 mt-1 line-clamp-2">
-                                                            {
-                                                                latestIteration
-                                                                    .page
-                                                                    .description
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {latestIteration.feature && (
-                                                    <div className="bg-white/5 p-3 rounded-md gap-2">
-                                                        <div className="font-medium text-gray-300 mb-1">
-                                                            Feature
-                                                        </div>
-                                                        <div className="text-white font-bold">
-                                                            {
-                                                                latestIteration
-                                                                    .feature
-                                                                    .name
-                                                            }
-                                                        </div>
-                                                        <div className="text-xs text-gray-400 mt-1 line-clamp-2">
-                                                            {
-                                                                latestIteration
-                                                                    .feature
-                                                                    .description
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Visual Activity Indicator */}
-                                        {latestIteration.status === "done" && (
-                                            <div className="flex items-center gap-2 text-green-300 bg-green-500/10 p-2 rounded-md text-sm mt-2">
-                                                <CircleCheck className="h-4 w-4" />
-                                                <span>
-                                                    Development completed
-                                                    successfully
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
+                            {webApplicationInfo?.url ? (
+                                <div className="relative flex justify-center w-full h-[calc(100%-40px)]">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
+                                    <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
+                                    <iframe
+                                        ref={iframeRef}
+                                        className={`relative shadow-xl border border-white/10 ${
+                                            viewMode === "mobile"
+                                                ? "w-[420px] h-[720px] rounded-b-lg mx-auto"
+                                                : "w-full h-[720px] rounded-b-lg"
+                                        }`}
+                                        src={webApplicationInfo.url}
+                                        title="Web Application Preview"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        referrerPolicy="strict-origin-when-cross-origin"
+                                        sandbox="allow-scripts allow-same-origin"
+                                    ></iframe>
                                 </div>
                             ) : (
-                                <div className="p-6 flex flex-col items-center justify-center">
-                                    <div className="w-16 h-16 border-4 border-t-transparent border-genesoft rounded-full animate-spin mb-4"></div>
-                                    <p className="text-gray-400 text-sm">
-                                        Loading development activity...
-                                    </p>
+                                <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-primary-dark/40 to-primary-dark/60 rounded-b-lg border border-white/10">
+                                    <div className="p-6 rounded-xl bg-black/30 border border-white/5 flex flex-col items-center gap-3">
+                                        <Globe className="h-10 w-10 text-gray-500 opacity-50" />
+                                        <p className="text-gray-400 text-center text-sm sm:text-base">
+                                            No preview available yet
+                                        </p>
+                                        <div className="text-xs text-gray-500 max-w-[250px] text-center mt-1">
+                                            Your web application will appear
+                                            here once deployed
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    </div>
-                </div>
+                    </TabsContent>
+
+                    {/* Status Tab Content */}
+                    <TabsContent value="status" className="w-full">
+                        {/* Web Application and Latest Iteration Status */}
+                        <div className="flex flex-col gap-4 w-full p-4">
+                            <div className="flex flex-col gap-1 w-full sm:w-fit">
+                                <div className="text-sm font-medium text-gray-300">
+                                    Web Application Status
+                                </div>
+                                <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
+                                    <DeploymentStatusBadge
+                                        status={
+                                            webApplicationInfo?.status ||
+                                            DeploymentStatus.NOT_DEPLOYED
+                                        }
+                                        readyStatus={
+                                            webApplicationInfo?.readyStatus ||
+                                            ReadyStatus.BUILDING
+                                        }
+                                    />
+                                    {[
+                                        ReadyStatus.READY,
+                                        ReadyStatus.BUILDING,
+                                    ].includes(
+                                        webApplicationInfo?.readyStatus as ReadyStatus,
+                                    ) && (
+                                        <span className="text-xs text-white">
+                                            at{" "}
+                                            {webApplicationInfo?.readyAt
+                                                ? formatDateToHumanReadable(
+                                                      webApplicationInfo.readyAt,
+                                                  )
+                                                : "Not available"}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-1 w-full sm:w-fit">
+                                <div className="text-sm font-medium text-gray-300">
+                                    Software Development Status
+                                </div>
+                                <div className="flex flex-col items-center md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10 ">
+                                    <DevelopmentStatusBadge
+                                        status={
+                                            webApplicationInfo?.developmentStatus ||
+                                            DevelopmentStatus.DEVELOPMENT_DONE
+                                        }
+                                    />
+                                    {isInProgress && (
+                                        <span className="text-xs text-white">
+                                            We will send email information to
+                                            your email when development is done
+                                        </span>
+                                    )}
+                                    {webApplicationInfo?.developmentStatus ===
+                                        DevelopmentStatus.DEVELOPMENT_DONE && (
+                                        <span className="text-xs text-white">
+                                            at{" "}
+                                            {webApplicationInfo?.developmentDoneAt
+                                                ? formatDateToHumanReadable(
+                                                      webApplicationInfo.developmentDoneAt,
+                                                  )
+                                                : "Not available"}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Development Activity Live Feed */}
+                            <div className="flex flex-col gap-3 w-full">
+                                <div className="text-sm font-medium text-gray-300 flex flex-col md:flex-row items-center gap-2 mt-8">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                                        Development Activity for latest sprint
+                                    </div>
+                                    {pollingCount > 0 && (
+                                        <span className="text-xs text-gray-400 animate-pulse">
+                                            (next update in{" "}
+                                            {5 - (pollingCount % 5)}s)
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="bg-primary-dark/30 rounded-lg border border-white/10 overflow-hidden">
+                                    {latestIteration ? (
+                                        <div className="relative">
+                                            {/* Activity Header */}
+                                            <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-white/10">
+                                                <div className="flex flex-col md:flex-row items-center gap-2">
+                                                    <span
+                                                        className={`px-2 py-1 text-xs rounded-full ${
+                                                            latestIteration.status ===
+                                                            "in_progress"
+                                                                ? "bg-blue-500/20 text-blue-300"
+                                                                : latestIteration.status ===
+                                                                    "done"
+                                                                  ? "bg-green-500/20 text-green-300"
+                                                                  : "bg-yellow-500/20 text-yellow-300"
+                                                        }`}
+                                                    >
+                                                        {latestIteration.status ===
+                                                        "in_progress"
+                                                            ? "In Progress"
+                                                            : latestIteration.status ===
+                                                                "done"
+                                                              ? "Completed"
+                                                              : "Pending"}
+                                                    </span>
+                                                    <span className="text-sm font-medium">
+                                                        {latestIteration.type ===
+                                                        "page_development"
+                                                            ? "Page Development"
+                                                            : latestIteration.type ===
+                                                                "feature_development"
+                                                              ? "Feature Development"
+                                                              : "Application Development"}
+                                                    </span>
+                                                </div>
+                                                <div className="text-xs text-gray-400">
+                                                    {latestIteration.created_at
+                                                        ? formatDateToHumanReadable(
+                                                              latestIteration.created_at,
+                                                          )
+                                                        : ""}
+                                                </div>
+                                            </div>
+
+                                            {/* Activity Content */}
+                                            <div className="p-4">
+                                                <div className="mb-3">
+                                                    <h4 className="text-sm font-medium mb-2">
+                                                        Development Details
+                                                    </h4>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                                        {latestIteration.conversation && (
+                                                            <div className="bg-white/5 p-3 rounded-md">
+                                                                <div className="font-medium text-gray-300 mb-1">
+                                                                    <span className="text-xs">
+                                                                        Sprint
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-white font-bold">
+                                                                    {
+                                                                        latestIteration
+                                                                            .conversation
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {latestIteration.page && (
+                                                            <div className="bg-white/5 p-3 rounded-md">
+                                                                <div className="font-medium text-gray-300 mb-1">
+                                                                    Page
+                                                                </div>
+                                                                <div className="text-white font-bold">
+                                                                    {
+                                                                        latestIteration
+                                                                            .page
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                                <div className="text-xs text-gray-400 mt-1 line-clamp-2">
+                                                                    {
+                                                                        latestIteration
+                                                                            .page
+                                                                            .description
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {latestIteration.feature && (
+                                                            <div className="bg-white/5 p-3 rounded-md gap-2">
+                                                                <div className="font-medium text-gray-300 mb-1">
+                                                                    Feature
+                                                                </div>
+                                                                <div className="text-white font-bold">
+                                                                    {
+                                                                        latestIteration
+                                                                            .feature
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                                <div className="text-xs text-gray-400 mt-1 line-clamp-2">
+                                                                    {
+                                                                        latestIteration
+                                                                            .feature
+                                                                            .description
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Visual Activity Indicator */}
+                                                {latestIteration.status ===
+                                                    "done" && (
+                                                    <div className="flex items-center gap-2 text-green-300 bg-green-500/10 p-2 rounded-md text-sm mt-2">
+                                                        <CircleCheck className="h-4 w-4" />
+                                                        <span>
+                                                            Development
+                                                            completed
+                                                            successfully
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="p-6 flex flex-col items-center justify-center">
+                                            <div className="w-16 h-16 border-4 border-t-transparent border-genesoft rounded-full animate-spin mb-4"></div>
+                                            <p className="text-gray-400 text-sm">
+                                                Loading development activity...
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </CardContent>
         </Card>
     );

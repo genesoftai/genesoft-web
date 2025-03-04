@@ -22,7 +22,6 @@ import {
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDialog";
 import { Label } from "@/components/ui/label";
-import { User } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import posthog from "posthog-js";
@@ -119,13 +118,13 @@ export default function ManageProjectPage() {
                 </div>
             </header>
 
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
-                <div className="flex flex-col gap-4 p-8 w-full rounded-xl bg-secondary-dark">
+            <div className="flex flex-1 flex-col gap-4 p-0 md:p-4 pt-0 w-full">
+                <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl bg-secondary-dark">
                     <div className="space-y-6">
                         <Card className="bg-primary-dark border-none text-white shadow-lg hover:shadow-xl transition-shadow duration-300">
                             <CardHeader className="flex flex-col items-start justify-between space-y-0 p-8">
                                 <div className="space-y-6">
-                                    <div className="flex items-center gap-x-8">
+                                    <div className="flex flex-col md:flex-row  gap-y-4 items-start md:items-center gap-x-8">
                                         <div className="flex items-center gap-4">
                                             {project?.branding?.logo_url && (
                                                 <Image
@@ -195,39 +194,6 @@ export default function ManageProjectPage() {
                     </div>
 
                     <WebPreview project={project} />
-
-                    <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl bg-primary-dark">
-                        <h2 className="text-xl md:text-2xl font-bold">
-                            Project Members
-                        </h2>
-                        <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-                            {organization?.users?.map((user) => (
-                                <div
-                                    key={user.id}
-                                    className="flex items-center gap-2 p-4 border rounded-lg bg-gray-800 hover:bg-gray-700 transition duration-200"
-                                >
-                                    {user.image ? (
-                                        <Image
-                                            src={user.image || ""}
-                                            alt={user.name || user.email}
-                                            width={40}
-                                            height={40}
-                                            className="rounded-full"
-                                        />
-                                    ) : (
-                                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                            <User className="w-6 h-6 text-gray-500" />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <p className="text-sm md:text-base text-white">
-                                            {user.email}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
                 </div>
             </div>
 

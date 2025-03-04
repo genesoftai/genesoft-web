@@ -18,11 +18,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { updateOrganization } from "@/actions/organization";
+import {
+    getOrganizationById,
+    getOrganizationProjects,
+    getOrganizationUsers,
+    updateOrganization,
+} from "@/actions/organization";
 import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
-import { GenesoftOrganization } from "@/types/organization";
+import { GenesoftOrganization, OrganizationUser } from "@/types/organization";
 import posthog from "posthog-js";
+import TeamMangement from "@/components/organization/team/TeamMangement";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { Project } from "@/types/project";
+import { ProjectCard } from "@/components/project/ProjectCard";
+import OrganizationProjects from "@/components/project/manage/OrganizationProjects";
 
 const pageName = "OrganizationInfoPage";
 const OrganizationInfoPage = () => {
@@ -37,6 +47,13 @@ const OrganizationInfoPage = () => {
     const [isUpdatingOrganization, setIsUpdatingOrganization] = useState(false);
     const router = useRouter();
     const { updateGenesoftUser } = useGenesoftUserStore();
+    const [organizationUsers, setOrganizationUsers] = useState<
+        OrganizationUser[]
+    >([]);
+    const { id: organizationId } = useGenesoftOrganizationStore();
+    const [organizationProjects, setOrganizationProjects] = useState<Project[]>(
+        [],
+    );
 
     useEffect(() => {
         if (email) {
@@ -44,18 +61,36 @@ const OrganizationInfoPage = () => {
         }
     }, [email]);
 
+    useEffect(() => {
+        if (organizationId) {
+            setUpOrganizationProjects();
+        }
+    }, [organizationId]);
+
+    const setUpOrganizationProjects = async () => {
+        const projects = await getOrganizationProjects(organizationId);
+        console.log({
+            message: `${pageName}: Organization projects`,
+            projects,
+        });
+        setOrganizationProjects(projects);
+    };
+
     const setupUserOrganization = async () => {
         setLoading(true);
         const user = await getUserByEmail({ email });
         if (!user.organization) {
             router.push("/dashboard");
         }
+        const organization = await getOrganizationById(organizationId);
+        const organizationUsers = await getOrganizationUsers(organizationId);
+        setOrganizationUsers(organizationUsers);
         setHasOrganization(user.organization !== null);
-        setOrganization(user.organization);
+        setOrganization(organization);
         updateGenesoftUser(user);
         setLoading(false);
-        setOrganizationName(user.organization.name);
-        setOrganizationDescription(user.organization.description);
+        setOrganizationName(organization.name);
+        setOrganizationDescription(organization.description);
     };
 
     const handleUpdateOrganization = async () => {
@@ -77,6 +112,16 @@ const OrganizationInfoPage = () => {
         } finally {
             setIsUpdatingOrganization(false);
         }
+    };
+
+    const handleUpdateOrganizationUsers = async (
+        action: "add" | "remove" | "update",
+    ) => {
+        posthog.capture(`click_update_organization_users_by_${action}`);
+        const organizationUsers = await getOrganizationUsers(
+            organization?.id ?? "",
+        );
+        setOrganizationUsers(organizationUsers);
     };
 
     console.log({
@@ -171,12 +216,20 @@ const OrganizationInfoPage = () => {
                                 className="flex items-center p-4 self-center w-fit bg-genesoft font-medium hover:bg-genesoft/80"
                                 onClick={handleUpdateOrganization}
                             >
-                                <span>Update organization</span>
+                                <span>Update organization information</span>
                                 {isUpdatingOrganization && (
                                     <Loader2 className="animate-spin" />
                                 )}
                             </Button>
                         </div>
+
+                        <OrganizationProjects organizationId={organizationId} />
+
+                        <TeamMangement
+                            organization={organization as GenesoftOrganization}
+                            organizationUsers={organizationUsers}
+                            onUpdate={handleUpdateOrganizationUsers}
+                        />
                     </div>
                 )}
             </div>

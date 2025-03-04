@@ -20,15 +20,20 @@ import {
     BreadcrumbSeparator,
     BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
 import { Page, Project } from "@/types/project";
 import {
-    AppWindow,
-    ChevronLeft,
-    ChevronRight,
+    ArrowDown,
+    ArrowRight,
+    ChevronDown,
+    ChevronUp,
     MessageSquare,
     MonitorPlay,
 } from "lucide-react";
@@ -41,6 +46,12 @@ import {
 } from "@/types/message";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const ManagePagePage = () => {
     const pathParams = useParams();
@@ -56,6 +67,7 @@ const ManagePagePage = () => {
         useState<ConversationMessageForWeb | null>(null);
     const [isLoadingSetupPageConversation, setIsLoadingSetupPageConversation] =
         useState<boolean>(false);
+    const [isPageCollapsed, setIsPageCollapsed] = useState(true);
 
     const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
     const [activeTab, setActiveTab] = useState("conversation");
@@ -148,37 +160,44 @@ const ManagePagePage = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <div className="p-2 md:p-4 lg:p-6 flex-1 flex flex-col gap-4">
-                {/* Breadcrumb Section */}
+                {/* Breadcrumb Section -> change to Navbar */}
                 <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
-                    <SidebarTrigger className="-ml-1 text-white" />
-                    <Separator orientation="vertical" className="mr-2 h-4" />
-                    <Breadcrumb className="flex-1">
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink
-                                    href="/dashboard"
-                                    className="text-subtext-in-dark-bg"
-                                >
-                                    Project
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink
-                                    href={`/dashboard/project/manage/${pathParams?.projectId}`}
-                                    className="text-subtext-in-dark-bg"
-                                >
-                                    {project?.name}
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage className="text-subtext-in-dark-bg">
-                                    {page?.name}
-                                </BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+                    <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-center gap-1">
+                            <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
+                        </div>
+                        <Separator
+                            orientation="vertical"
+                            className="mr-2 h-4"
+                        />
+                        <Collapsible
+                            className="w-full text-gray-400 text-xs"
+                            open={!isPageCollapsed}
+                            onOpenChange={(open) => setIsPageCollapsed(!open)}
+                        >
+                            <CollapsibleTrigger className="text-white border-none font-bold text-lg">
+                                <div className="flex flex-col gap-2 items-start">
+                                    <span className="text-gray-400 text-xs">
+                                        {"Page"}
+                                    </span>
+
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-white text-sm">
+                                            {page?.name}
+                                        </span>
+                                        {isPageCollapsed ? (
+                                            <ChevronDown className="h-4 w-4" />
+                                        ) : (
+                                            <ChevronUp className="h-4 w-4" />
+                                        )}
+                                    </div>
+                                </div>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="text-gray-400 text-xs">
+                                {page?.description}
+                            </CollapsibleContent>
+                        </Collapsible>
+                    </div>
 
                     {/* Toggle Button - Only visible on md and up */}
                     <div className="hidden md:block">

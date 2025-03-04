@@ -92,7 +92,7 @@ export default function EditProjectInfoDialog({
                     Edit
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="max-w-[95%] sm:max-w-[600px] rounded-xl">
                 <DialogHeader>
                     <DialogTitle className="text-xl">Edit Project</DialogTitle>
                 </DialogHeader>

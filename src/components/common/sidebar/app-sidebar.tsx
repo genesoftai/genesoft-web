@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { AppWindow, BookOpen, Building, LifeBuoy, Send } from "lucide-react";
+import { AppWindow, Building, LifeBuoy } from "lucide-react";
 
 import { NavMain } from "@/components/common/sidebar/nav-main";
 import { NavSecondary } from "@/components/common/sidebar/nav-secondary";
@@ -26,8 +26,8 @@ const data = {
     },
     navMain: [
         {
-            title: "Organization",
-            url: "/dashboard/organization/info",
+            title: "Organizations",
+            url: "/dashboard/organization",
             icon: Building,
             items: [
                 {
@@ -117,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         {organization?.name}
                                     </span>
                                     <span className="truncate text-xs">
-                                        {"Standard"}
+                                        {"Free tier"}
                                     </span>
                                 </div>
                             </a>
