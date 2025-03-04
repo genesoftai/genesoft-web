@@ -12,11 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
     Send,
     ChevronDown,
-    Paperclip,
     Loader2,
-    Link,
     CircleCheck,
-    Circle,
     MessageCircleMore,
 } from "lucide-react";
 import { Message } from "@/types/message";
@@ -31,12 +28,6 @@ import AIAgentMessage from "./message/AIAgentMessage";
 import UserMessage from "./message/UserMessage";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import {
-    Accordion,
-    AccordionItem,
-    AccordionTrigger,
-    AccordionContent,
-} from "@/components/ui/accordion";
 
 export type SprintOption = {
     id: string;
@@ -191,7 +182,7 @@ const Conversation: React.FC<ConversationProps> = ({
     });
 
     return (
-        <Card className="flex flex-col w-full h-full sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
+        <Card className="flex flex-col w-full max-h-[120vh] h-full sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg overflow-y-auto">
             {/* Channel Header */}
             <CardHeader className="flex flex-row items-center justify-between px-4 py-2 bg-[#222529] border-b border-[#383838]">
                 <CardTitle className="text-lg font-semibold text-white flex items-center gap-2 justify-between w-full">
@@ -285,7 +276,7 @@ const Conversation: React.FC<ConversationProps> = ({
             {!isLoading ? (
                 <CardContent className="flex-grow p-0 overflow-hidden h-full">
                     <ScrollArea
-                        className="min-h-[60vh] h-fit md:min-h-[40vh] w-full conversation-scrollarea overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+                        className="min-h-[60vh] h-[80vh] md:min-h-[40vh] w-full conversation-scrollarea overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
                         scrollHideDelay={0}
                     >
                         <div className="flex flex-col p-4 gap-4 pb-0 h-full">
@@ -318,7 +309,7 @@ const Conversation: React.FC<ConversationProps> = ({
                 </CardContent>
             ) : (
                 <CardContent className="flex-grow p-0 overflow-hidden h-full">
-                    <ScrollArea className="h-[calc(100vh-280px)] w-full conversation-scrollarea">
+                    <ScrollArea className="h-[60vh] md:h-[calc(100vh-280px)] w-full conversation-scrollarea">
                         <div className="flex flex-col p-4 gap-3">
                             {messages.length === 0 && (
                                 <div className="flex flex-col items-center justify-center h-[calc(100vh-350px)]">
