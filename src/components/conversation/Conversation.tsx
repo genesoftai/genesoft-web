@@ -294,7 +294,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     )}
                                 </div>
                             ))}
-                            <div className="h-0" />
+                            <div className="h-0" ref={messagesEndRef} />
 
                             {isLoadingSendMessage && (
                                 <div className="flex justify-center mb-4">
