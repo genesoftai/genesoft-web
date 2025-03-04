@@ -6,8 +6,8 @@ import React from "react";
 
 const UserMessage = ({ message }: { message: Message }) => {
     return (
-        <div className="flex items-start gap-3 group p-2 rounded-md">
-            <Avatar className={`h-9 w-9 rounded-md `}>
+        <div className="flex items-start gap-3 group p-2 rounded-md w-full overflow-hidden">
+            <Avatar className={`h-9 w-9 rounded-md flex-shrink-0`}>
                 {message.sender?.image ? (
                     <div className="relative w-full h-full">
                         <Image
@@ -32,7 +32,7 @@ const UserMessage = ({ message }: { message: Message }) => {
                 )}
             </Avatar>
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex flex-col items-baseline">
                     <span
                         className={`font-semibold text-sm text-subtext-in-dark-bg `}
@@ -46,7 +46,9 @@ const UserMessage = ({ message }: { message: Message }) => {
                     </span>
                 </div>
 
-                <div className="mt-1 text-white text-sm">{message.content}</div>
+                <div className="mt-1 text-white text-sm break-words whitespace-pre-wrap overflow-hidden">
+                    {message.content}
+                </div>
             </div>
         </div>
     );
