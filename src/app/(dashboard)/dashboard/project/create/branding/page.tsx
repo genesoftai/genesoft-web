@@ -27,9 +27,9 @@ import { RGBColor, SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
 import posthog from "posthog-js";
-import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { CreateProjectRequest } from "@/types/project";
 import { createProject } from "@/actions/project";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 
 const pageName = "CreateProjectBrandingPage";
 
@@ -45,7 +45,8 @@ const CreateProjectBrandingPage = () => {
         clearCreateProjectStore,
     } = useCreateProjectStore();
     const [isCreatingProject, setIsCreatingProject] = useState(false);
-    const { organization } = useGenesoftUserStore();
+    // const { organization } = useGenesoftUserStore();
+    const { id: organizationId } = useGenesoftOrganizationStore();
     const [error, setError] = useState<string | null>(null);
 
     const handleBack = () => {
@@ -60,7 +61,7 @@ const CreateProjectBrandingPage = () => {
         setIsCreatingProject(true);
 
         const project: CreateProjectRequest = {
-            organization_id: organization?.id || "",
+            organization_id: organizationId || "",
             name,
             description,
             purpose,
