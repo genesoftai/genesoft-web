@@ -54,7 +54,7 @@ export default function Dashboard() {
         setHasOrganization(organizations.length > 0);
         setUser(user);
         updateGenesoftUser(user);
-        if (organizations.length > 0) {
+        if (!organizationId && organizations.length > 0) {
             updateGenesoftOrganization({
                 id: organizations[0].id,
                 name: organizations[0].name,
