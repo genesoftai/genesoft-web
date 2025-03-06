@@ -137,7 +137,7 @@ const OrganizationsPage = () => {
                                                     organizationId !==
                                                     organization.id
                                                         ? "bg-genesoft hover:bg-genesoft/80 text-white"
-                                                        : "bg-gray-500 text-gray-300"
+                                                        : "bg-white text-black"
                                                 }`}
                                                 disabled={
                                                     organizationId ===

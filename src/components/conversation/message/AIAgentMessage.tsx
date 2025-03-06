@@ -11,6 +11,7 @@ import rehypeFormat from "rehype-format";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import DOMPurify from "dompurify";
+import { Loader2 } from "lucide-react";
 
 const processor = unified()
     .use(remarkParse)
@@ -19,20 +20,82 @@ const processor = unified()
     .use(rehypeFormat)
     .use(rehypeStringify);
 
-const AIAgentMessage = ({ message }: { message: Message }) => {
+type AIAgentMessageProps = {
+    message: Message;
+    messagesLength: number;
+    index: number;
+    messagesEndRef: React.RefObject<HTMLDivElement | null>;
+    status: string;
+};
+
+const AIAgentMessage = ({
+    message,
+    messagesLength,
+    index,
+    messagesEndRef,
+    status,
+}: AIAgentMessageProps) => {
     const [htmlContent, setHtmlContent] = useState("");
+    const [displayedContent, setDisplayedContent] = useState("");
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [processingComplete, setProcessingComplete] = useState(false);
+    const isLatestMessage = index === messagesLength - 1;
+    const shouldStream = status !== "submitted" && isLatestMessage;
 
     useEffect(() => {
         setupContent();
     }, [message?.content]);
 
+    // Auto scroll to bottom on new messages
+    useEffect(() => {
+        if (isLatestMessage) {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messagesEndRef, isLatestMessage, displayedContent]);
+
+    useEffect(() => {
+        if (
+            processingComplete &&
+            shouldStream &&
+            currentIndex < htmlContent.length
+        ) {
+            const timeoutId = setTimeout(() => {
+                setDisplayedContent((prev) => prev + htmlContent[currentIndex]);
+                setCurrentIndex((prev) => prev + 1);
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, 10);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [
+        processingComplete,
+        currentIndex,
+        htmlContent,
+        messagesEndRef,
+        isLatestMessage,
+        shouldStream,
+    ]);
+
     const setupContent = async () => {
+        if (!message?.content) return;
+
         const value = `${message?.content?.trim()}`;
         const file = await processor.process(value);
         const processedContent = String(file)
             .replace(/\n/g, "<br />")
             .replace(/<br \/>/g, "<br style='margin: 8px 0' />");
+
         setHtmlContent(processedContent);
+        setProcessingComplete(true);
+
+        // Only reset for streaming if it's the latest message and not submitted
+        if (shouldStream) {
+            setDisplayedContent("");
+            setCurrentIndex(0);
+        } else {
+            // For older messages or submitted status, show the full content immediately
+            setDisplayedContent(processedContent);
+        }
     };
 
     return (
@@ -67,11 +130,21 @@ const AIAgentMessage = ({ message }: { message: Message }) => {
                 </div>
 
                 <div
+                    ref={isLatestMessage ? messagesEndRef : null}
                     className={`text-white text-sm rounded-lg self-start break-words overflow-hidden max-w-full`}
                     dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(htmlContent),
+                        __html: DOMPurify.sanitize(
+                            shouldStream ? displayedContent : htmlContent,
+                        ),
                     }}
                 />
+
+                {shouldStream && !processingComplete && (
+                    <div className="flex items-center gap-2 text-gray-400 mt-1">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span className="text-xs">Generating response...</span>
+                    </div>
+                )}
             </div>
         </div>
     );

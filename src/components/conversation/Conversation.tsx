@@ -50,6 +50,7 @@ export interface ConversationProps {
     status: string;
     featureId?: string;
     pageId?: string;
+    isOnboarding?: boolean;
 }
 
 const Conversation: React.FC<ConversationProps> = ({
@@ -92,11 +93,6 @@ const Conversation: React.FC<ConversationProps> = ({
             setMessages(initialMessages);
         }
     }, [initialMessages]);
-
-    // Auto scroll to bottom on new messages
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
 
     const handleSendMessage = async () => {
         if (inputValue.trim() === "") return;
@@ -169,6 +165,11 @@ const Conversation: React.FC<ConversationProps> = ({
             }
         }
     };
+
+    // Auto scroll to bottom on new messages
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messagesEndRef]);
 
     console.log({
         message: "Conversation: basic info",
@@ -290,11 +291,16 @@ const Conversation: React.FC<ConversationProps> = ({
                                     ) : message.sender_type === "user" ? (
                                         <UserMessage message={message} />
                                     ) : (
-                                        <AIAgentMessage message={message} />
+                                        <AIAgentMessage
+                                            message={message}
+                                            messagesLength={messages.length}
+                                            index={index}
+                                            messagesEndRef={messagesEndRef}
+                                            status={status}
+                                        />
                                     )}
                                 </div>
                             ))}
-                            <div className="h-0" ref={messagesEndRef} />
 
                             {isLoadingSendMessage && (
                                 <div className="flex justify-center mb-4">

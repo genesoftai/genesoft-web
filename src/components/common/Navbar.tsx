@@ -13,7 +13,14 @@ import UserNav from "./UserNav";
 import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
 import posthog from "posthog-js";
-import { updateUserImageByEmail } from "@/actions/user";
+import { getUserByEmail, updateUserImageByEmail } from "@/actions/user";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { useProjectStore } from "@/stores/project-store";
+import {
+    getOrganizationProjects,
+    getOrganizationsByUserId,
+} from "@/actions/organization";
 
 type UserData = { user: User } | { user: null };
 
@@ -24,6 +31,10 @@ export default function Navbar() {
     const [userData, setUserData] = useState<UserData>();
     const { updateUser } = useUserStore();
     const [scrolled, setScrolled] = useState(false);
+    const { updateGenesoftUser } = useGenesoftUserStore();
+    const { id: organizationId, updateGenesoftOrganization } =
+        useGenesoftOrganizationStore();
+    const { id: projectId, updateProjectStore } = useProjectStore();
 
     const router = useRouter();
 
@@ -60,6 +71,13 @@ export default function Navbar() {
             const user = data?.user;
             updateUser(user as Partial<UserStore>);
             setUserEmail(user?.email ?? "");
+            const genesoftUser = await getUserByEmail({
+                email: user?.email ?? "",
+            });
+            updateGenesoftUser(genesoftUser);
+            if (!organizationId || !projectId) {
+                setupOrganizationAndProjectData(genesoftUser.id);
+            }
         }
         setUserData(data);
         // update user image
@@ -68,6 +86,16 @@ export default function Navbar() {
                 email: data.user.email ?? "",
                 imageUrl: data.user.user_metadata.avatar_url,
             });
+        }
+    };
+
+    const setupOrganizationAndProjectData = async (userId: string) => {
+        const organizations = await getOrganizationsByUserId(userId);
+        updateGenesoftOrganization(organizations[0]);
+        const organizationId = organizations[0].id;
+        if (!projectId) {
+            const projects = await getOrganizationProjects(organizationId);
+            updateProjectStore(projects[0]);
         }
     };
 
@@ -131,7 +159,7 @@ export default function Navbar() {
                         </div>
 
                         <Link
-                            href="/dashboard"
+                            href={`/dashboard/project/manage/${projectId}`}
                             className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70"
                         >
                             Dashboard

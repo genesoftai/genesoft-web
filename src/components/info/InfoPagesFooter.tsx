@@ -112,7 +112,7 @@ export default function Footer() {
                         <GenesoftLogo />
                         <p className="text-subtext-in-dark-bg mt-4">
                             Empowering small businesses and startups with
-                            AI-powered web development
+                            Advanced AI Agent technology
                         </p>
                         <div className="flex items-center space-x-4 mt-6">
                             <a
@@ -169,7 +169,7 @@ export default function Footer() {
                                     href="/dashboard"
                                     className="text-subtext-in-dark-bg hover:text-white transition-colors"
                                 >
-                                    Dashboard
+                                    AI Agent Workspace
                                 </Link>
                             </li>
                         </ul>

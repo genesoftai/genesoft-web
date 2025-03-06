@@ -221,7 +221,7 @@ export function EditFeatureDialog({
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </div>
-                    <div className="grid gap-4">
+                    {/* <div className="grid gap-4">
                         <div>
                             <h3 className="text-lg font-semibold mb-2">
                                 References
@@ -419,7 +419,7 @@ export function EditFeatureDialog({
                                 </Button>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {error && (

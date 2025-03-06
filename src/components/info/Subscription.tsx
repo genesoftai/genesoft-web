@@ -35,10 +35,11 @@ const pricingTiers: PricingTier[] = [
         features: [
             "1 project",
             "10 sprints per month",
-            "Basic LLM (Claude Haiku, backup by o1-mini)",
-            "Email Support",
+            "Advanced AI Model (Claude Haiku, backup by o1-mini)",
             "Project in organization deleted in 7 days",
             "Maximum 2 team members",
+            "Infrastructure: Database, Authentication, Storage, and Hosting",
+            "Email Support",
         ],
         buttonText: "Get Started",
         buttonVariant: "outline",
@@ -51,45 +52,46 @@ const pricingTiers: PricingTier[] = [
         features: [
             "1 project",
             "30 sprints per month",
-            "Moderate LLM (Claude Haiku, backup by o1-mini)",
-            "Infrastructure setup support",
+            "Advanced AI Model (Claude Sonnet 3.7, backup by o1-mini)",
             "Unlimited team members",
             "Project not deleted while in subscription",
+            "Infrastructure: Database, Authentication, Storage, and Hosting",
+            "Email Support, Infrastructure setup support, Dedicated Support, and Code Edition Support",
             "Extra sprints: $0.5 per sprint",
         ],
         buttonText: "Sign Up",
         highlighted: true,
     },
-    {
-        name: "Launch Tier",
-        description: "For businesses ready to scale",
-        price: "$99",
-        priceDescription: "per month",
-        features: [
-            "2 projects",
-            "60 sprints per month",
-            "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
-            "Dedicated Support",
-            "Project not deleted while in subscription",
-            "Extra sprints: $1 per sprint",
-        ],
-        buttonText: "Sign Up",
-    },
-    {
-        name: "Scale Tier",
-        description: "For larger companies with complex needs",
-        price: "$199",
-        priceDescription: "per month",
-        features: [
-            "3 Projects",
-            "100 sprints per month",
-            "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
-            "Expert Software developer support",
-            "2 Environments per project: Development and Production",
-            "Extra sprints: $1 per sprint",
-        ],
-        buttonText: "Sign Up",
-    },
+    // {
+    //     name: "Launch Tier",
+    //     description: "For businesses ready to scale",
+    //     price: "$99",
+    //     priceDescription: "per month",
+    //     features: [
+    //         "2 projects",
+    //         "60 sprints per month",
+    //         "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
+    //         "Dedicated Support",
+    //         "Project not deleted while in subscription",
+    //         "Extra sprints: $1 per sprint",
+    //     ],
+    //     buttonText: "Sign Up",
+    // },
+    // {
+    //     name: "Scale Tier",
+    //     description: "For larger companies with complex needs",
+    //     price: "$199",
+    //     priceDescription: "per month",
+    //     features: [
+    //         "3 Projects",
+    //         "100 sprints per month",
+    //         "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
+    //         "Expert Software developer support",
+    //         "2 Environments per project: Development and Production",
+    //         "Extra sprints: $1 per sprint",
+    //     ],
+    //     buttonText: "Sign Up",
+    // },
 ];
 
 const enterpriseTier = {
@@ -135,7 +137,7 @@ export default function Subscription() {
                     </p>
                 </div>
 
-                <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
                     {pricingTiers.map((tier, i) => (
                         <Card
                             key={i}
@@ -191,7 +193,7 @@ export default function Subscription() {
                                         tier.highlighted
                                             ? "bg-genesoft hover:bg-genesoft/90 text-white"
                                             : tier.buttonVariant === "outline"
-                                              ? "border-line-in-dark-bg text-black hover:bg-tertiary-dark hover:text-white"
+                                              ? "border-line-in-dark-bg text-black hover:text-white hover:bg-genesoft"
                                               : "bg-secondary-dark hover:bg-tertiary-dark text-white",
                                     )}
                                     variant={tier.buttonVariant || "default"}
@@ -207,7 +209,7 @@ export default function Subscription() {
                 {/* Enterprise Card */}
                 <div className="mt-12">
                     <Card className="overflow-hidden border-line-in-dark-bg bg-gradient-to-r from-secondary-dark to-tertiary-dark">
-                        <div className="sm:flex sm:items-start sm:justify-between">
+                        <div className="flex flex-col items-center justify-start">
                             <div className="p-6">
                                 <CardTitle className="text-2xl text-white">
                                     {enterpriseTier.name}
@@ -234,7 +236,7 @@ export default function Subscription() {
                                     )}
                                 </ul>
                             </div>
-                            <div className="flex items-center justify-center bg-genesoft/10 p-6">
+                            <div className="flex items-center justify-center p-6">
                                 <Button
                                     size="lg"
                                     className="h-12 text-base bg-genesoft hover:bg-genesoft/90 text-white w-full md:w-auto"
@@ -256,19 +258,16 @@ export default function Subscription() {
                         Glossary
                     </h3>
                     <p className="text-subtext-in-dark-bg mb-4">
-                        <strong className="text-white">
-                            Sprint (iteration)
-                        </strong>{" "}
-                        is 1 round that triggers our Software development AI
-                        Agent team to develop software based on conversation
-                        between your team and Genesoft Project Manager. It has 3
-                        types including page development, feature development,
-                        and project creation.
+                        <strong className="text-white">Sprint</strong> is 1
+                        round that triggers our Software development AI Agent
+                        team to develop software based on conversation between
+                        your team and Genesoft Project Manager. It has 2 types
+                        including page development and feature development.
                     </p>
                     <p className="text-subtext-in-dark-bg">
                         Each tier includes a set number of sprints per month.
                         Additional sprints will be charged according to your
-                        plan's overage rate.
+                        plan&apos;s overage rate.
                     </p>
                 </div>
             </div>

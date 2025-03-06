@@ -6,12 +6,14 @@ import posthog from "posthog-js";
 export default function SubscriptionPage() {
     posthog.capture("pageview_subscription");
     return (
-        <div className="w-full grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen gap-16 bg-primary-dark text-subtext-in-dark-bg">
-            <main className="flex flex-col items-center gap-8 row-start-2 w-full justify-center">
+        <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg">
+            <main className="flex-1 container mx-auto px-4">
                 <Subscription />
             </main>
-            <footer className="row-start-4 flex gap-6 flex-wrap items-center justify-center bg-primary-dark w-full">
-                <Footer />
+            <footer className="w-full bg-primary-dark py-6">
+                <div className="container mx-auto px-4 flex justify-center items-center flex-wrap gap-6">
+                    <Footer />
+                </div>
             </footer>
         </div>
     );

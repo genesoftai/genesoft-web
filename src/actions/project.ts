@@ -385,3 +385,30 @@ export const editFeature = async ({
         throw new Error("Failed to edit feature");
     }
 };
+
+export type CreateProjectFromOnboardingDto = {
+    user_id: string;
+    project_name: string;
+    project_description: string;
+    branding?: {
+        logo_url?: string;
+        color?: string;
+    };
+};
+
+export async function createProjectFromOnboarding(
+    payload: CreateProjectFromOnboardingDto,
+) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/onboarding`;
+    try {
+        const res = await axios.post(url, payload, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error creating project from onboarding:", error);
+        throw new Error("Failed to create project from onboarding");
+    }
+}
