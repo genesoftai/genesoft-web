@@ -34,3 +34,35 @@ export async function uploadFileForOrganization(
         throw error;
     }
 }
+
+export async function uploadFileFree(
+    folderName: string,
+    name: string,
+    description: string,
+    fileType: string,
+    file: File,
+) {
+    try {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("file_type", fileType);
+        formData.append("file", file);
+
+        const response = await axios.post(
+            `${genesoftCoreApiServiceBaseUrl}/metadata/file/${folderName}`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            },
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        throw error;
+    }
+}

@@ -52,12 +52,27 @@ export const checkBuildErrors = async (projectId: string) => {
     }
 };
 
+export const recheckBuild = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/repository-build/recheck`;
+    try {
+        const response = await axios.post(
+            url,
+            { project_id: projectId },
+            {
+                headers: {
+                    Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+                },
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error rechecking build:", error);
+        throw new Error("Failed to recheck build");
+    }
+};
+
 export const getLatestIteration = async (projectId: string) => {
     const url = `${genesoftCoreApiServiceBaseUrl}/development/iteration/project/${projectId}/latest`;
-    console.log({
-        message: "Getting latest iteration",
-        url,
-    });
     try {
         const response = await axios.get(url, {
             headers: {

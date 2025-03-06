@@ -8,6 +8,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCreateProjectStore } from "@/stores/create-project-store";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { useUserStore } from "@/stores/user-store";
 import { createClient } from "@/utils/supabase/client";
 import { UserIcon, LogOutIcon, ChevronDownIcon } from "lucide-react";
@@ -24,10 +27,16 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
     const supabase = createClient();
     const router = useRouter();
     const { clearUserStore } = useUserStore();
+    const { clearGenesoftUserStore } = useGenesoftUserStore();
+    const { clearGenesoftOrganizationStore } = useGenesoftOrganizationStore();
+    const { clearCreateProjectStore } = useCreateProjectStore();
 
     const signOut = async () => {
         posthog.capture("click_signout_from_user_nav");
         clearUserStore();
+        clearGenesoftUserStore();
+        clearGenesoftOrganizationStore();
+        clearCreateProjectStore();
         await supabase.auth.signOut();
         router.push("/");
     };

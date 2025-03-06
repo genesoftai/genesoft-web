@@ -23,6 +23,9 @@ import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
+import { useCreateProjectStore } from "@/stores/create-project-store";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 
 type UserData = { user: User } | { user: null };
 
@@ -32,6 +35,9 @@ export function NavUser() {
     const [userEmail, setUserEmail] = useState("");
     const [userData, setUserData] = useState<UserData>();
     const { updateUser, clearUserStore } = useUserStore();
+    const { clearGenesoftUserStore } = useGenesoftUserStore();
+    const { clearGenesoftOrganizationStore } = useGenesoftOrganizationStore();
+    const { clearCreateProjectStore } = useCreateProjectStore();
     const router = useRouter();
 
     useEffect(() => {
@@ -67,6 +73,9 @@ export function NavUser() {
     const signOut = async () => {
         posthog.capture("click_signout_from_nav_user");
         clearUserStore();
+        clearGenesoftUserStore();
+        clearGenesoftOrganizationStore();
+        clearCreateProjectStore();
         await supabase.auth.signOut();
         router.push("/");
     };

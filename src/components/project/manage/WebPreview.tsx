@@ -1,13 +1,6 @@
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
     Globe,
-    CircleCheck,
     ExternalLink,
     Monitor,
     Smartphone,
@@ -16,36 +9,28 @@ import {
     Activity,
     Wrench,
     Loader2,
-    TriangleAlert,
 } from "lucide-react";
 import { Project } from "@/types/project";
-import { useRouter } from "next/navigation";
-import {
-    buildWebApplication,
-    checkBuildErrors,
-    getLatestIteration,
-} from "@/actions/development";
+import { checkBuildErrors, getLatestIteration } from "@/actions/development";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState, useRef } from "react";
 import { getWebApplicationInfo } from "@/actions/web-application";
-import {
-    DeploymentStatus,
-    DevelopmentStatus,
-    ReadyStatus,
-    WebApplicationInfo,
-} from "@/types/web-application";
-import { DevelopmentStatusBadge } from "../web-application/DevelopmentStatus";
+import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
 import { DeploymentStatusBadge } from "../web-application/DeploymentStatus";
 import posthog from "posthog-js";
 import { formatDateToHumanReadable } from "@/utils/common/time";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BuildStatus from "./build/BuildStatus";
+import DevelopmentActivity from "./development/DevelopmentActivity";
 
 interface WebPreviewProps {
     project: Project | null;
+    onPage?: string;
+    isOnboarding?: boolean;
 }
 
-export function WebPreview({ project }: WebPreviewProps) {
+export function WebPreview({ project, onPage, isOnboarding }: WebPreviewProps) {
     const { toast } = useToast();
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
@@ -120,12 +105,6 @@ export function WebPreview({ project }: WebPreviewProps) {
 
             setWebApplicationInfo(webAppInfo);
             setLatestIteration(iterationInfo);
-
-            console.log({
-                message: "Latest data fetched",
-                webAppInfo,
-                iterationInfo,
-            });
         } catch (error) {
             console.error("Error fetching latest data:", error);
         }
@@ -142,59 +121,49 @@ export function WebPreview({ project }: WebPreviewProps) {
         refreshIframe();
     };
 
+    useEffect(() => {
+        if (isOnboarding) {
+            setActiveTab("status");
+        } else {
+            setActiveTab("preview");
+        }
+    }, [isOnboarding]);
+
     console.log({
         webApplicationInfo,
         latestIteration,
+        isOnboarding,
     });
 
     return (
         <Card
-            className={`bg-primary-dark text-white border-none  max-w-[380px] md:max-w-[1024px] `}
+            className={`bg-primary-dark text-white border-none  ${onPage === "manage-project" ? "w-full" : "max-w-[380px] md:max-w-[1024px]"}  self-center`}
         >
-            <CardHeader className="flex flex-col md:flex-row items-center justify-between">
-                <div className="flex flex-col md:flex-row items-center justify-between">
-                    <CardTitle className="text-white text-lg md:text-2xl">
-                        <p>Web Application Information</p>
-                    </CardTitle>
-                </div>
-                <CardDescription className="text-subtext-in-dark-bg">
-                    <div className="flex flex-col md:flex-row items-center gap-x-2 gap-y-2 w-full">
-                        <a
-                            href={webApplicationInfo?.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
-                        >
-                            <Globe className="h-4 w-4" />
-                            <span className="text-xs md:text-sm">
-                                {"Web application"}
-                            </span>
-                            <ExternalLink className="h-4 w-4" />
-                        </a>
-                    </div>
-                </CardDescription>
-            </CardHeader>
             <CardContent className="flex flex-col items-center gap-6">
                 {/* Tabs for Preview and Status */}
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
-                    className="w-full"
+                    className="w-full flex flex-col items-center"
                 >
-                    <TabsList className="grid w-full grid-cols-2 mb-4 bg-secondary-dark text-subtext-in-dark-bg">
+                    <TabsList className="grid w-full sm:w-5/6 md:w-3/6 grid-cols-2 mb-4 mt-4 bg-secondary-dark text-subtext-in-dark-bg">
                         <TabsTrigger
                             value="preview"
                             className="flex items-center gap-2"
                         >
                             <Laptop className="h-4 w-4" />
-                            <span>Web Preview</span>
+                            <span className="text-xs sm:text-sm">
+                                Web Preview
+                            </span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="status"
                             className="flex items-center gap-2"
                         >
                             <Activity className="h-4 w-4" />
-                            <span>Development Status</span>
+                            <span className="text-xs sm:text-sm">
+                                Development Status
+                            </span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -203,14 +172,27 @@ export function WebPreview({ project }: WebPreviewProps) {
                         value="preview"
                         className="w-full flex flex-col items-center"
                     >
-                        <p className="text-xs md:text-sm text-gray-400 mb-4">
-                            This is a UI preview of your web application. For
-                            full functionality, please visit the web application
-                            link above
-                        </p>
+                        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-x-2 gap-y-2">
+                            <p className="text-xs md:text-sm text-gray-400 mb-4">
+                                This is a UI preview of your web application.
+                                For full functionality, please visit web url
+                            </p>
+                            <a
+                                href={webApplicationInfo?.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
+                            >
+                                <Globe className="h-4 w-4" />
+                                <span className="text-xs md:text-sm">
+                                    {"Web application"}
+                                </span>
+                                <ExternalLink className="h-4 w-4" />
+                            </a>
+                        </div>
 
                         <div
-                            className={`relative w-full aspect-video rounded-lg overflow-hidden ${viewMode === "mobile" ? "h-[720px] max-w-[380px]" : "h-[100vh] max-w-[850px]"}`}
+                            className={`relative w-full aspect-video rounded-lg overflow-hidden ${onPage !== "manage-project" && viewMode === "mobile" && "h-[720px] max-w-[380px]"} ${onPage !== "manage-project" && viewMode === "desktop" && "h-[100vh] max-w-[1024px]"}`}
                         >
                             <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
                                 {/* Browser controls */}
@@ -258,11 +240,7 @@ export function WebPreview({ project }: WebPreviewProps) {
                                     <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                                     <iframe
                                         ref={iframeRef}
-                                        className={`relative shadow-xl border border-white/10 ${
-                                            viewMode === "mobile"
-                                                ? "w-[380px] h-[720px] rounded-b-lg mx-auto"
-                                                : "w-full h-[720px] rounded-b-lg"
-                                        }`}
+                                        className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" && "w-[380px] h-[720px] rounded-b-lg mx-auto"} ${onPage === "manage-project" && viewMode === "desktop" ? "w-full h-full rounded-b-lg" : "w-full h-[720px] rounded-b-lg mx-auto"}`}
                                         src={webApplicationInfo.url}
                                         title="Web Application Preview"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -354,316 +332,18 @@ export function WebPreview({ project }: WebPreviewProps) {
 
                             {/* Repository Build Info */}
                             {webApplicationInfo?.repositoryBuild && (
-                                <div className="flex flex-col gap-1 w-full mt-4">
-                                    <div className="text-sm font-medium text-white flex items-center gap-2">
-                                        <span className="text-sm text-white font-bold">
-                                            Build Status
-                                        </span>
-                                        {webApplicationInfo?.repositoryBuild
-                                            .status === "failed" && (
-                                            <TriangleAlert className="h-4 w-4 text-red-400" />
-                                        )}
-                                        {webApplicationInfo?.repositoryBuild
-                                            .status === "pending" && (
-                                            <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
-                                        )}
-                                        {webApplicationInfo?.repositoryBuild
-                                            .status === "in_progress" && (
-                                            <Wrench className="h-4 w-4 animate-pulse text-genesoft" />
-                                        )}
-                                    </div>
-                                    <div className="flex flex-col p-4 bg-primary-dark/30 rounded-lg border border-white/10">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-gray-400">
-                                                    Status
-                                                </span>
-                                                <span
-                                                    className={`text-sm font-medium ${
-                                                        (webApplicationInfo
-                                                            .repositoryBuild
-                                                            .status as string) ===
-                                                        "deployed"
-                                                            ? "text-green-400"
-                                                            : (webApplicationInfo
-                                                                    .repositoryBuild
-                                                                    .status as string) ===
-                                                                    "pending" ||
-                                                                (webApplicationInfo
-                                                                    .repositoryBuild
-                                                                    .status as string) ===
-                                                                    "in_progress"
-                                                              ? "text-yellow-400"
-                                                              : "text-red-400"
-                                                    }`}
-                                                >
-                                                    {(webApplicationInfo
-                                                        .repositoryBuild
-                                                        .status as string) ===
-                                                    "deployed"
-                                                        ? "Successfully Deployed"
-                                                        : (webApplicationInfo
-                                                                .repositoryBuild
-                                                                .status as string) ===
-                                                            "pending"
-                                                          ? "Deployment in Progress"
-                                                          : (webApplicationInfo
-                                                                  .repositoryBuild
-                                                                  .status as string) ===
-                                                              "in_progress"
-                                                            ? "AI Agent Fixing Errors for deployment failed"
-                                                            : "Deployment Failed"}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-gray-400">
-                                                    Started On
-                                                </span>
-                                                <span className="text-sm text-white">
-                                                    {new Date(
-                                                        webApplicationInfo.repositoryBuild.created_at,
-                                                    ).toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-gray-400">
-                                                    Last Updated
-                                                </span>
-                                                <span className="text-sm text-white">
-                                                    {new Date(
-                                                        webApplicationInfo.repositoryBuild.updated_at,
-                                                    ).toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-gray-400">
-                                                    Fix Attempts
-                                                </span>
-                                                <span className="text-sm text-white">
-                                                    {
-                                                        webApplicationInfo
-                                                            .repositoryBuild
-                                                            .fix_attempts
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {webApplicationInfo.repositoryBuild
-                                            .status === "failed" && (
-                                            <div className="mt-4 p-3 bg-red-900/30 border border-red-500/30 rounded-md">
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-sm font-medium text-red-300">
-                                                            We couldn&apos;t
-                                                            deploy your website
-                                                        </span>
-                                                        <span className="text-xs text-gray-400">
-                                                            Fix attempts:{" "}
-                                                            {
-                                                                webApplicationInfo
-                                                                    .repositoryBuild
-                                                                    .fix_attempts
-                                                            }
-                                                        </span>
-                                                    </div>
-
-                                                    {webApplicationInfo
-                                                        .repositoryBuild
-                                                        .error_logs && (
-                                                        <div className="mt-2 p-2 bg-black/50 rounded border border-white/10 max-h-32 overflow-y-auto">
-                                                            <pre className="text-xs text-red-300 font-mono whitespace-pre-wrap">
-                                                                {
-                                                                    webApplicationInfo
-                                                                        .repositoryBuild
-                                                                        .error_logs
-                                                                }
-                                                            </pre>
-                                                        </div>
-                                                    )}
-
-                                                    {/* <div className="flex justify-end mt-2">
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            className="bg-red-700 hover:bg-red-600 text-white"
-                                                            onClick={
-                                                                handleFixErrors
-                                                            }
-                                                        >
-                                                            <Wrench className="h-4 w-4 mr-2" />
-                                                            {"Fix errors"}
-                                                            {isCheckingBuildErrors && (
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            )}
-                                                        </Button>
-                                                    </div> */}
-
-                                                    <p className="text-xs text-gray-400 self-end">
-                                                        Please contact support
-                                                        at support@genesoft.com
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <BuildStatus
+                                    webApplicationInfo={webApplicationInfo}
+                                    projectId={project?.id || ""}
+                                />
                             )}
 
                             {/* Development Activity Live Feed */}
-                            <div className="flex flex-col gap-3 w-full">
-                                <div className="text-sm font-medium text-gray-300 flex flex-col md:flex-row items-center gap-2 mt-8">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                                        Software Development Activity for latest
-                                        sprint
-                                    </div>
-                                    {pollingCount > 0 && (
-                                        <span className="text-xs text-gray-400 animate-pulse">
-                                            (next update in{" "}
-                                            {5 - (pollingCount % 5)}s)
-                                        </span>
-                                    )}
-                                </div>
-
-                                <div className="bg-primary-dark/30 rounded-lg border border-white/10 overflow-hidden">
-                                    {latestIteration ? (
-                                        <div className="relative">
-                                            {/* Activity Header */}
-                                            <div className="flex flex-col md:flex-row justify-between items-center p-4 border-b border-white/10">
-                                                <div className="flex flex-col md:flex-row items-center gap-2">
-                                                    <span
-                                                        className={`px-2 py-1 text-xs rounded-full ${
-                                                            latestIteration.status ===
-                                                            "in_progress"
-                                                                ? "bg-blue-500/20 text-blue-300"
-                                                                : latestIteration.status ===
-                                                                    "done"
-                                                                  ? "bg-green-500/20 text-green-300"
-                                                                  : "bg-yellow-500/20 text-yellow-300"
-                                                        }`}
-                                                    >
-                                                        {latestIteration.status ===
-                                                        "in_progress"
-                                                            ? "In Progress"
-                                                            : latestIteration.status ===
-                                                                "done"
-                                                              ? "Completed"
-                                                              : "Pending"}
-                                                    </span>
-                                                    <span className="text-sm font-medium">
-                                                        {latestIteration.type ===
-                                                        "page_development"
-                                                            ? "Page Development"
-                                                            : latestIteration.type ===
-                                                                "feature_development"
-                                                              ? "Feature Development"
-                                                              : "Application Development"}
-                                                    </span>
-                                                </div>
-                                                <div className="text-xs text-gray-400">
-                                                    {latestIteration.created_at
-                                                        ? formatDateToHumanReadable(
-                                                              latestIteration.created_at,
-                                                          )
-                                                        : ""}
-                                                </div>
-                                            </div>
-
-                                            {/* Activity Content */}
-                                            <div className="p-4">
-                                                <div className="mb-3">
-                                                    <h4 className="text-sm font-medium mb-2">
-                                                        Development Details
-                                                    </h4>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                                                        {latestIteration.conversation && (
-                                                            <div className="bg-white/5 p-3 rounded-md">
-                                                                <div className="font-medium text-gray-300 mb-1">
-                                                                    <span className="text-xs">
-                                                                        Sprint
-                                                                    </span>
-                                                                </div>
-                                                                <div className="text-white font-bold">
-                                                                    {
-                                                                        latestIteration
-                                                                            .conversation
-                                                                            .name
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        {latestIteration.page && (
-                                                            <div className="bg-white/5 p-3 rounded-md">
-                                                                <div className="font-medium text-gray-300 mb-1">
-                                                                    Page
-                                                                </div>
-                                                                <div className="text-white font-bold">
-                                                                    {
-                                                                        latestIteration
-                                                                            .page
-                                                                            .name
-                                                                    }
-                                                                </div>
-                                                                <div className="text-xs text-gray-400 mt-1 line-clamp-2">
-                                                                    {
-                                                                        latestIteration
-                                                                            .page
-                                                                            .description
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        {latestIteration.feature && (
-                                                            <div className="bg-white/5 p-3 rounded-md gap-2">
-                                                                <div className="font-medium text-gray-300 mb-1">
-                                                                    Feature
-                                                                </div>
-                                                                <div className="text-white font-bold">
-                                                                    {
-                                                                        latestIteration
-                                                                            .feature
-                                                                            .name
-                                                                    }
-                                                                </div>
-                                                                <div className="text-xs text-gray-400 mt-1 line-clamp-2">
-                                                                    {
-                                                                        latestIteration
-                                                                            .feature
-                                                                            .description
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                {/* Visual Activity Indicator */}
-                                                {latestIteration.status ===
-                                                    "done" && (
-                                                    <div className="flex items-center gap-2 text-green-300 bg-green-500/10 p-2 rounded-md text-sm mt-2">
-                                                        <CircleCheck className="h-4 w-4" />
-                                                        <span>
-                                                            Development
-                                                            completed
-                                                            successfully
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="p-6 flex flex-col items-center justify-center">
-                                            <div className="w-16 h-16 border-4 border-t-transparent border-genesoft rounded-full animate-spin mb-4"></div>
-                                            <p className="text-gray-400 text-sm">
-                                                Loading development activity...
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <DevelopmentActivity
+                                pollingCount={pollingCount}
+                                latestIteration={latestIteration}
+                                project={project as Project}
+                            />
                         </div>
                     </TabsContent>
                 </Tabs>

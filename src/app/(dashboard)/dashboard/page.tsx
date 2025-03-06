@@ -18,15 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import {
     createOrganization,
-    getOrganizationProjects,
     getOrganizationsByUserId,
 } from "@/actions/organization";
-import { useRouter } from "next/navigation";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
-import { ProjectCard } from "@/components/project/ProjectCard";
 import PageLoading from "@/components/common/PageLoading";
 import { GenesoftUser } from "@/types/user";
-import { Project } from "@/types/project";
 import posthog from "posthog-js";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import OrganizationProjects from "@/components/project/manage/OrganizationProjects";
@@ -42,19 +38,12 @@ export default function Dashboard() {
     const [organizationName, setOrganizationName] = useState("");
     const [organizationDescription, setOrganizationDescription] = useState("");
     const [isCreatingOrganization, setIsCreatingOrganization] = useState(false);
-    const [organizationProjects, setOrganizationProjects] = useState<Project[]>(
-        [],
-    );
-    const router = useRouter();
     const { id: organizationId, updateGenesoftOrganization } =
         useGenesoftOrganizationStore();
 
     useEffect(() => {
         if (email) {
             setupUser();
-        }
-        if (hasOrganization) {
-            setUpOrganizationProjects();
         }
     }, [email, hasOrganization]);
 
@@ -99,15 +88,6 @@ export default function Dashboard() {
         } finally {
             setIsCreatingOrganization(false);
         }
-    };
-
-    const setUpOrganizationProjects = async () => {
-        const projects = await getOrganizationProjects(organizationId);
-        console.log({
-            message: `${pageName}: Organization projects`,
-            projects,
-        });
-        setOrganizationProjects(projects);
     };
 
     console.log({

@@ -8,17 +8,13 @@ import {
     CircleDollarSign,
     Rocket,
     FileCheck,
-    SquarePen,
-    Laptop,
-    AppWindow,
-    FilePenLine,
     Sparkles,
     Command,
     Code,
     Search,
+    Loader2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import HeroSectionBanner from "@public/image/showcase/manage-project-example.png";
 import Image from "next/image";
 import posthog from "posthog-js";
 import KhonkaenUnknown from "@public/image/showcase/project/khonkaen-unknown.png";
@@ -31,6 +27,15 @@ import {
     CarouselPrevious,
 } from "../ui/carousel";
 import BangkokExplorerUsage from "@public/image/genesoft-usage/bangkok-explorer-mange-page.png";
+import OnboardingForm from "./OnboardingForm";
+import PlayWithME from "@public/image/showcase/play-with-me-example.png";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { useProjectStore } from "@/stores/project-store";
+import { useCreateProjectStore } from "@/stores/create-project-store";
+import { createProjectFromOnboarding, getProjectById } from "@/actions/project";
+import { useChannelStore } from "@/stores/channel-store";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { getOrganizationById } from "@/actions/organization";
 
 const StreamingText = ({
     text,
@@ -63,11 +68,37 @@ const StreamingText = ({
 export default function LandingPage() {
     const router = useRouter();
     const [heroStage, setHeroStage] = useState(0);
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const { id: user_id } = useGenesoftUserStore();
+    const { id: projectId } = useProjectStore();
+    const {
+        is_onboarding,
+        name: projectName,
+        description: projectDescription,
+        branding: projectBranding,
+        clearCreateProjectStore,
+    } = useCreateProjectStore();
+    const [
+        isCreatingProjectFromOnboarding,
+        setIsCreatingProjectFromOnboarding,
+    ] = useState(false);
+    const { updateProjectStore } = useProjectStore();
+    const { updateChannelStore } = useChannelStore();
+    const { updateGenesoftOrganization } = useGenesoftOrganizationStore();
+    // const heroContent = [
+    //     "Software development team for your startup in the AI Agent era",
+    //     "Transform business idea into reality with our AI agents",
+    // ];
+
+    // ! quite like this version actually
+    // const heroContent = [
+    //     "Don't let your potential business idea to go to waste",
+    //     "Let our AI agents build your web application for your business idea with cost of air",
+    // ];
 
     const heroContent = [
-        "Software development team for your startup in the AI Agent era",
-        "Collaborate with our AI agent team to build your startup web application - our agents work 24/7 to turn your requirements into reality",
-        "Perfect for entrepreneurs and founders without technical expertise who want to turn ideas into reality on a low budget",
+        "Don't let your potential business idea go to waste",
+        "Collaborate with your team and our AI agents to build web application for your business idea, get started free",
     ];
 
     const nextStage = () => {
@@ -75,14 +106,91 @@ export default function LandingPage() {
     };
     const handleStartNow = () => {
         posthog.capture("click_start_now_from_landing_page");
-        router.push(`signup`);
+        if (user_id) {
+            router.push(`/dashboard/project/manage/${projectId}`);
+        } else {
+            setShowOnboarding(true);
+        }
     };
+
+    const handleOnboardingComplete = () => {
+        posthog.capture("onboarding_complete_from_landing_page");
+        router.push(`/signup`);
+    };
+
+    const handleCreateProjectFromOnboarding = async () => {
+        setIsCreatingProjectFromOnboarding(true);
+        let projectId = "";
+        let pageId = "";
+        try {
+            const res = await createProjectFromOnboarding({
+                user_id: user_id,
+                project_name: projectName,
+                project_description: projectDescription,
+                branding: {
+                    logo_url: projectBranding?.logo_url,
+                    color: projectBranding?.color,
+                },
+            });
+            if (res.error) {
+                posthog.capture(
+                    "landing_page_create_project_from_onboarding_failed",
+                );
+                console.error(res.error);
+            } else {
+                clearCreateProjectStore();
+                projectId = res.project.id;
+                pageId = res.page.id;
+                const projectInfo = await getProjectById(projectId);
+                const organizationInfo = await getOrganizationById(
+                    projectInfo.organization_id,
+                );
+                updateProjectStore(projectInfo);
+                updateChannelStore({
+                    id: res.page.id,
+                    category: "page",
+                });
+                updateGenesoftOrganization({
+                    id: organizationInfo.id,
+                    name: organizationInfo.name,
+                    description: organizationInfo.description,
+                    image: organizationInfo.image,
+                });
+                posthog.capture(
+                    "landing_page_create_project_from_onboarding_success",
+                );
+            }
+        } catch (error) {
+            console.error(error);
+            posthog.capture(
+                "landing_page_create_project_from_onboarding_failed",
+            );
+        } finally {
+            router.push(
+                `/dashboard/project/manage/${projectId}/pages/${pageId}`,
+            );
+            setIsCreatingProjectFromOnboarding(false);
+        }
+    };
+
+    useEffect(() => {
+        if (is_onboarding && user_id && projectName && projectDescription) {
+            posthog.capture("landing_page_viewed_after_onboarding");
+            handleCreateProjectFromOnboarding();
+        }
+    }, [
+        is_onboarding,
+        user_id,
+        projectName,
+        projectDescription,
+        projectBranding,
+    ]);
 
     return (
         <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg">
             <main className="flex-grow">
                 {/* Hero Section */}
-                <section className="relative text-center px-5 md:px-10 lg:px-20 pt-16 md:pt-24 pb-24 md:pb-32 overflow-hidden">
+                <section className="relative text-center px-5 md:px-10 lg:px-20 pt-0 md:pt-24 pb-24 md:pb-32 overflow-hidden">
                     {/* Decorative elements */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
                         <div className="absolute top-0 left-1/4 w-1/3 h-1/3 bg-genesoft/10 rounded-full blur-[120px] transform -translate-y-1/2"></div>
@@ -93,7 +201,8 @@ export default function LandingPage() {
                         <div className="inline-flex items-center bg-tertiary-dark rounded-full px-4 py-2 mb-8 border border-line-in-dark-bg">
                             <Sparkles className="h-4 w-4 mr-2 text-genesoft" />
                             <span className="text-sm">
-                                AI-Powered Web Development for Startups
+                                AI Agents workspace to build app for small
+                                business and startup
                             </span>
                         </div>
 
@@ -112,17 +221,35 @@ export default function LandingPage() {
                             {heroContent[1]}
                         </p>
 
-                        <p className="text-base text-subtext-in-dark-bg/80 max-w-2xl mx-auto mb-12">
-                            {heroContent[2]}
-                        </p>
-
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-16">
-                            <Button
-                                className="w-64 md:w-auto px-8 py-6 text-base md:text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
-                                onClick={handleStartNow}
-                            >
-                                Get your web application now
-                            </Button>
+                        {/* Onboarding component */}
+                        <div className="mb-16">
+                            {showOnboarding ? (
+                                <OnboardingForm
+                                    onComplete={handleOnboardingComplete}
+                                />
+                            ) : (
+                                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                                    {isCreatingProjectFromOnboarding ? (
+                                        <Button
+                                            className="w-64 md:w-auto px-8 py-6 text-base md:text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
+                                            onClick={handleStartNow}
+                                        >
+                                            <span>
+                                                Genesoft is building your
+                                                project
+                                            </span>
+                                            <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            className="w-64 md:w-auto px-8 py-6 text-base md:text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
+                                            onClick={handleStartNow}
+                                        >
+                                            Build your business idea
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -160,8 +287,8 @@ export default function LandingPage() {
                                     24/7 Development
                                 </h3>
                                 <p className="text-subtext-in-dark-bg">
-                                    AI agents work around the clock to build
-                                    your web application
+                                    AI agents ready to work for you around the
+                                    clock
                                 </p>
                             </div>
 
@@ -173,8 +300,8 @@ export default function LandingPage() {
                                     Simple Requirements
                                 </h3>
                                 <p className="text-subtext-in-dark-bg">
-                                    Just tell us what you need - no technical
-                                    knowledge required
+                                    Just talking with our Project manager AI
+                                    agents, no technical knowledge required
                                 </p>
                             </div>
 
@@ -194,26 +321,15 @@ export default function LandingPage() {
                     </div>
 
                     <div className="relative max-w-5xl mx-auto px-4">
-                        <div className="bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-4 md:p-6">
-                            <p className="text-lg md:text-xl font-bold bg-gradient-to-r from-genesoft to-genesoft/80 bg-clip-text text-transparent mb-6">
-                                Collaborate with your team to work with our AI
-                                Agent team for your business web application
-                            </p>
-                            <p className="text-base md:text-lg text-white/90 mb-10">
-                                Our AI Agents develop your web application while
-                                you focus on your business
-                            </p>
-
-                            <iframe
-                                className="w-full aspect-video rounded-lg shadow-xl z-10 transition-transform duration-300"
-                                src="https://www.youtube.com/embed/io0Hz_IS4Dg?si=Ubs9J88hK3HvWyHn"
-                                title="YouTube video player"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                referrerPolicy="strict-origin-when-cross-origin"
-                                allowFullScreen
-                            ></iframe>
-                        </div>
+                        <iframe
+                            className="w-full aspect-video rounded-lg shadow-xl z-10 transition-transform duration-300"
+                            src="https://www.youtube.com/embed/io0Hz_IS4Dg?si=Ubs9J88hK3HvWyHn"
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                        ></iframe>
                     </div>
                 </section>
 
@@ -224,8 +340,8 @@ export default function LandingPage() {
                             Showcases
                         </h2>
                         <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-16 max-w-3xl mx-auto">
-                            Take a look at some of the websites built by our AI
-                            agents
+                            Take a look at some of the web applications built by
+                            our AI agents
                         </p>
 
                         <div className="flex items-center justify-center">
@@ -237,7 +353,7 @@ export default function LandingPage() {
                                                 className="flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
                                                 onClick={() => {
                                                     window.open(
-                                                        "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app/about",
+                                                        "https://nextjs-web461237da-5b5d-4e98-9ea5-05a7c5328d8f.vercel.app",
                                                         "_blank",
                                                     );
                                                 }}
@@ -245,18 +361,19 @@ export default function LandingPage() {
                                                 <div className="relative w-full mb-6 overflow-hidden rounded-xl border border-line-in-dark-bg">
                                                     <div className="absolute inset-0 bg-gradient-to-r from-genesoft/20 to-genesoft/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                                                     <Image
-                                                        src={KhonkaenUnknown}
-                                                        alt="Khonkaen Unknown"
+                                                        src={PlayWithME}
+                                                        alt="PlayWithME"
                                                         width={500}
                                                         height={500}
                                                         className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
                                                     />
                                                 </div>
-                                                <h3 className="text-xl md:text-2xl font-medium text-white group-hover:text-genesoft transition-colors">
-                                                    Khonkaen Unknown
+                                                <h3 className="text-xl md:text-2xl font-bold  text-white group-hover:text-genesoft transition-colors">
+                                                    Play with ME
                                                 </h3>
                                                 <p className="text-sm text-subtext-in-dark-bg mt-2">
-                                                    City depvelopment platform
+                                                    Art toy collection from the
+                                                    future of 2077
                                                 </p>
                                             </div>
                                         </div>
@@ -283,11 +400,42 @@ export default function LandingPage() {
                                                         className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
                                                     />
                                                 </div>
-                                                <h3 className="text-xl md:text-2xl font-medium text-white group-hover:text-genesoft transition-colors">
+                                                <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-genesoft transition-colors">
                                                     Curlent
                                                 </h3>
                                                 <p className="text-sm text-subtext-in-dark-bg mt-2">
                                                     AI-Powered US Stock Research
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CarouselItem>
+
+                                    <CarouselItem>
+                                        <div className="p-1">
+                                            <div
+                                                className="flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+                                                onClick={() => {
+                                                    window.open(
+                                                        "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app/about",
+                                                        "_blank",
+                                                    );
+                                                }}
+                                            >
+                                                <div className="relative w-full mb-6 overflow-hidden rounded-xl border border-line-in-dark-bg">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-genesoft/20 to-genesoft/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                                                    <Image
+                                                        src={KhonkaenUnknown}
+                                                        alt="Khonkaen Unknown"
+                                                        width={500}
+                                                        height={500}
+                                                        className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                </div>
+                                                <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-genesoft transition-colors">
+                                                    Khonkaen Unknown
+                                                </h3>
+                                                <p className="text-sm text-subtext-in-dark-bg mt-2">
+                                                    City depvelopment platform
                                                 </p>
                                             </div>
                                         </div>
@@ -381,93 +529,6 @@ export default function LandingPage() {
                         </div>
                     </div>
                 </section>
-
-                {/* Testimonials - added as inspired by Raycast */}
-                {/* <section className="py-16 md:py-24 bg-gradient-to-b from-secondary-dark to-primary-dark overflow-hidden">
-                    <div className="container mx-auto px-4">
-                        <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                            Built for businesses like yours
-                        </h2>
-                        <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-16 max-w-3xl mx-auto">
-                            Trusted by startups and small businesses to bring
-                            their ideas to life
-                        </p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300">
-                                <p className="text-subtext-in-dark-bg mb-4">
-                                    "Genesoft helped us launch our e-commerce
-                                    platform in just two weeks. Their AI agents
-                                    understood exactly what we needed and
-                                    delivered beyond our expectations."
-                                </p>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-genesoft/20 flex items-center justify-center mr-3">
-                                        <span className="text-genesoft font-bold">
-                                            JM
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-medium">
-                                            John Miller
-                                        </h4>
-                                        <p className="text-xs text-subtext-in-dark-bg/70">
-                                            Founder, ShopEasy
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300">
-                                <p className="text-subtext-in-dark-bg mb-4">
-                                    "As someone with zero technical knowledge, I
-                                    was amazed at how easy it was to get my
-                                    business website up and running with
-                                    Genesoft."
-                                </p>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-genesoft/20 flex items-center justify-center mr-3">
-                                        <span className="text-genesoft font-bold">
-                                            SP
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-medium">
-                                            Sarah Parker
-                                        </h4>
-                                        <p className="text-xs text-subtext-in-dark-bg/70">
-                                            Owner, Wellness Studio
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-tertiary-dark p-6 rounded-xl border border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300">
-                                <p className="text-subtext-in-dark-bg mb-4">
-                                    "The cost savings compared to traditional
-                                    development are incredible. We got a
-                                    professional web app at a fraction of what
-                                    we were quoted elsewhere."
-                                </p>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-genesoft/20 flex items-center justify-center mr-3">
-                                        <span className="text-genesoft font-bold">
-                                            RJ
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-medium">
-                                            Robert Johnson
-                                        </h4>
-                                        <p className="text-xs text-subtext-in-dark-bg/70">
-                                            CEO, TechStart
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section> */}
 
                 {/* CTA Section */}
                 <section className="py-16 md:py-24 text-center bg-gradient-to-b from-tertiary-dark to-primary-dark relative overflow-hidden">

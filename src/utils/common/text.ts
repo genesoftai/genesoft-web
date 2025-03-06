@@ -22,3 +22,10 @@ export const getFirstCharacterUppercase = (
     if (!text) return "";
     return text.charAt(0).toUpperCase() + text.slice(1);
 };
+
+export const getTextSeparatedUnderScore = (
+    text: string | undefined,
+): string => {
+    if (!text) return "";
+    return text.split("_").join(" ");
+};

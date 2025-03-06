@@ -41,7 +41,6 @@ const ManagePagePage = () => {
     const pathParams = useParams();
     const { id: projectId, updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
-
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState<Page | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -72,6 +71,8 @@ const ManagePagePage = () => {
     const setupPage = async (pageId: string) => {
         const pageFromDb = await getPageById(pageId);
         setPage(pageFromDb);
+        setupSprintOptions(pageId as string);
+        setupActivePageConversation(pageId as string);
     };
 
     useEffect(() => {
@@ -81,8 +82,6 @@ const ManagePagePage = () => {
             pageId,
         });
         setupPage(pageId as string);
-        setupActivePageConversation(pageId as string);
-        setupSprintOptions(pageId as string);
     }, [pathParams]);
 
     useEffect(() => {
@@ -116,6 +115,8 @@ const ManagePagePage = () => {
             }),
         );
         setSprintOptions(sprintOptions);
+        const lastSprint = sprintOptions[sprintOptions.length - 1];
+        setSelectedSprint(lastSprint.id);
     };
 
     const handleSubmitConversation = async () => {
@@ -131,7 +132,6 @@ const ManagePagePage = () => {
 
     console.log({
         message: "ManagePagePage",
-
         page,
         conversation,
         messages,

@@ -30,6 +30,8 @@ import { useProjectStore } from "@/stores/project-store";
 import { getOrganizationById } from "@/actions/organization";
 import { GenesoftOrganization } from "@/types/organization";
 import Image from "next/image";
+import ProjectPages from "@/components/project/pages/ProjectPages";
+import ProjectFeatures from "@/components/project/features/ProjectFeatures";
 
 const pageName = "ManageProjectPage";
 
@@ -193,7 +195,11 @@ export default function ManageProjectPage() {
                         </Card>
                     </div>
 
-                    <WebPreview project={project} />
+                    <WebPreview project={project} onPage="manage-project" />
+
+                    <ProjectPages projectId={projectId} />
+
+                    <ProjectFeatures projectId={projectId} />
                 </div>
             </div>
 

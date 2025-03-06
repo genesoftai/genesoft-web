@@ -23,6 +23,7 @@ const OrganizationProjects = ({ organizationId }: Props) => {
 
     const setUpOrganizationProjects = async () => {
         const projects = await getOrganizationProjects(organizationId);
+
         setOrganizationProjects(projects);
     };
 
