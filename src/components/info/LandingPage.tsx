@@ -323,7 +323,7 @@ export default function LandingPage() {
                     <div className="relative max-w-5xl mx-auto px-4">
                         <iframe
                             className="w-full aspect-video rounded-lg shadow-xl z-10 transition-transform duration-300"
-                            src="https://www.youtube.com/embed/io0Hz_IS4Dg?si=Ubs9J88hK3HvWyHn"
+                            src="https://www.youtube.com/embed/L5pblM_Tsgc?si=R7LrNhQhxh76DtLp"
                             title="YouTube video player"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
