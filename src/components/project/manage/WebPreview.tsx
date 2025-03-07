@@ -129,14 +129,14 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
         <Card
             className={`bg-primary-dark text-white border-none ${onPage === "manage-project" ? "w-full" : "max-w-[380px] md:max-w-[1024px]"}  self-center`}
         >
-            <CardContent className="flex flex-col items-center gap-6">
+            <CardContent className="flex flex-col gap-6">
                 {/* Tabs for Preview and Status */}
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
                     className="w-full flex flex-col items-center"
                 >
-                    <TabsList className="grid w-full sm:w-5/6 md:w-3/6 grid-cols-2 mb-4 mt-4 bg-secondary-dark text-subtext-in-dark-bg">
+                    <TabsList className="grid w-full sm:w-5/6 md:w-4/6 grid-cols-2 mb-4 mt-4 bg-secondary-dark text-subtext-in-dark-bg">
                         <TabsTrigger
                             value="preview"
                             className="flex items-center gap-2"
