@@ -17,7 +17,6 @@ import {
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import posthog from "posthog-js";
-import KhonkaenUnknown from "@public/image/showcase/project/khonkaen-unknown.png";
 import Curlent from "@public/image/showcase/project/curlent.png";
 import {
     Carousel,
@@ -437,37 +436,6 @@ export default function LandingPage() {
                                                 </h3>
                                                 <p className="text-sm text-subtext-in-dark-bg mt-2">
                                                     Art Gallery for Artist
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CarouselItem>
-
-                                    <CarouselItem>
-                                        <div className="p-1">
-                                            <div
-                                                className="flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
-                                                onClick={() => {
-                                                    window.open(
-                                                        "https://nextjs-webdb1f1b9b-6d50-4772-9a52-10aedced300e.vercel.app/about",
-                                                        "_blank",
-                                                    );
-                                                }}
-                                            >
-                                                <div className="relative w-full mb-6 overflow-hidden rounded-xl border border-line-in-dark-bg">
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-genesoft/20 to-genesoft/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-                                                    <Image
-                                                        src={KhonkaenUnknown}
-                                                        alt="Khonkaen Unknown"
-                                                        width={500}
-                                                        height={500}
-                                                        className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
-                                                    />
-                                                </div>
-                                                <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-genesoft transition-colors">
-                                                    Khonkaen Unknown
-                                                </h3>
-                                                <p className="text-sm text-subtext-in-dark-bg mt-2">
-                                                    City depvelopment platform
                                                 </p>
                                             </div>
                                         </div>
