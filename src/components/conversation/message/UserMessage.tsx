@@ -33,11 +33,9 @@ const UserMessage = ({ message }: { message: Message }) => {
             </Avatar>
 
             <div className="flex-1 min-w-0 overflow-hidden">
-                <div className="flex flex-col items-baseline">
-                    <span
-                        className={`font-semibold text-sm text-subtext-in-dark-bg `}
-                    >
-                        {message.sender?.name}
+                <div className="flex items-baseline">
+                    <span className="font-semibold text-sm text-white">
+                        {message.sender?.name || "User"}
                     </span>
                     <span className="ml-2 text-xs text-gray-500">
                         {formatDateToHumanReadable(
@@ -46,9 +44,24 @@ const UserMessage = ({ message }: { message: Message }) => {
                     </span>
                 </div>
 
-                <div className="mt-1 text-white text-sm break-words whitespace-pre-wrap overflow-hidden">
-                    {message.content}
-                </div>
+                {message.message_type === "image" && message.files?.[0]?.url ? (
+                    <div className="mt-2">
+                        <img
+                            src={message.files?.[0]?.url}
+                            alt="Image Message"
+                            className="max-h-64 rounded-md"
+                        />
+                        {message.content && (
+                            <p className="mt-2 text-gray-300 text-sm break-words whitespace-pre-wrap">
+                                {message.content}
+                            </p>
+                        )}
+                    </div>
+                ) : (
+                    <div className="mt-1 text-gray-300 text-sm break-words whitespace-pre-wrap">
+                        {message.content}
+                    </div>
+                )}
             </div>
         </div>
     );

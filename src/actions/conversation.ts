@@ -6,6 +6,15 @@ import { genesoftCoreApiServiceBaseUrl } from "@/constants/api-service/url";
 import { AxiosError } from "axios";
 import { Message } from "@/types/message";
 
+export type CreateMessageDto = {
+    sender_type: string;
+    message_type: string;
+    content?: string;
+    sender_id?: string;
+    file_ids?: string[];
+    reference_link_ids?: string[];
+};
+
 export type CreatePageDto = {
     project_id: string;
     name: string;
@@ -17,7 +26,7 @@ export type CreatePageDto = {
 export type TalkToProjectManagerDto = {
     project_id: string;
     conversation_id: string;
-    message: Partial<Message>;
+    message: CreateMessageDto;
     feature_id?: string;
     page_id?: string;
 };

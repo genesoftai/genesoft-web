@@ -54,6 +54,7 @@ const ManageFeaturePage = () => {
         setIsLoadingSetupFeatureConversation,
     ] = useState<boolean>(false);
     const [isFeatureCollapsed, setIsFeatureCollapsed] = useState(true);
+    const [conversationKey, setConversationKey] = useState<number>(0);
 
     const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
     const [activeTab, setActiveTab] = useState("conversation");
@@ -129,6 +130,12 @@ const ManageFeaturePage = () => {
         const conversationForWeb = await getConversationById(sprintId);
         setConversation(conversationForWeb);
         setMessages(conversationForWeb.messages);
+    };
+
+    const handleSendImageWithMessage = async (messages: Message[]) => {
+        setMessages(messages);
+        // Force conversation component to reload by changing its key
+        setConversationKey((prevKey) => prevKey + 1);
     };
 
     console.log({
@@ -226,6 +233,7 @@ const ManageFeaturePage = () => {
                         >
                             <div className="flex-1">
                                 <Conversation
+                                    key={`mobile-conversation-${conversationKey}`}
                                     type="feature"
                                     channelName={feature?.name || ""}
                                     channelDescription={
@@ -244,6 +252,9 @@ const ManageFeaturePage = () => {
                                     }
                                     status={conversation?.status || ""}
                                     featureId={pathParams?.featureId as string}
+                                    onSendImageWithMessage={
+                                        handleSendImageWithMessage
+                                    }
                                 />
                             </div>
                         </TabsContent>
@@ -268,6 +279,7 @@ const ManageFeaturePage = () => {
                         }`}
                     >
                         <Conversation
+                            key={`desktop-conversation-${conversationKey}`}
                             type="feature"
                             channelName={feature?.name || ""}
                             channelDescription={feature?.description || ""}
@@ -280,6 +292,7 @@ const ManageFeaturePage = () => {
                             onSubmitConversation={handleSubmitConversation}
                             status={conversation?.status || ""}
                             featureId={pathParams?.featureId as string}
+                            onSendImageWithMessage={handleSendImageWithMessage}
                         />
                     </div>
 

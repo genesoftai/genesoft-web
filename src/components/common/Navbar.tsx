@@ -99,6 +99,15 @@ export default function Navbar() {
         }
     };
 
+    const handleGoToDashboard = () => {
+        if (userEmail) {
+            router.push(`/dashboard/project/manage/${projectId}`);
+        } else {
+            posthog.capture("click_dashboard_from_navbar_but_not_logged_in");
+            router.push("/signin");
+        }
+    };
+
     return (
         <nav
             className={`border-b border-line-in-dark-bg w-full sticky top-0 z-50 bg-primary-dark/90 backdrop-blur-md transition-all duration-300 ${
@@ -138,32 +147,32 @@ export default function Navbar() {
                             </Button>
                             <div className="absolute left-0 top-full pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
                                 <div className="bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-2 shadow-lg min-w-[200px]">
-                                    <Link
-                                        href="/signup"
-                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors"
+                                    <div
+                                        onClick={handleGoToDashboard}
+                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer"
                                     >
                                         <div className="w-8 h-8 rounded-full bg-genesoft/20 flex items-center justify-center mr-2">
                                             <AppWindow className="h-4 w-4 text-genesoft" />
                                         </div>
                                         <div>
                                             <p className="font-medium">
-                                                Web Development
+                                                AI Agent Workspace
                                             </p>
                                             <p className="text-xs text-subtext-in-dark-bg/70">
-                                                AI-powered web apps
+                                                for web development
                                             </p>
                                         </div>
-                                    </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <Link
-                            href={`/dashboard/project/manage/${projectId}`}
-                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70"
+                        <p
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
+                            onClick={handleGoToDashboard}
                         >
                             Dashboard
-                        </Link>
+                        </p>
 
                         <a
                             href="mailto:support@genesoftai.com"

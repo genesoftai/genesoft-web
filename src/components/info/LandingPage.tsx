@@ -26,9 +26,8 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "../ui/carousel";
-import BangkokExplorerUsage from "@public/image/genesoft-usage/bangkok-explorer-mange-page.png";
 import OnboardingForm from "./OnboardingForm";
-import PlayWithME from "@public/image/showcase/play-with-me-example.png";
+import PlayWithME from "@public/image/showcase/play-with-me-collection.png";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { useProjectStore } from "@/stores/project-store";
 import { useCreateProjectStore } from "@/stores/create-project-store";
@@ -36,6 +35,8 @@ import { createProjectFromOnboarding, getProjectById } from "@/actions/project";
 import { useChannelStore } from "@/stores/channel-store";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { getOrganizationById } from "@/actions/organization";
+import PlayWithMeUsage from "@public/image/genesoft-usage/play-with-me-usage.png";
+import Peachful from "@public/image/showcase/peachful.png";
 
 const StreamingText = ({
     text,
@@ -92,13 +93,13 @@ export default function LandingPage() {
 
     // ! quite like this version actually
     // const heroContent = [
-    //     "Don't let your potential business idea to go to waste",
-    //     "Let our AI agents build your web application for your business idea with cost of air",
+    //     "Don't let your potential business idea to go to waste, build it with the cost of air",
+    //     "Let our AI agents build your web application for your business idea",
     // ];
 
     const heroContent = [
-        "Don't let your potential business idea go to waste",
-        "Collaborate with your team and our AI agents to build web application for your business idea, get started free",
+        "Push your idea to the world in minutes",
+        "Collaborate with your team and our AI agents to build web application for your business idea",
     ];
 
     const nextStage = () => {
@@ -262,7 +263,7 @@ export default function LandingPage() {
                                 <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
                             </div>
                             <Image
-                                src={BangkokExplorerUsage}
+                                src={PlayWithMeUsage}
                                 alt="Genesoft AI-powered web development"
                                 className="w-full rounded-lg mt-8 transform hover:scale-[1.02] transition-all duration-500"
                                 priority
@@ -405,6 +406,37 @@ export default function LandingPage() {
                                                 </h3>
                                                 <p className="text-sm text-subtext-in-dark-bg mt-2">
                                                     AI-Powered US Stock Research
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CarouselItem>
+
+                                    <CarouselItem>
+                                        <div className="p-1">
+                                            <div
+                                                className="flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group"
+                                                onClick={() => {
+                                                    window.open(
+                                                        "https://nextjs-web9790eda0-f8de-477a-809d-9f31ad92738b.vercel.app",
+                                                        "_blank",
+                                                    );
+                                                }}
+                                            >
+                                                <div className="relative w-full mb-6 overflow-hidden rounded-xl border border-line-in-dark-bg">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-genesoft/20 to-genesoft/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                                                    <Image
+                                                        src={Peachful}
+                                                        alt="Peachful"
+                                                        width={500}
+                                                        height={500}
+                                                        className="w-full rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                </div>
+                                                <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-genesoft transition-colors">
+                                                    Peachful
+                                                </h3>
+                                                <p className="text-sm text-subtext-in-dark-bg mt-2">
+                                                    Art Gallery for Artist
                                                 </p>
                                             </div>
                                         </div>
