@@ -45,7 +45,7 @@ const DevelopmentActivity = ({
                 )}
             </div>
 
-            <div className="bg-primary-dark/30 rounded-lg border border-white/10 overflow-hidden">
+            <div className="bg-primary-dark/30 rounded-lg border border-white/10 overflow-hidden w-full">
                 {latestIteration ? (
                     <div className="relative">
                         {/* Activity Header */}

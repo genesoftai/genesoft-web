@@ -101,7 +101,7 @@ export default function Signup() {
 
                 <div className="text-subtext-in-dark-bg text-2xl w-8/12 ">
                     {
-                        "Get started to build your web application with software development team of AI Agents"
+                        "Get started with AI Agent workspace to collaborate with your team and AI Agent to build web application for your potential business idea"
                     }
                 </div>
             </div>
@@ -126,7 +126,9 @@ export default function Signup() {
                     </h1>
 
                     <div className="text-muted-foreground text-lg w-full flex lg:hidden mb-10">
-                        {"Get started to fine tune LLM for your use case"}
+                        {
+                            "Get started to collaborate AI Agent with your team in AI Agent workspace"
+                        }
                     </div>
 
                     <form className="space-y-4" onSubmit={handleSignup}>

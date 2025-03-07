@@ -51,6 +51,7 @@ const ManagePagePage = () => {
     const [isLoadingSetupPageConversation, setIsLoadingSetupPageConversation] =
         useState<boolean>(false);
     const [isPageCollapsed, setIsPageCollapsed] = useState(true);
+    const [conversationKey, setConversationKey] = useState<number>(0);
 
     const [sprintOptions, setSprintOptions] = useState<SprintOption[]>([]);
     const [activeTab, setActiveTab] = useState("conversation");
@@ -130,6 +131,12 @@ const ManagePagePage = () => {
         setMessages(conversationForWeb.messages);
     };
 
+    const handleSendImageWithMessage = async (messages: Message[]) => {
+        setMessages(messages);
+        // Force conversation component to reload by changing its key
+        setConversationKey((prevKey) => prevKey + 1);
+    };
+
     console.log({
         message: "ManagePagePage",
         page,
@@ -194,7 +201,7 @@ const ManagePagePage = () => {
                 </div>
 
                 {/* Mobile View (Tabs) - Only visible below md breakpoint */}
-                <div className="md:hidden flex-1 flex flex-col">
+                <div className="md:hidden flex-1 flex flex-col w-full items-center">
                     <Tabs
                         value={activeTab}
                         onValueChange={setActiveTab}
@@ -223,6 +230,7 @@ const ManagePagePage = () => {
                         >
                             <div className="flex-1">
                                 <Conversation
+                                    key={`mobile-conversation-${conversationKey}`}
                                     type="page"
                                     channelName={page?.name || ""}
                                     channelDescription={page?.description || ""}
@@ -237,6 +245,9 @@ const ManagePagePage = () => {
                                     }
                                     status={conversation?.status || ""}
                                     pageId={pathParams?.pageId as string}
+                                    onSendImageWithMessage={
+                                        handleSendImageWithMessage
+                                    }
                                 />
                             </div>
                         </TabsContent>
@@ -261,6 +272,7 @@ const ManagePagePage = () => {
                         }`}
                     >
                         <Conversation
+                            key={`desktop-conversation-${conversationKey}`}
                             type="page"
                             channelName={page?.name || ""}
                             channelDescription={page?.description || ""}
@@ -273,6 +285,7 @@ const ManagePagePage = () => {
                             onSubmitConversation={handleSubmitConversation}
                             status={conversation?.status || ""}
                             pageId={pathParams?.pageId as string}
+                            onSendImageWithMessage={handleSendImageWithMessage}
                         />
                     </div>
 

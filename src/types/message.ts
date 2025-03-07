@@ -5,6 +5,7 @@ export interface Message {
     sender_type: "user" | "ai_agent" | "system";
     conversation_id: string;
     message_type: string;
+    image_url?: string;
     sender?: {
         name: string;
         email?: string;
@@ -14,6 +15,10 @@ export interface Message {
     reference_link_ids?: string[] | null;
     created_at?: Date;
     updated_at?: Date;
+    files?: {
+        id: string;
+        url: string;
+    }[];
 }
 
 export interface ConversationMessage {
