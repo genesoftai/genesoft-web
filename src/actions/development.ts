@@ -85,3 +85,23 @@ export const getLatestIteration = async (projectId: string) => {
         throw new Error("Failed to get latest iteration");
     }
 };
+
+export const getMonthlySprintsWithSubscription = async (
+    organizationId: string,
+) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/development/iteration/organization/${organizationId}/monthly`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(
+            "Error getting monthly sprints with subscription:",
+            error,
+        );
+        throw new Error("Failed to get monthly sprints with subscription");
+    }
+};

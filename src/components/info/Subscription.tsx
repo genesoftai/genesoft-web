@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Check, InfoIcon } from "lucide-react";
 import {
     Card,
@@ -13,7 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/utils/supabase/client";
+import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { getUserByEmail } from "@/actions/user";
+import { SubscriptionLookupKey } from "@/constants/subscription";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { getMonthlySprintsWithSubscription } from "@/actions/development";
+import { getOrganizationById } from "@/actions/organization";
 
 type PricingTier = {
     name: string;
@@ -35,7 +40,7 @@ const pricingTiers: PricingTier[] = [
         features: [
             "1 project",
             "10 sprints per month",
-            "Advanced AI Model (Claude Haiku, backup by o1-mini)",
+            "Moderate AI Model (Claude Haiku, backup by o1-mini)",
             "Project in organization deleted in 7 days",
             "Maximum 2 team members",
             "Infrastructure: Database, Authentication, Storage, and Hosting",
@@ -46,18 +51,18 @@ const pricingTiers: PricingTier[] = [
     },
     {
         name: "Startup Tier",
-        description: "For small teams and growing projects",
+        description: "For small team and growing projects",
         price: "$30",
         priceDescription: "per month",
         features: [
             "1 project",
-            "30 sprints per month",
+            "40 sprints per month",
             "Advanced AI Model (Claude Sonnet 3.7, backup by o1-mini)",
             "Unlimited team members",
             "Project not deleted while in subscription",
             "Infrastructure: Database, Authentication, Storage, and Hosting",
             "Email Support, Infrastructure setup support, Dedicated Support, and Code Edition Support",
-            "Extra sprints: $0.5 per sprint",
+            "Extra sprints: $0.3 per sprint",
         ],
         buttonText: "Sign Up",
         highlighted: true,
@@ -109,15 +114,83 @@ const enterpriseTier = {
 };
 
 export default function Subscription() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
+    const { id: user_id, email: userEmail } = useGenesoftUserStore();
+    const { id: organization_id, name: organization_name } =
+        useGenesoftOrganizationStore();
+    const [monthlySprints, setMonthlySprints] = useState({});
+
+    useEffect(() => {
+        if (user_id && organization_id) {
+            setIsLoggedIn(true);
+            setupSubscription();
+        }
+    }, [user_id]);
+
+    const handleSubscription = async () => {
+        const user = await getUserByEmail({
+            email: userEmail,
+        });
+
+        const organization = await getOrganizationById(organization_id);
+
+        console.log({
+            message: "Organization",
+            organization,
+        });
+
+        if (organization.customer_id) {
+            const response = await fetch(`api/stripe/create-portal-session`, {
+                method: "POST",
+                body: JSON.stringify({
+                    customer_id: organization.customer_id,
+                }),
+            });
+            const data = await response.json();
+            router.push(data.url);
+        } else {
+            const response = await fetch(`api/stripe/create-checkout-session`, {
+                method: "POST",
+                body: JSON.stringify({
+                    customer_email: user.email,
+                    lookup_key: SubscriptionLookupKey.Startup,
+                    organization_id: organization_id,
+                    organization_name: organization_name,
+                }),
+            });
+            const data = await response.json();
+            console.log({ message: "Stripe checkout session", data });
+            router.push(data.url);
+        }
+    };
 
     const handleButtonClick = (tier: string) => {
         if (tier === "Enterprise") {
             router.push("/contact");
         } else {
-            router.push("/signup");
+            if (isLoggedIn) {
+                handleSubscription();
+            } else {
+                router.push("/signup");
+            }
         }
     };
+
+    const setupSubscription = async () => {
+        const response =
+            await getMonthlySprintsWithSubscription(organization_id);
+        console.log({
+            message: "Monthly sprints",
+            response,
+        });
+        setMonthlySprints(response);
+    };
+
+    console.log({
+        message: "Monthly sprints",
+        monthlySprints,
+    });
 
     return (
         <div className="w-full py-12 md:py-24">
@@ -199,7 +272,15 @@ export default function Subscription() {
                                     variant={tier.buttonVariant || "default"}
                                     onClick={() => handleButtonClick(tier.name)}
                                 >
-                                    {tier.buttonText}
+                                    {isLoggedIn && monthlySprints?.tier
+                                        ? monthlySprints?.tier === "startup" &&
+                                          tier.name === "Startup Tier"
+                                            ? "Manage Subscription"
+                                            : monthlySprints?.tier === "free" &&
+                                                tier.name === "Free Tier"
+                                              ? "Manage Subscription"
+                                              : "Downgrade"
+                                        : tier.buttonText}
                                 </Button>
                             </CardFooter>
                         </Card>

@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { AppWindow, Building, ChevronLeft, LifeBuoy } from "lucide-react";
+import {
+    AppWindow,
+    Building,
+    ChevronLeft,
+    FlaskConical,
+    LifeBuoy,
+    Rocket,
+} from "lucide-react";
 
 import { NavMain } from "@/components/common/sidebar/nav-main";
 import { NavSecondary } from "@/components/common/sidebar/nav-secondary";
@@ -19,6 +26,8 @@ import {
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { NavProject } from "./nav-project";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { useEffect, useState } from "react";
+import { getMonthlySprintsWithSubscription } from "@/actions/development";
 
 const data = {
     user: {
@@ -87,7 +96,7 @@ const data = {
     ],
     navSecondary: [
         {
-            title: "support@genesoftai.com",
+            title: "Support",
             url: "mailto:support@genesoftai.com",
             icon: LifeBuoy,
         },
@@ -96,11 +105,22 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { project_id } = useGenesoftUserStore();
-    const { name: organization_name } = useGenesoftOrganizationStore();
+    const { id: organizationId, name: organization_name } =
+        useGenesoftOrganizationStore();
+    const [monthlySprints, setMonthlySprints] = useState({});
     console.log({
         message: "AppSidebar",
         project_id,
     });
+
+    useEffect(() => {
+        const fetchMonthlySprints = async () => {
+            const response =
+                await getMonthlySprintsWithSubscription(organizationId);
+            setMonthlySprints(response);
+        };
+        fetchMonthlySprints();
+    }, [organizationId]);
     return (
         <Sidebar
             variant="inset"
@@ -119,9 +139,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <span className="truncate font-semibold">
                                         {organization_name}
                                     </span>
-                                    <span className="truncate text-xs">
-                                        {"Free tier"}
-                                    </span>
+                                    <div className="flex items-center gap-1">
+                                        <span className="truncate text-xs">
+                                            {monthlySprints.tier === "free"
+                                                ? "Free tier"
+                                                : "Startup plan"}
+                                        </span>
+                                        {monthlySprints.tier === "free" ? (
+                                            <FlaskConical className="size-4" />
+                                        ) : (
+                                            <Rocket className="size-4" />
+                                        )}
+                                    </div>
                                 </div>
                             </a>
                         </SidebarMenuButton>

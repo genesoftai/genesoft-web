@@ -26,6 +26,8 @@ import { GenesoftUser } from "@/types/user";
 import posthog from "posthog-js";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import OrganizationProjects from "@/components/project/manage/OrganizationProjects";
+import { useSearchParams } from "next/navigation";
+import { createSubscriptionFromCheckoutSession } from "@/actions/subscription";
 const pageName = "DashboardPage";
 
 export default function Dashboard() {
@@ -40,6 +42,15 @@ export default function Dashboard() {
     const [isCreatingOrganization, setIsCreatingOrganization] = useState(false);
     const { id: organizationId, updateGenesoftOrganization } =
         useGenesoftOrganizationStore();
+    const searchParams = useSearchParams();
+    const sessionId = searchParams.get("session_id");
+    const success = searchParams.get("success");
+
+    useEffect(() => {
+        if (success && sessionId) {
+            createSubscriptionFromCheckoutSession(sessionId);
+        }
+    }, [success, sessionId]);
 
     useEffect(() => {
         if (email) {

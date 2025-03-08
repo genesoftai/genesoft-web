@@ -17,11 +17,7 @@ export async function getWebApplicationInfo(projectId: string | undefined) {
                 Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
             },
         });
-        console.log({
-            message: "getWebApplicationInfo",
-            res: res,
-            data: res.data,
-        });
+
         return res.data;
     } catch (error) {
         console.error("Error getting web application info:", error);

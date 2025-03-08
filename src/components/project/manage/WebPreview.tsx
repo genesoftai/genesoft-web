@@ -2,9 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
     Globe,
     ExternalLink,
-    Monitor,
-    Smartphone,
-    RotateCcw,
     Laptop,
     Activity,
     Wrench,
@@ -119,11 +116,6 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
         fetchLatestData();
         refreshIframe();
     };
-
-    console.log({
-        webApplicationInfo,
-        latestIteration,
-    });
 
     return (
         <Card
