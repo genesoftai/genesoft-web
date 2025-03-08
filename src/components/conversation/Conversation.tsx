@@ -47,6 +47,7 @@ import { getOrganizationById } from "@/actions/organization";
 import { SubscriptionLookupKey } from "@/constants/subscription";
 import { useRouter } from "next/navigation";
 import { nextAppBaseUrl } from "@/constants/web";
+import { MonthlySprint } from "@/types/subscription";
 
 export type SprintOption = {
     id: string;
@@ -111,7 +112,13 @@ const Conversation: React.FC<ConversationProps> = ({
     const [fileId, setFileId] = useState<string>("");
     const [isSendingImageWithMessage, setIsSendingImageWithMessage] =
         useState<boolean>(false);
-    const [monthlySprints, setMonthlySprints] = useState<object>({});
+    const [monthlySprints, setMonthlySprints] = useState<MonthlySprint>({
+        iterations: [],
+        count: 0,
+        exceeded: false,
+        tier: "",
+        remaining: 0,
+    });
     const { id: organizationId } = useGenesoftOrganizationStore();
     const router = useRouter();
 

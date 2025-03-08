@@ -28,6 +28,7 @@ import { NavProject } from "./nav-project";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { useEffect, useState } from "react";
 import { getMonthlySprintsWithSubscription } from "@/actions/development";
+import { MonthlySprint } from "@/types/subscription";
 
 const data = {
     user: {
@@ -107,7 +108,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { project_id } = useGenesoftUserStore();
     const { id: organizationId, name: organization_name } =
         useGenesoftOrganizationStore();
-    const [monthlySprints, setMonthlySprints] = useState({});
+    const [monthlySprints, setMonthlySprints] = useState<MonthlySprint>({
+        iterations: [],
+        count: 0,
+        exceeded: false,
+        tier: "",
+        remaining: 0,
+    });
     console.log({
         message: "AppSidebar",
         project_id,
@@ -141,11 +148,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     </span>
                                     <div className="flex items-center gap-1">
                                         <span className="truncate text-xs">
-                                            {monthlySprints.tier === "free"
+                                            {monthlySprints?.tier === "free"
                                                 ? "Free tier"
                                                 : "Startup plan"}
                                         </span>
-                                        {monthlySprints.tier === "free" ? (
+                                        {monthlySprints?.tier === "free" ? (
                                             <FlaskConical className="size-4" />
                                         ) : (
                                             <Rocket className="size-4" />
