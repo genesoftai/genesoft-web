@@ -187,6 +187,7 @@ const Conversation: React.FC<ConversationProps> = ({
     };
 
     const handleSubmitConversation = async () => {
+        let status = "error";
         if (sprintName.trim() === "") {
             setErrorStartSprint("Please enter a sprint name");
             return;
@@ -197,16 +198,19 @@ const Conversation: React.FC<ConversationProps> = ({
         try {
             await submitConversation(conversationId, sprintName);
             setupMonthlySprints();
+            status = "submitted";
         } catch (error) {
             if (
                 error instanceof Error &&
-                error.message ===
+                error?.message ===
                     "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue."
             ) {
+                status = "error";
                 setErrorStartSprint(
                     "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue.",
                 );
             } else {
+                status = "error";
                 console.error("Error submitting conversation:", error);
                 setErrorStartSprint(
                     "Something went wrong, Please try again later or contact support@genesoftai.com",
@@ -214,7 +218,7 @@ const Conversation: React.FC<ConversationProps> = ({
             }
         } finally {
             setIsLoadingSubmitConversation(false);
-            if (onSubmitConversation && !errorStartSprint) {
+            if (onSubmitConversation && status === "submitted") {
                 onSubmitConversation();
             }
         }
@@ -706,11 +710,21 @@ const Conversation: React.FC<ConversationProps> = ({
                                         onClick={handleSubmitConversation}
                                         disabled={isLoadingSubmitConversation}
                                     >
-                                        <span className="text-xs md:text-sm font-medium">
-                                            {isLoadingSubmitConversation
-                                                ? "Starting Sprint..."
-                                                : "Start Sprint"}
-                                        </span>
+                                        {monthlySprints?.remaining <= 0 ? (
+                                            <Button
+                                                variant="link"
+                                                className="bg-genesoft text-white hover:bg-genesoft/80 w-fit self-center"
+                                                onClick={handleSubscription}
+                                            >
+                                                Upgrade to a startup plan
+                                            </Button>
+                                        ) : (
+                                            <span className="text-xs md:text-sm font-medium">
+                                                {isLoadingSubmitConversation
+                                                    ? "Starting Sprint..."
+                                                    : "Start Sprint"}
+                                            </span>
+                                        )}
                                         {isLoadingSubmitConversation ? (
                                             <Loader2 className="h-4 w-4 animate-spin ml-1" />
                                         ) : (
@@ -724,16 +738,6 @@ const Conversation: React.FC<ConversationProps> = ({
                                         <span className="text-red-400">
                                             {errorStartSprint}
                                         </span>
-                                        {errorStartSprint ===
-                                            "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue." && (
-                                            <Button
-                                                variant="link"
-                                                className="bg-genesoft text-white hover:bg-genesoft/80 w-fit self-center"
-                                                onClick={handleSubscription}
-                                            >
-                                                Upgrade to a startup plan
-                                            </Button>
-                                        )}
                                     </div>
                                 ) : (
                                     <div className="px-2 py-1 text-xs md:text-sm text-gray-400 italic w-full">
