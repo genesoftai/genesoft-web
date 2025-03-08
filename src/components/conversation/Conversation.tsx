@@ -214,7 +214,7 @@ const Conversation: React.FC<ConversationProps> = ({
             }
         } finally {
             setIsLoadingSubmitConversation(false);
-            if (onSubmitConversation) {
+            if (onSubmitConversation && !errorStartSprint) {
                 onSubmitConversation();
             }
         }
