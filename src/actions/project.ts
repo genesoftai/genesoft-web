@@ -292,12 +292,6 @@ export async function getPageReferenceLinks(projectId: string, pageId: string) {
 
 export async function getPageFiles(projectId: string, pageId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/page/${pageId}/files`;
-    console.log({
-        message: "getPageFiles",
-        projectId,
-        pageId,
-        url,
-    });
     try {
         const res = await axios.get(url, {
             headers: {
@@ -313,12 +307,6 @@ export async function getPageFiles(projectId: string, pageId: string) {
 
 export async function getFeatureFiles(projectId: string, featureId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/feature/${featureId}/files`;
-    console.log({
-        message: "getFeatureFiles",
-        projectId,
-        featureId,
-        url,
-    });
     try {
         const res = await axios.get(url, {
             headers: {

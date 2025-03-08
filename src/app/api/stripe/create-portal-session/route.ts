@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     try {
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: customer_id,
-            return_url: `${YOUR_DOMAIN}/ai-assistant`,
+            return_url: `${YOUR_DOMAIN}/dashboard`,
         });
 
         console.log({ message: "Stripe portal session", portalSession });

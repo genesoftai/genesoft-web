@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, ExternalLink, ChevronDown, AppWindow } from "lucide-react";
+import { Menu, ExternalLink, ChevronDown, AppWindow, Send } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,21 @@ import {
     getOrganizationProjects,
     getOrganizationsByUserId,
 } from "@/actions/organization";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
+import { sendSupportEmail } from "@/actions/email";
 
 type UserData = { user: User } | { user: null };
 
@@ -35,6 +50,10 @@ export default function Navbar() {
     const { id: organizationId, updateGenesoftOrganization } =
         useGenesoftOrganizationStore();
     const { id: projectId, updateProjectStore } = useProjectStore();
+    const [supportDialogOpen, setSupportDialogOpen] = useState(false);
+    const [supportEmail, setSupportEmail] = useState("");
+    const [supportQuery, setSupportQuery] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
 
@@ -64,6 +83,12 @@ export default function Navbar() {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
+
+    useEffect(() => {
+        if (userEmail) {
+            setSupportEmail(userEmail);
+        }
+    }, [userEmail]);
 
     const setupUserData = async () => {
         const { data } = await supabase.auth.getUser();
@@ -105,6 +130,51 @@ export default function Navbar() {
         } else {
             posthog.capture("click_dashboard_from_navbar_but_not_logged_in");
             router.push("/signin");
+        }
+    };
+
+    const handleSupportClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setSupportDialogOpen(true);
+    };
+
+    const handleSupportSubmit = async () => {
+        if (!supportEmail || !supportQuery) {
+            toast({
+                title: "Missing information",
+                description: "Please provide both email and your question",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await sendSupportEmail({
+                email: supportEmail,
+                query: supportQuery,
+            });
+
+            if (response) {
+                toast({
+                    title: "Support request sent",
+                    description: "We'll get back to you as soon as possible!",
+                });
+                setSupportQuery("");
+                setSupportDialogOpen(false);
+            } else {
+                throw new Error("Failed to send support request");
+            }
+        } catch (error) {
+            console.error("Error sending support request:", error);
+            toast({
+                title: "Error",
+                description: "Failed to send your request. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -174,13 +244,22 @@ export default function Navbar() {
                             Dashboard
                         </p>
 
-                        <a
-                            href="mailto:support@genesoftai.com"
+                        <button
+                            onClick={handleSupportClick}
                             className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
                             Support
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                        </a>
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                router.push("/subscription");
+                            }}
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                        >
+                            Pricing
+                        </button>
                     </div>
                 </div>
 
@@ -253,13 +332,15 @@ export default function Navbar() {
                                 >
                                     Dashboard
                                 </Link>
-                                <a
-                                    href="mailto:support@genesoftai.com"
-                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                                <button
+                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center text-left"
+                                    onClick={(e) => {
+                                        handleSupportClick(e);
+                                        setIsOpen(false);
+                                    }}
                                 >
                                     Support
-                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                                </a>
+                                </button>
                             </div>
 
                             {userEmail ? (
@@ -305,6 +386,100 @@ export default function Navbar() {
                     </SheetContent>
                 </Sheet>
             </div>
+
+            <AlertDialog
+                open={supportDialogOpen}
+                onOpenChange={setSupportDialogOpen}
+            >
+                <AlertDialogContent className="bg-tertiary-dark border-line-in-dark-bg">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-white">
+                            Get Support
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-subtext-in-dark-bg">
+                            Please provide your details and we'll get back to
+                            you as soon as possible.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label
+                                htmlFor="support-email"
+                                className="text-white"
+                            >
+                                Your Email
+                            </Label>
+                            <Input
+                                id="support-email"
+                                placeholder="email@example.com"
+                                className="bg-secondary-dark border-line-in-dark-bg text-white"
+                                value={supportEmail}
+                                onChange={(e) =>
+                                    setSupportEmail(e.target.value)
+                                }
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label
+                                htmlFor="support-query"
+                                className="text-white"
+                            >
+                                How can we help you?
+                            </Label>
+                            <Textarea
+                                id="support-query"
+                                placeholder="Describe your question, issue, or feature request in detail..."
+                                className="min-h-[120px] bg-secondary-dark border-line-in-dark-bg text-white"
+                                value={supportQuery}
+                                onChange={(e) =>
+                                    setSupportQuery(e.target.value)
+                                }
+                            />
+                        </div>
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-secondary-dark text-white hover:bg-secondary-dark/80 border-line-in-dark-bg">
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleSupportSubmit}
+                            className="bg-genesoft hover:bg-genesoft/90 text-white"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <span className="flex items-center">
+                                    <svg
+                                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Sending...
+                                </span>
+                            ) : (
+                                <span className="flex items-center">
+                                    <Send className="mr-2 h-4 w-4" />
+                                    Submit
+                                </span>
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </nav>
     );
 }

@@ -34,7 +34,6 @@ import { uploadFileFree } from "@/actions/file";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -42,6 +41,12 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { getMonthlySprintsWithSubscription } from "@/actions/development";
+import { useGenesoftOrganizationStore } from "@/stores/organization-store";
+import { getOrganizationById } from "@/actions/organization";
+import { SubscriptionLookupKey } from "@/constants/subscription";
+import { useRouter } from "next/navigation";
+import { nextAppBaseUrl } from "@/constants/web";
 
 export type SprintOption = {
     id: string;
@@ -106,6 +111,9 @@ const Conversation: React.FC<ConversationProps> = ({
     const [fileId, setFileId] = useState<string>("");
     const [isSendingImageWithMessage, setIsSendingImageWithMessage] =
         useState<boolean>(false);
+    const [monthlySprints, setMonthlySprints] = useState<object>({});
+    const { id: organizationId } = useGenesoftOrganizationStore();
+    const router = useRouter();
 
     const { id: projectId } = useProjectStore();
     const {
@@ -118,6 +126,7 @@ const Conversation: React.FC<ConversationProps> = ({
     useEffect(() => {
         if (initialMessages.length > 0) {
             setMessages(initialMessages);
+            setupMonthlySprints();
         }
     }, [initialMessages]);
 
@@ -180,11 +189,22 @@ const Conversation: React.FC<ConversationProps> = ({
         setIsLoadingSubmitConversation(true);
         try {
             await submitConversation(conversationId, sprintName);
+            setupMonthlySprints();
         } catch (error) {
-            console.error("Error submitting conversation:", error);
-            setErrorStartSprint(
-                "Something went wrong, Please try again later or contact support@genesoftai.com",
-            );
+            if (
+                error instanceof Error &&
+                error.message ===
+                    "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue."
+            ) {
+                setErrorStartSprint(
+                    "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue.",
+                );
+            } else {
+                console.error("Error submitting conversation:", error);
+                setErrorStartSprint(
+                    "Something went wrong, Please try again later or contact support@genesoftai.com",
+                );
+            }
         } finally {
             setIsLoadingSubmitConversation(false);
             if (onSubmitConversation) {
@@ -305,6 +325,62 @@ const Conversation: React.FC<ConversationProps> = ({
     const handleImagePreview = (imageUrl: string) => {
         console.log("Opening image preview:", imageUrl);
         setPreviewImage(imageUrl);
+    };
+
+    useEffect(() => {
+        setupMonthlySprints();
+    }, []);
+
+    const setupMonthlySprints = async () => {
+        const response =
+            await getMonthlySprintsWithSubscription(organizationId);
+        if (response) {
+            setMonthlySprints(response);
+            if (response.remaining === 0) {
+                setErrorStartSprint(
+                    "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue.",
+                );
+            }
+        }
+    };
+
+    const handleSubscription = async () => {
+        const organization = await getOrganizationById(organizationId);
+
+        console.log({
+            message: "Organization",
+            organization,
+        });
+
+        if (organization.customer_id) {
+            const response = await fetch(
+                `${nextAppBaseUrl}/api/stripe/create-portal-session`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        customer_id: organization.customer_id,
+                    }),
+                },
+            );
+            const data = await response.json();
+            router.push(data.url);
+        } else {
+            const response = await fetch(
+                `${nextAppBaseUrl}/api/stripe/create-checkout-session`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        customer_email: userEmail,
+                        lookup_key: SubscriptionLookupKey.Startup,
+                        organization_id: organizationId,
+                        organization_name: organization.name,
+                    }),
+                },
+            );
+            const data = await response.json();
+            console.log({ message: "Stripe checkout session", data });
+            router.push(data.url);
+        }
     };
 
     console.log({
@@ -580,10 +656,31 @@ const Conversation: React.FC<ConversationProps> = ({
                             <div
                                 className={`flex flex-col items-center gap-3 mt-2 bg-[#1e2124] p-3 rounded-lg border border-[#383838]/50 relative z-0`}
                             >
+                                <div className="flex items-center justify-center bg-gradient-to-r from-[#2a2d32] to-[#1e2124] px-3 py-1.5 rounded-full shadow-inner">
+                                    <span className="text-gray-400 text-xs font-medium flex items-center gap-1.5">
+                                        <CircleCheck
+                                            size={12}
+                                            className="text-blue-400"
+                                        />
+                                        Usage:
+                                        <span className="text-white font-semibold">
+                                            {monthlySprints?.count || 0}
+                                        </span>
+                                        <span className="text-gray-500">/</span>
+                                        <span className="text-white font-semibold">
+                                            {(monthlySprints?.count || 0) +
+                                                (monthlySprints?.remaining ||
+                                                    0)}
+                                        </span>
+                                        <span className="text-blue-400 font-medium ml-0.5">
+                                            Sprints
+                                        </span>
+                                    </span>
+                                </div>
                                 <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
                                     <div className="flex flex-col gap-1.5 w-full">
-                                        <Label className="text-gray-300 text-xs font-medium">
-                                            Sprint name
+                                        <Label className="text-gray-300 text-xs font-medium flex items-center gap-2">
+                                            <span>Sprint name</span>
                                         </Label>
                                         <Input
                                             value={sprintName}
@@ -616,8 +713,20 @@ const Conversation: React.FC<ConversationProps> = ({
                                 </div>
 
                                 {errorStartSprint ? (
-                                    <div className="px-2 py-1 text-sm text-red-400 bg-red-500/10 rounded-md w-full">
-                                        {errorStartSprint}
+                                    <div className="px-2 py-1 text-sm text-red-400 bg-red-500/10 rounded-md w-full flex flex-col gap-2">
+                                        <span className="text-red-400">
+                                            {errorStartSprint}
+                                        </span>
+                                        {errorStartSprint ===
+                                            "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue." && (
+                                            <Button
+                                                variant="link"
+                                                className="bg-genesoft text-white hover:bg-genesoft/80 w-fit self-center"
+                                                onClick={handleSubscription}
+                                            >
+                                                Upgrade to a startup plan
+                                            </Button>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="px-2 py-1 text-xs md:text-sm text-gray-400 italic w-full">

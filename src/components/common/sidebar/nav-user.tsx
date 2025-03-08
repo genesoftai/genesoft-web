@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { CalendarCheck, ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,6 +26,11 @@ import posthog from "posthog-js";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
+import { getUserByEmail } from "@/actions/user";
+import { SubscriptionLookupKey } from "@/constants/subscription";
+import { nextAppBaseUrl } from "@/constants/web";
+import { getOrganizationById } from "@/actions/organization";
+import { useProjectStore } from "@/stores/project-store";
 
 type UserData = { user: User } | { user: null };
 
@@ -36,8 +41,13 @@ export function NavUser() {
     const [userData, setUserData] = useState<UserData>();
     const { updateUser, clearUserStore } = useUserStore();
     const { clearGenesoftUserStore } = useGenesoftUserStore();
-    const { clearGenesoftOrganizationStore } = useGenesoftOrganizationStore();
+    const {
+        id: organization_id,
+        name: organization_name,
+        clearGenesoftOrganizationStore,
+    } = useGenesoftOrganizationStore();
     const { clearCreateProjectStore } = useCreateProjectStore();
+    const { clearProjectStore } = useProjectStore();
     const router = useRouter();
 
     useEffect(() => {
@@ -76,8 +86,47 @@ export function NavUser() {
         clearGenesoftUserStore();
         clearGenesoftOrganizationStore();
         clearCreateProjectStore();
+        clearProjectStore();
         await supabase.auth.signOut();
         router.push("/");
+    };
+
+    const handleSubscription = async () => {
+        const { data: userData } = await supabase.auth.getUser();
+        const user = await getUserByEmail({
+            email: userData?.user?.email ?? "",
+        });
+        const organization = await getOrganizationById(organization_id);
+
+        if (organization.customer_id) {
+            const response = await fetch(
+                `${nextAppBaseUrl}/api/stripe/create-portal-session`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        customer_id: organization.customer_id,
+                    }),
+                },
+            );
+            const data = await response.json();
+            router.push(data.url);
+        } else {
+            const response = await fetch(
+                `${nextAppBaseUrl}/api/stripe/create-checkout-session`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        customer_email: user.email,
+                        lookup_key: SubscriptionLookupKey.Startup,
+                        organization_id: organization_id,
+                        organization_name: organization_name,
+                    }),
+                },
+            );
+            const data = await response.json();
+            console.log({ message: "Stripe checkout session", data });
+            router.push(data.url);
+        }
     };
 
     return (
@@ -148,6 +197,14 @@ export function NavUser() {
                                 </div>
                             </div>
                         </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-tertiary-dark" />
+                        <DropdownMenuItem
+                            className="cursor-pointer focus:bg-genesoft focus:text-white text-white"
+                            onClick={handleSubscription}
+                        >
+                            <CalendarCheck className="mr-2 h-4 w-4" />
+                            <span>Subscription</span>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-tertiary-dark" />
                         {/* <DropdownMenuGroup>
                             <DropdownMenuItem className="text-white hover:bg-secondary-dark">
