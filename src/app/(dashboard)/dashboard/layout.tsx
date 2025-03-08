@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-import React from "react";
+import React, { Suspense } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/common/sidebar/app-sidebar";
 import { PostHogProvider } from "@/app/posthog-provider";
+import PageLoading from "@/components/common/PageLoading";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -37,7 +38,17 @@ export default function RootLayout({
                     <SidebarProvider>
                         <AppSidebar />
                         <main className="w-full">
-                            <SidebarInset>{children}</SidebarInset>
+                            <Suspense
+                                fallback={
+                                    <PageLoading
+                                        size={30}
+                                        text={"Loading information..."}
+                                        color="#2563EB"
+                                    />
+                                }
+                            >
+                                <SidebarInset>{children}</SidebarInset>
+                            </Suspense>
                         </main>
                     </SidebarProvider>
                 </body>

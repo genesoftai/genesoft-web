@@ -19,6 +19,7 @@ import { SubscriptionLookupKey } from "@/constants/subscription";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { getMonthlySprintsWithSubscription } from "@/actions/development";
 import { getOrganizationById } from "@/actions/organization";
+import { MonthlySprint } from "@/types/subscription";
 
 type PricingTier = {
     name: string;
@@ -119,7 +120,13 @@ export default function Subscription() {
     const { id: user_id, email: userEmail } = useGenesoftUserStore();
     const { id: organization_id, name: organization_name } =
         useGenesoftOrganizationStore();
-    const [monthlySprints, setMonthlySprints] = useState({});
+    const [monthlySprints, setMonthlySprints] = useState<MonthlySprint>({
+        iterations: [],
+        count: 0,
+        exceeded: false,
+        tier: "",
+        remaining: 0,
+    });
 
     useEffect(() => {
         if (user_id && organization_id) {
