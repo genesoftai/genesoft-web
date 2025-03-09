@@ -126,7 +126,11 @@ export default function Navbar() {
 
     const handleGoToDashboard = () => {
         if (userEmail) {
-            router.push(`/dashboard/project/manage/${projectId}`);
+            if (projectId) {
+                router.push(`/dashboard/project/manage/${projectId}`);
+            } else {
+                router.push(`/dashboard`);
+            }
         } else {
             posthog.capture("click_dashboard_from_navbar_but_not_logged_in");
             router.push("/signin");
