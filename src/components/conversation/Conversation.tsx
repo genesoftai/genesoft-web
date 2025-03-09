@@ -688,50 +688,68 @@ const Conversation: React.FC<ConversationProps> = ({
                                         </span>
                                     </span>
                                 </div>
-                                <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
-                                    <div className="flex flex-col gap-1.5 w-full">
-                                        <Label className="text-gray-300 text-xs font-medium flex items-center gap-2">
-                                            <span>Sprint name</span>
-                                        </Label>
-                                        <Input
-                                            value={sprintName}
-                                            onChange={(e) =>
-                                                setSprintName(e.target.value)
-                                            }
-                                            placeholder="Enter sprint name to help you remember conversation ..."
-                                            className="text-xs md:text-sm w-full bg-[#2b2d31] border-[#383838] focus:border-[#1e62d0] text-white placeholder:text-gray-500 transition-colors"
-                                        />
-                                    </div>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="bg-[#1e62d0] text-white hover:bg-[#1a56b8] hover:text-white w-fit h-10 px-4 rounded-md shadow-md transition-all duration-200 flex items-center gap-2 mt-6"
-                                        onClick={handleSubmitConversation}
-                                        disabled={isLoadingSubmitConversation}
-                                    >
-                                        {monthlySprints?.remaining <= 0 ? (
-                                            <Button
-                                                variant="link"
-                                                className="bg-genesoft text-white hover:bg-genesoft/80 w-fit self-center"
-                                                onClick={handleSubscription}
-                                            >
-                                                Upgrade to a startup plan
-                                            </Button>
-                                        ) : (
+                                {monthlySprints?.remaining <= 0 ? (
+                                    <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <Label className="text-red-400 text-xs font-medium flex items-center gap-2">
+                                                <span>
+                                                    You have exceeded the
+                                                    maximum number of sprints
+                                                    for free tier. Please
+                                                    upgrade to a startup plan to
+                                                    continue.
+                                                </span>
+                                            </Label>
+                                        </div>
+                                        <Button
+                                            variant="link"
+                                            className="bg-genesoft text-white hover:bg-genesoft/80 w-fit self-center"
+                                            onClick={handleSubscription}
+                                        >
+                                            Upgrade to a startup plan
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <Label className="text-gray-300 text-xs font-medium flex items-center gap-2">
+                                                <span>Sprint name</span>
+                                            </Label>
+                                            <Input
+                                                value={sprintName}
+                                                onChange={(e) =>
+                                                    setSprintName(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                placeholder="Enter sprint name to help you remember conversation ..."
+                                                className="text-xs md:text-sm w-full bg-[#2b2d31] border-[#383838] focus:border-[#1e62d0] text-white placeholder:text-gray-500 transition-colors"
+                                            />
+                                        </div>
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="bg-[#1e62d0] text-white hover:bg-[#1a56b8] hover:text-white w-fit h-10 px-4 rounded-md shadow-md transition-all duration-200 flex items-center gap-2 mt-6"
+                                            onClick={handleSubmitConversation}
+                                            disabled={
+                                                isLoadingSubmitConversation
+                                            }
+                                        >
                                             <span className="text-xs md:text-sm font-medium">
                                                 {isLoadingSubmitConversation
                                                     ? "Starting Sprint..."
                                                     : "Start Sprint"}
                                             </span>
-                                        )}
-                                        {isLoadingSubmitConversation ? (
-                                            <Loader2 className="h-4 w-4 animate-spin ml-1" />
-                                        ) : (
-                                            <CircleCheck className="h-4 w-4 ml-1" />
-                                        )}
-                                    </Button>
-                                </div>
+                                            {isLoadingSubmitConversation ? (
+                                                <Loader2 className="h-4 w-4 animate-spin ml-1" />
+                                            ) : (
+                                                <CircleCheck className="h-4 w-4 ml-1" />
+                                            )}
+                                        </Button>
+                                    </div>
+                                )}
 
                                 {errorStartSprint ? (
                                     <div className="px-2 py-1 text-sm text-red-400 bg-red-500/10 rounded-md w-full flex flex-col gap-2">
