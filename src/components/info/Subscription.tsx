@@ -280,13 +280,15 @@ export default function Subscription() {
                                     onClick={() => handleButtonClick(tier.name)}
                                 >
                                     {isLoggedIn && monthlySprints?.tier
-                                        ? monthlySprints?.tier === "startup" &&
-                                          tier.name === "Startup Tier"
-                                            ? "Manage Subscription"
-                                            : monthlySprints?.tier === "free" &&
-                                                tier.name === "Free Tier"
-                                              ? "Manage Subscription"
-                                              : "Downgrade"
+                                        ? tier.name === "Startup Tier"
+                                            ? monthlySprints?.tier === "startup"
+                                                ? "Manage Subscription"
+                                                : "Upgrade"
+                                            : tier.name === "Free Tier"
+                                              ? monthlySprints?.tier === "free"
+                                                  ? "Manage Subscription"
+                                                  : "Downgrade"
+                                              : tier.buttonText
                                         : tier.buttonText}
                                 </Button>
                             </CardFooter>
