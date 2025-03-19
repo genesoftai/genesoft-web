@@ -63,6 +63,34 @@ export async function getConversationById(conversationId: string) {
     }
 }
 
+export async function getActiveConversationByProjectId(projectId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/project/${projectId}/active`;
+
+    console.log({
+        message: "getActiveConversationByProjectId",
+        projectId,
+        url,
+    });
+
+    try {
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error(
+            "Error getting active conversation by project id:",
+            error,
+        );
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error("Failed to get active conversation by project id");
+    }
+}
+
 export async function getActiveConversationByPageId(pageId: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/conversation/page/${pageId}/active`;
 
@@ -169,16 +197,12 @@ export async function talkToProjectManager(payload: TalkToProjectManagerDto) {
     }
 }
 
-export async function submitConversation(
-    conversation_id: string,
-    name: string,
-) {
+export async function submitConversation(conversation_id: string) {
     const url = `${genesoftCoreApiServiceBaseUrl}/conversation/submit`;
 
     console.log({
         message: "submitConversation",
         conversation_id,
-        name,
         url,
     });
 
@@ -187,7 +211,6 @@ export async function submitConversation(
             url,
             {
                 conversation_id,
-                name,
             },
             {
                 headers: {
@@ -234,6 +257,65 @@ export async function getLatestActiveConversationByProjectId(
         }
         throw new Error(
             "Failed to get latest active conversation by project id",
+        );
+    }
+}
+
+export async function getConversationsByProjectId(projectId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/project/${projectId}`;
+
+    console.log({
+        message: "getConversationsByProjectId",
+        projectId,
+        url,
+    });
+
+    try {
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+
+        return res.data;
+    } catch (error) {
+        console.error("Error getting conversations by project id:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error("Failed to get conversations by project id");
+    }
+}
+
+export async function getConversationsWithIterationsByProjectId(
+    projectId: string,
+) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/project/${projectId}/iterations`;
+
+    console.log({
+        message: "getConversationsWithIterationsByProjectId",
+        projectId,
+        url,
+    });
+
+    try {
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+
+        return res.data;
+    } catch (error) {
+        console.error(
+            "Error getting conversations with iterations by project id:",
+            error,
+        );
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error(
+            "Failed to get conversations with iterations by project id",
         );
     }
 }

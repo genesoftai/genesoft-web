@@ -17,17 +17,16 @@ import {
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import posthog from "posthog-js";
-import OnboardingForm from "./OnboardingForm";
 import { getOrganizationById } from "@/actions/organization";
 import PlayWithMeUsage from "@public/image/genesoft-usage/play-with-me-usage.png";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { useProjectStore } from "@/stores/project-store";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 import { createProjectFromOnboarding, getProjectById } from "@/actions/project";
-import { useChannelStore } from "@/stores/channel-store";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 
 import Showcases from "./Showcases";
+import ProjectCreationBox from "../project/ProjectCreationBox";
 
 const StreamingText = ({
     text,
@@ -60,34 +59,19 @@ const StreamingText = ({
 export default function LandingPage() {
     const router = useRouter();
     const [heroStage, setHeroStage] = useState(0);
-    const [showOnboarding, setShowOnboarding] = useState(false);
     const { id: user_id } = useGenesoftUserStore();
-    const { id: projectId } = useProjectStore();
     const {
         is_onboarding,
-        name: projectName,
         description: projectDescription,
         branding: projectBranding,
         clearCreateProjectStore,
     } = useCreateProjectStore();
-    const { id: organizationId } = useGenesoftOrganizationStore();
     const [
         isCreatingProjectFromOnboarding,
         setIsCreatingProjectFromOnboarding,
     ] = useState(false);
     const { updateProjectStore } = useProjectStore();
-    const { updateChannelStore } = useChannelStore();
     const { updateGenesoftOrganization } = useGenesoftOrganizationStore();
-    // const heroContent = [
-    //     "Software development team for your startup in the AI Agent era",
-    //     "Transform business idea into reality with our AI agents",
-    // ];
-
-    // ! quite like this version actually
-    // const heroContent = [
-    //     "Don't let your potential business idea to go to waste, build it with the cost of air",
-    //     "Let our AI agents build your web application for your business idea",
-    // ];
 
     const heroContent = [
         "Push your idea to the world in minutes",
@@ -97,23 +81,32 @@ export default function LandingPage() {
     const nextStage = () => {
         setHeroStage((prev) => prev + 1);
     };
-    const handleStartNow = async () => {
-        posthog.capture("click_start_now_from_landing_page");
-        if (organizationId) {
-            if (organizationId && projectId) {
-                router.push(`/dashboard/project/manage/${projectId}`);
-            } else {
-                setShowOnboarding(true);
-            }
-        } else {
-            setShowOnboarding(true);
-        }
-    };
 
-    const handleOnboardingComplete = () => {
+    const handleOnboardingComplete = ({
+        description,
+        logo,
+        color,
+    }: {
+        description: string;
+        logo?: string;
+        color?: string;
+    }) => {
+        console.log({
+            message: "onboarding complete",
+            data: {
+                description,
+                logo,
+                color,
+            },
+        });
+
         if (user_id) {
             posthog.capture("onboarding_complete_from_landing_page");
-            setShowOnboarding(false);
+            handleCreateProjectFromOnboarding({
+                description,
+                logo,
+                color,
+            });
             setIsCreatingProjectFromOnboarding(true);
         } else {
             posthog.capture("onboarding_complete_from_landing_page");
@@ -121,18 +114,24 @@ export default function LandingPage() {
         }
     };
 
-    const handleCreateProjectFromOnboarding = async () => {
+    const handleCreateProjectFromOnboarding = async ({
+        description,
+        logo,
+        color,
+    }: {
+        description: string;
+        logo?: string;
+        color?: string;
+    }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
-        let pageId = "";
         try {
             const res = await createProjectFromOnboarding({
                 user_id: user_id,
-                project_name: projectName,
-                project_description: projectDescription,
+                project_description: description,
                 branding: {
-                    logo_url: projectBranding?.logo_url,
-                    color: projectBranding?.color,
+                    logo_url: logo,
+                    color: color,
                 },
             });
             if (res.error) {
@@ -140,19 +139,15 @@ export default function LandingPage() {
                     "landing_page_create_project_from_onboarding_failed",
                 );
                 console.error(res.error);
+                alert("Failed to create project, Please try again.");
             } else {
                 clearCreateProjectStore();
                 projectId = res.project.id;
-                pageId = res.page.id;
                 const projectInfo = await getProjectById(projectId);
                 const organizationInfo = await getOrganizationById(
                     projectInfo.organization_id,
                 );
                 updateProjectStore(projectInfo);
-                updateChannelStore({
-                    id: res.page.id,
-                    category: "page",
-                });
                 updateGenesoftOrganization({
                     id: organizationInfo.id,
                     name: organizationInfo.name,
@@ -169,25 +164,23 @@ export default function LandingPage() {
                 "landing_page_create_project_from_onboarding_failed",
             );
         } finally {
-            router.push(
-                `/dashboard/project/manage/${projectId}/pages/${pageId}`,
-            );
+            if (projectId) {
+                router.push(`/dashboard/project/${projectId}/ai-agent`);
+            }
             setIsCreatingProjectFromOnboarding(false);
         }
     };
 
     useEffect(() => {
-        if (is_onboarding && user_id && projectName && projectDescription) {
+        if (is_onboarding && user_id && projectDescription) {
             posthog.capture("landing_page_viewed_after_onboarding");
-            handleCreateProjectFromOnboarding();
+            handleCreateProjectFromOnboarding({
+                description: projectDescription,
+                logo: projectBranding?.logo_url,
+                color: projectBranding?.color,
+            });
         }
-    }, [
-        is_onboarding,
-        user_id,
-        projectName,
-        projectDescription,
-        projectBranding,
-    ]);
+    }, [is_onboarding, user_id, projectDescription]);
 
     return (
         <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg">
@@ -204,8 +197,8 @@ export default function LandingPage() {
                         <div className="inline-flex items-center bg-tertiary-dark rounded-full px-4 py-2 mb-8 border border-line-in-dark-bg">
                             <Sparkles className="h-4 w-4 mr-2 text-genesoft" />
                             <span className="text-sm">
-                                AI Agents workspace to build app for small
-                                business and startup
+                                AI Agents workspace to build app for
+                                non-technical product owner
                             </span>
                         </div>
 
@@ -224,36 +217,38 @@ export default function LandingPage() {
                             {heroContent[1]}
                         </p>
 
-                        {/* Onboarding component */}
-                        <div className="mb-16">
-                            {showOnboarding ? (
-                                <OnboardingForm
-                                    onComplete={handleOnboardingComplete}
-                                />
-                            ) : (
-                                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                                    {isCreatingProjectFromOnboarding ? (
-                                        <Button
-                                            className="w-64 md:w-auto px-8 py-6 text-base md:text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
-                                            onClick={handleStartNow}
-                                        >
-                                            <span>
-                                                Genesoft is building your
-                                                project
-                                            </span>
-                                            <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            className="w-64 md:w-auto px-8 py-6 text-base md:text-lg bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
-                                            onClick={handleStartNow}
-                                        >
-                                            Build your business idea
-                                        </Button>
-                                    )}
+                        {!isCreatingProjectFromOnboarding ? (
+                            <ProjectCreationBox
+                                onComplete={handleOnboardingComplete}
+                                initialValues={{
+                                    description: projectDescription,
+                                    logo: projectBranding?.logo_url,
+                                    color: projectBranding?.color,
+                                }}
+                            />
+                        ) : (
+                            <div className="mb-16">
+                                <div className="flex flex-col items-center justify-center">
+                                    <div className="bg-genesoft/10 border border-genesoft/30 rounded-xl p-6 max-w-md text-center">
+                                        <div className="flex items-center justify-center mb-4">
+                                            <Loader2 className="w-8 h-8 text-genesoft animate-spin mr-3" />
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-white mb-2">
+                                            Your Project Is Being Created
+                                        </h3>
+                                        <p className="text-subtext-in-dark-bg/90">
+                                            Genesoft is building your project.
+                                            This may take a moment as we set up
+                                            everything for you.
+                                        </p>
+                                        <div className="mt-4 text-genesoft text-sm">
+                                            Please wait while we prepare your
+                                            workspace...
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="relative max-w-4xl mx-auto">

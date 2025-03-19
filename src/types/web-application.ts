@@ -22,7 +22,7 @@ export interface RepositoryBuild {
     project_id: string;
     iteration_id: string;
     type: "web";
-    status: "pending" | "in_progress" | "deployed" | "failed";
+    status: "pending" | "in_progress" | "deployed" | "failed" | "done";
     error_logs: string;
     fix_attempts: number;
     fix_triggered: boolean;

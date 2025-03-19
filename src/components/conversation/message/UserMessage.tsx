@@ -49,7 +49,13 @@ const UserMessage = ({ message }: { message: Message }) => {
                         <img
                             src={message.files?.[0]?.url}
                             alt="Image Message"
-                            className="max-h-64 rounded-md"
+                            className="max-h-64 rounded-md cursor-pointer"
+                            onClick={() => {
+                                window.open(
+                                    message.files?.[0]?.url || "",
+                                    "_blank",
+                                );
+                            }}
                         />
                         {message.content && (
                             <p className="mt-2 text-gray-300 text-sm break-words whitespace-pre-wrap">

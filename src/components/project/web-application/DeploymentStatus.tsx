@@ -44,7 +44,7 @@ export function DeploymentStatusBadge({ readyStatus }: DeploymentStatusProps) {
     return (
         <div>
             <div
-                className={`flex items-center gap-2 text-sm ${bgColor} px-3 py-1 rounded-full w-fit`}
+                className={`flex items-center gap-2 text-sm ${bgColor} px-3 py-1 rounded-full w-fit text-white`}
             >
                 {readyStatus === ReadyStatus.BUILDING && (
                     <Loader2 className="h-4 w-4 animate-spin" />

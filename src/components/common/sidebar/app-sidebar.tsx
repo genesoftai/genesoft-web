@@ -138,7 +138,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="#">
+                            <a href="/dashboard/organization/info">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary-dark text-white">
                                     <Building className="size-4" />
                                 </div>
@@ -161,12 +161,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </div>
                             </a>
                         </SidebarMenuButton>
-
-                        <div className="flex items-center cursor-pointer text-xs my-4">
-                            <ChevronLeft className="size-4" />
-                            <SidebarTrigger />
-                            <p>{"close sidebar"}</p>
-                        </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>

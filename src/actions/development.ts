@@ -105,3 +105,33 @@ export const getMonthlySprintsWithSubscription = async (
         throw new Error("Failed to get monthly sprints with subscription");
     }
 };
+
+export const getIterationById = async (iterationId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/development/iteration/${iterationId}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error getting iteration by id:", error);
+        throw new Error("Failed to get iteration by id");
+    }
+};
+
+export const getLatestDeployment = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/frontend-infra/vercel-deployment/${projectId}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error getting latest deployment:", error);
+        throw new Error("Failed to get latest deployment");
+    }
+};
