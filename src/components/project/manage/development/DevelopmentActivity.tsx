@@ -43,7 +43,7 @@ const DevelopmentActivity = ({
                 </div>
                 {pollingCount > 0 && (
                     <span className="text-xs text-gray-400 animate-pulse">
-                        (next update in {5 - (pollingCount % 5)}s)
+                        (next update in {10 - (pollingCount % 10)}s)
                     </span>
                 )}
             </div>

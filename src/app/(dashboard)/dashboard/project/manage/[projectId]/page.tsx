@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SimpleLoading from "@/components/common/SimpleLoading";
 import {
     Breadcrumb,
@@ -19,7 +19,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { WebPreview } from "@/components/project/manage/WebPreview";
 import EditProjectInfoDialog from "@/components/project/manage/EditProjectInfoDialog";
 import { Label } from "@/components/ui/label";
 import { useParams } from "next/navigation";
@@ -30,8 +29,9 @@ import { useProjectStore } from "@/stores/project-store";
 import { getOrganizationById } from "@/actions/organization";
 import { GenesoftOrganization } from "@/types/organization";
 import Image from "next/image";
-import ProjectPages from "@/components/project/pages/ProjectPages";
-import ProjectFeatures from "@/components/project/features/ProjectFeatures";
+import WebApplication from "@/components/project/web-application/WebApplication";
+import { getWebApplicationInfo } from "@/actions/web-application";
+import { WebApplicationInfo } from "@/types/web-application";
 
 const pageName = "ManageProjectPage";
 
@@ -40,6 +40,10 @@ export default function ManageProjectPage() {
     const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [project, setProject] = useState<Project | null>(null);
+    const [webApplicationInfo, setWebApplicationInfo] =
+        useState<WebApplicationInfo | null>(null);
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
 
     const [projectId, setProjectId] = useState<string>("");
     const { updateGenesoftUser } = useGenesoftUserStore();
@@ -80,6 +84,37 @@ export default function ManageProjectPage() {
     const setupOrganization = async (organizationId: string) => {
         const organizationData = await getOrganizationById(organizationId);
         setOrganization(organizationData);
+    };
+
+    const fetchLatestData = async () => {
+        console.log("fetchLatestData", project?.id);
+        if (!project?.id) return;
+
+        try {
+            const webAppInfo = await getWebApplicationInfo(project?.id);
+
+            setWebApplicationInfo(webAppInfo);
+        } catch (error) {
+            console.error("Error fetching latest data:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (project?.id) {
+            fetchLatestData();
+        }
+    }, [project?.id]);
+
+    const refreshIframe = () => {
+        if (iframeRef.current) {
+            iframeRef.current.src = iframeRef.current.src;
+        }
+    };
+
+    const handleRefresh = () => {
+        setWebApplicationInfo(null);
+        refreshIframe();
+        fetchLatestData();
     };
 
     console.log({
@@ -195,11 +230,16 @@ export default function ManageProjectPage() {
                         </Card>
                     </div>
 
-                    <WebPreview project={project} onPage="manage-project" />
-
-                    <ProjectPages projectId={projectId} />
-
-                    <ProjectFeatures projectId={projectId} />
+                    <WebApplication
+                        webApplicationInfo={webApplicationInfo}
+                        onPage="manage-project"
+                        viewMode={viewMode}
+                        handleRefresh={handleRefresh}
+                        setViewMode={setViewMode}
+                        iframeRef={
+                            iframeRef as React.RefObject<HTMLIFrameElement>
+                        }
+                    />
                 </div>
             </div>
 
