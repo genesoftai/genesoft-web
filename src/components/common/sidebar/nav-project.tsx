@@ -18,19 +18,9 @@ export function NavProject() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
-    console.log({
-        message: "NavProject: branding",
-        branding,
-    });
-
     if (!id) {
         return null;
     }
-
-    console.log({
-        message: "NavProject: branding",
-        branding,
-    });
 
     return (
         <SidebarGroup>

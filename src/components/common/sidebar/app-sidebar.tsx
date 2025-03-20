@@ -115,10 +115,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         tier: "",
         remaining: 0,
     });
-    console.log({
-        message: "AppSidebar",
-        project_id,
-    });
 
     useEffect(() => {
         const fetchMonthlySprints = async () => {

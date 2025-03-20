@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Sheet,
     SheetContent,
@@ -6,14 +6,16 @@ import {
     SheetHeader,
     SheetTitle,
     SheetTrigger,
-    SheetFooter,
-    SheetClose,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
 import StripeSection from "./StripeSection";
 import FirebaseSection from "./FirebaseSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getStripeEnvs } from "@/actions/integration";
+import { getFirebaseEnvs } from "@/actions/integration";
+import { useProjectStore } from "@/stores/project-store";
+import { FirebaseEnv, StripeEnv } from "@/types/integration";
 
 interface ServicesIntegrationSheetProps {
     isOpen: boolean;
@@ -24,6 +26,24 @@ export const ServicesIntegrationSheet = ({
     isOpen,
     onOpenChange,
 }: ServicesIntegrationSheetProps) => {
+    const [stripeEnv, setStripeEnv] = useState<StripeEnv | null>(null);
+    const [firebaseEnv, setFirebaseEnv] = useState<FirebaseEnv | null>(null);
+
+    const { id: projectId } = useProjectStore();
+
+    useEffect(() => {
+        if (projectId) {
+            setupIntegration();
+        }
+    }, [projectId]);
+
+    const setupIntegration = async () => {
+        const stripeEnv = await getStripeEnvs(projectId);
+        const firebaseEnv = await getFirebaseEnvs(projectId);
+        setStripeEnv(stripeEnv);
+        setFirebaseEnv(firebaseEnv);
+    };
+
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
             <SheetTrigger asChild>
@@ -54,18 +74,16 @@ export const ServicesIntegrationSheet = ({
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                     <div className="py-6 space-y-6">
-                        <FirebaseSection />
-                        <StripeSection />
+                        <FirebaseSection
+                            projectId={projectId}
+                            firebaseEnv={firebaseEnv as FirebaseEnv}
+                        />
+                        <StripeSection
+                            projectId={projectId}
+                            stripeEnv={stripeEnv as StripeEnv}
+                        />
                     </div>
                 </ScrollArea>
-
-                <SheetFooter>
-                    <SheetClose asChild>
-                        <Button className="bg-genesoft hover:bg-genesoft/90 text-white text-sm">
-                            Save Changes
-                        </Button>
-                    </SheetClose>
-                </SheetFooter>
             </SheetContent>
         </Sheet>
     );
