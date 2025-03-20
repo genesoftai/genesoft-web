@@ -1,4 +1,4 @@
-import { ExternalLink, Globe } from "lucide-react";
+import { ExternalLink, Globe, Loader2 } from "lucide-react";
 import { Smartphone } from "lucide-react";
 import { Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -83,14 +83,19 @@ const WebApplication = ({
                     ></iframe>
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-primary-dark/40 to-primary-dark/60 rounded-b-lg border border-white/10">
-                    <div className="p-6 rounded-xl bg-black/30 border border-white/5 flex flex-col items-center gap-3">
-                        <Globe className="h-10 w-10 text-gray-500 opacity-50" />
-                        <p className="text-gray-400 text-center text-sm sm:text-base">
-                            No preview available yet
+                <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-space-pattern animate-fade bg-cover"></div>
+                    <div className="p-6 rounded-xl bg-black/60 border border-white/5 flex flex-col items-center gap-3 shadow-lg transform transition-transform duration-500 hover:scale-105">
+                        <Globe className="h-10 w-10 text-blue-300 animate-pulse" />
+                        <p className="text-white text-center text-sm sm:text-base">
+                            Deploying your latest version of web application...
                         </p>
-                        <div className="text-xs text-gray-500 max-w-[250px] text-center mt-1">
-                            Your web application will appear here once deployed
+                        <div className="text-xs text-gray-300 max-w-[250px] text-center mt-1">
+                            Please hold on while we prepare your application for
+                            viewing.
+                        </div>
+                        <div className="mt-4">
+                            <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
                         </div>
                     </div>
                 </div>

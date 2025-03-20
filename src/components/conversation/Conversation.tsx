@@ -479,7 +479,7 @@ const Conversation: React.FC<ConversationProps> = ({
             interval = setInterval(() => {
                 fetchLatestData();
                 setPollingCount((prev) => prev + 1);
-            }, 5000);
+            }, 10000);
         }
 
         return () => {
