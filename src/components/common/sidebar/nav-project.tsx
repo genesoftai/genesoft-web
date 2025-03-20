@@ -1,44 +1,32 @@
 "use client";
 
 import {
-    ChevronRight,
-    Files,
-    Layers,
     Loader2,
     ScanEye,
     Info,
+    Database,
+    Users,
+    CloudUpload,
 } from "lucide-react";
 import React, { useState } from "react";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarMenu,
-    SidebarMenuAction,
     SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { AddPageDialog } from "@/components/project/pages/AddPageDialog";
 import { AddFeatureDialog } from "@/components/project/features/AddFeatureDialog";
-import { Feature, Page } from "@/types/project";
+import { Feature } from "@/types/project";
 import { useChannelStore } from "@/stores/channel-store";
 import { sleep } from "@/utils/common/time";
-import { createPage } from "@/actions/page";
 import { createFeature } from "@/actions/feature";
 
 export function NavProject() {
-    const { id, name, pages, features, branding } = useProjectStore();
-    const { id: channelId, category, updateChannelStore } = useChannelStore();
+    const { id, name, branding } = useProjectStore();
+    const { updateChannelStore } = useChannelStore();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -46,26 +34,6 @@ export function NavProject() {
         message: "NavProject: branding",
         branding,
     });
-
-    const handleAddPage = async (page: Page) => {
-        let pageId = "";
-        try {
-            setIsLoading(true);
-            const newPage = await createPage({
-                project_id: id,
-                name: page.name,
-                description: page.description,
-            });
-            pageId = newPage.id;
-            updateChannelStore({ id: newPage.id, category: "page" });
-            sleep(1000);
-        } catch (error) {
-            console.error("Error adding page:", error);
-        } finally {
-            setIsLoading(false);
-            router.push(`/dashboard/project/manage/${id}/pages/${pageId}`);
-        }
-    };
 
     const handleAddFeature = async (feature: Feature) => {
         let featureId = "";
@@ -87,15 +55,6 @@ export function NavProject() {
                 `/dashboard/project/manage/${id}/features/${featureId}`,
             );
         }
-    };
-
-    const handleSelectPage = (pageId: string) => {
-        updateChannelStore({ id: pageId, category: "page" });
-        router.push(`/dashboard/project/manage/${id}/pages/${pageId}`);
-    };
-    const handleSelectFeature = (featureId: string) => {
-        updateChannelStore({ id: featureId, category: "feature" });
-        router.push(`/dashboard/project/manage/${id}/features/${featureId}`);
     };
 
     if (!id) {
@@ -168,129 +127,54 @@ export function NavProject() {
                             </span>
                         </a>
                     </SidebarMenuButton>
-                    {/* Pages */}
-                    <Collapsible asChild defaultOpen>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                asChild
-                                tooltip="Pages"
-                                className="text-white hover:bg-secondary-dark"
-                            >
-                                <div>
-                                    <Files className="text-subtext-in-dark-bg" />
-                                    <span className="text-subtext-in-dark-bg">
-                                        Pages
-                                    </span>
-                                </div>
-                            </SidebarMenuButton>
-                            {pages && pages.length > 0 && (
-                                <>
-                                    <CollapsibleTrigger asChild>
-                                        <SidebarMenuAction className="data-[state=open]:rotate-90 text-subtext-in-dark-bg ">
-                                            <ChevronRight />
-                                            <span className="sr-only">
-                                                Toggle
-                                            </span>
-                                        </SidebarMenuAction>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent>
-                                        <SidebarMenuSub>
-                                            {pages.map((page) => (
-                                                <SidebarMenuSubItem
-                                                    key={page.id}
-                                                >
-                                                    <SidebarMenuSubButton
-                                                        asChild
-                                                        className={`cursor-pointer text-subtext-in-dark-bg hover:bg-secondary-dark hover:text-white ${category === "page" && channelId === page.id ? "bg-genesoft text-white" : ""}`}
-                                                    >
-                                                        <p
-                                                            onClick={() =>
-                                                                handleSelectPage(
-                                                                    page.id,
-                                                                )
-                                                            }
-                                                        >
-                                                            <span>
-                                                                {page.name}
-                                                            </span>
-                                                        </p>
-                                                    </SidebarMenuSubButton>
-                                                </SidebarMenuSubItem>
-                                            ))}
-                                        </SidebarMenuSub>
-                                    </CollapsibleContent>
-                                </>
-                            )}
-                        </SidebarMenuItem>
-                    </Collapsible>
-                    <button className="flex items-center justify-center gap-1.5 p-2 rounded-lg transition-colors hover:bg-secondary-dark/20 group">
-                        <AddPageDialog
-                            onAddPage={handleAddPage}
-                            type="update"
-                        />
-                    </button>
-
-                    {/* Features */}
-                    <Collapsible asChild defaultOpen>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                asChild
-                                tooltip="Features"
-                                className="text-white hover:bg-secondary-dark"
-                            >
-                                <div>
-                                    <Layers className="text-subtext-in-dark-bg" />
-                                    <span className="text-subtext-in-dark-bg">
-                                        Features
-                                    </span>
-                                </div>
-                            </SidebarMenuButton>
-                            {features && features.length > 0 && (
-                                <>
-                                    <CollapsibleTrigger asChild>
-                                        <SidebarMenuAction className="data-[state=open]:rotate-90 text-subtext-in-dark-bg">
-                                            <ChevronRight />
-                                            <span className="sr-only">
-                                                Toggle
-                                            </span>
-                                        </SidebarMenuAction>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent>
-                                        <SidebarMenuSub>
-                                            {features.map((feature) => (
-                                                <SidebarMenuSubItem
-                                                    key={feature.id}
-                                                >
-                                                    <SidebarMenuSubButton
-                                                        asChild
-                                                        className={`cursor-pointer text-subtext-in-dark-bg hover:bg-secondary-dark hover:text-white ${category === "feature" && channelId === feature.id ? "bg-genesoft text-white" : ""}`}
-                                                    >
-                                                        <p
-                                                            onClick={() =>
-                                                                handleSelectFeature(
-                                                                    feature.id,
-                                                                )
-                                                            }
-                                                        >
-                                                            <span>
-                                                                {feature.name}
-                                                            </span>
-                                                        </p>
-                                                    </SidebarMenuSubButton>
-                                                </SidebarMenuSubItem>
-                                            ))}
-                                        </SidebarMenuSub>
-                                    </CollapsibleContent>
-                                </>
-                            )}
-                        </SidebarMenuItem>
-                    </Collapsible>
-                    <button className="flex items-center justify-center gap-1.5 p-2 rounded-lg transition-colors hover:bg-secondary-dark/20 group">
-                        <AddFeatureDialog
-                            type="update"
-                            onAddFeature={handleAddFeature}
-                        />
-                    </button>
+                    <SidebarMenuButton
+                        asChild
+                        tooltip="Branding"
+                        className="text-white hover:bg-secondary-dark"
+                    >
+                        <a href={`/dashboard/project/${id}/ai-agent`}>
+                            <ScanEye className="text-subtext-in-dark-bg" />
+                            <span className="text-subtext-in-dark-bg">
+                                Conversation
+                            </span>
+                        </a>
+                    </SidebarMenuButton>
+                    {/* <SidebarMenuButton
+                        asChild
+                        tooltip="Branding"
+                        className="text-white hover:bg-secondary-dark"
+                    >
+                        <a href={`/dashboard/project/manage/${id}/branding`}>
+                            <Database className="text-subtext-in-dark-bg" />
+                            <span className="text-subtext-in-dark-bg">
+                                Database
+                            </span>
+                        </a>
+                    </SidebarMenuButton>
+                    <SidebarMenuButton
+                        asChild
+                        tooltip="Branding"
+                        className="text-white hover:bg-secondary-dark"
+                    >
+                        <a href={`/dashboard/project/manage/${id}/branding`}>
+                            <Users className="text-subtext-in-dark-bg" />
+                            <span className="text-subtext-in-dark-bg">
+                                Authentication
+                            </span>
+                        </a>
+                    </SidebarMenuButton>
+                    <SidebarMenuButton
+                        asChild
+                        tooltip="Branding"
+                        className="text-white hover:bg-secondary-dark"
+                    >
+                        <a href={`/dashboard/project/manage/${id}/branding`}>
+                            <CloudUpload className="text-subtext-in-dark-bg" />
+                            <span className="text-subtext-in-dark-bg">
+                                Deployment
+                            </span>
+                        </a>
+                    </SidebarMenuButton> */}
                 </SidebarMenu>
             )}
         </SidebarGroup>

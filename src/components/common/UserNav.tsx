@@ -118,7 +118,7 @@ export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
                             {email}
                         </p>
                     </div>
-                    <ChevronDownIcon className="ml-1 h-4 w-4 text-muted-foreground" />
+                    <ChevronDownIcon className="ml-1 h-4 w-4 text-muted-foreground text-white" />
                     <span className="sr-only">Open user menu</span>
                 </Button>
             </DropdownMenuTrigger>

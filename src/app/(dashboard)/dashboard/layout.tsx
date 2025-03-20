@@ -35,7 +35,7 @@ export default function RootLayout({
                     className={`${geistSans.variable} ${geistMono.variable} antialiased`}
                 >
                     {/* <Navbar /> */}
-                    <SidebarProvider>
+                    <SidebarProvider defaultOpen={false}>
                         <AppSidebar />
                         <main className="w-full">
                             <Suspense

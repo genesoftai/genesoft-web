@@ -56,3 +56,62 @@ export type LatestIteration = {
     };
     iteration_tasks?: Array<IterationTask>;
 };
+
+export type IterationWithTask = {
+    id: string;
+    project_id: string;
+    status: string;
+    type: string;
+    feedback_id: string | null;
+    working_time: string;
+    created_at: string;
+    updated_at: string;
+    iteration_tasks: IterationTask[];
+};
+export type LatestDeployment = {
+    deployment: {
+        uid: string;
+        name: string;
+        url: string;
+        created: number;
+        source: string;
+        state: string;
+        readyState: string;
+        type: string;
+        creator: {
+            uid: string;
+            email: string;
+            username: string;
+            githubLogin: string;
+        };
+        inspectorUrl: string;
+        meta: {
+            githubCommitAuthorName: string;
+            githubCommitMessage: string;
+            githubCommitOrg: string;
+            githubCommitRef: string;
+            githubCommitRepo: string;
+            githubCommitSha: string;
+            githubDeployment: string;
+            githubOrg: string;
+            githubRepo: string;
+            githubRepoOwnerType: string;
+            githubCommitRepoId: string;
+            githubRepoId: string;
+            githubRepoVisibility: string;
+            githubCommitAuthorLogin: string;
+            branchAlias: string;
+        };
+        target: string | null;
+        aliasAssigned: string | null;
+        isRollbackCandidate: boolean;
+        createdAt: number;
+        buildingAt: number;
+        ready: number;
+        projectSettings: {
+            commandForIgnoringBuildStep: string | null;
+        };
+    };
+    status: string;
+    errorMessage: string;
+};

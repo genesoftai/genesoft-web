@@ -231,15 +231,9 @@ const ManagePagePage = () => {
                             <div className="flex-1">
                                 <Conversation
                                     key={`mobile-conversation-${conversationKey}`}
-                                    type="page"
-                                    channelName={page?.name || ""}
-                                    channelDescription={page?.description || ""}
                                     conversationId={conversation?.id || ""}
                                     initialMessages={messages || []}
                                     isLoading={isLoadingSetupPageConversation}
-                                    sprintOptions={sprintOptions || []}
-                                    selectedSprint={selectedSprint || ""}
-                                    onSprintChange={handleSprintChange}
                                     onSubmitConversation={
                                         handleSubmitConversation
                                     }
@@ -273,15 +267,9 @@ const ManagePagePage = () => {
                     >
                         <Conversation
                             key={`desktop-conversation-${conversationKey}`}
-                            type="page"
-                            channelName={page?.name || ""}
-                            channelDescription={page?.description || ""}
                             conversationId={conversation?.id || ""}
                             initialMessages={messages || []}
                             isLoading={isLoadingSetupPageConversation}
-                            sprintOptions={sprintOptions || []}
-                            selectedSprint={selectedSprint || ""}
-                            onSprintChange={handleSprintChange}
                             onSubmitConversation={handleSubmitConversation}
                             status={conversation?.status || ""}
                             pageId={pathParams?.pageId as string}

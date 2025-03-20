@@ -3,7 +3,7 @@ import { Message } from "@/types/message";
 import { formatDateToHumanReadable } from "@/utils/common/time";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import GenesoftLogo from "@public/assets/genesoft-logo-blue.png";
+import GenesoftLogo from "@public/assets/genesoft-logo-black.png";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";

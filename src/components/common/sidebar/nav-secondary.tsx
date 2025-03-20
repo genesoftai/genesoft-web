@@ -132,14 +132,15 @@ export function NavSecondary({
                 open={supportDialogOpen}
                 onOpenChange={setSupportDialogOpen}
             >
-                <AlertDialogContent className="bg-tertiary-dark border-line-in-dark-bg">
+                <AlertDialogContent className="bg-tertiary-dark border-line-in-dark-bg w-11/12 md:w-4/12 rounded-lg ">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-white">
                             Get Support
                         </AlertDialogTitle>
                         <AlertDialogDescription className="text-subtext-in-dark-bg">
                             Please provide your details and we&apos;ll get back
-                            to you as soon as possible.
+                            to you as soon as possible. You can also send email
+                            directly to support@genesoft.ai
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <div className="space-y-4 py-4">

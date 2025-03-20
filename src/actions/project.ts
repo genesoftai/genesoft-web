@@ -376,7 +376,6 @@ export const editFeature = async ({
 
 export type CreateProjectFromOnboardingDto = {
     user_id: string;
-    project_name: string;
     project_description: string;
     branding?: {
         logo_url?: string;

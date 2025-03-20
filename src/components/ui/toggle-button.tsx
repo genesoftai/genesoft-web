@@ -1,6 +1,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PanelRight, PanelLeftClose, MonitorPlay } from "lucide-react";
+import {
+    PanelRight,
+    PanelLeftClose,
+    MonitorPlay,
+    PanelRightClose,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
     Tooltip,
@@ -36,22 +41,21 @@ export function ToggleButton({
                             className,
                         )}
                     >
-                        <MonitorPlay className="h-4 w-4" />
                         {showLabel && (
                             <span className="text-sm text-black">
-                                {isCollapsed ? "Show web app" : "Hide web app"}
+                                {isCollapsed ? "Show" : "Hide"}
                             </span>
                         )}
                         {isCollapsed ? (
-                            <PanelRight className="h-4 w-4" />
+                            <MonitorPlay className="h-4 w-4" />
                         ) : (
-                            <PanelLeftClose className="h-4 w-4" />
+                            <PanelRightClose className="h-4 w-4" />
                         )}
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p className="text-white text-xs">
-                        {isCollapsed ? "Show web app" : "Hide web app"}
+                        {isCollapsed ? "Show" : "Hide"}
                     </p>
                 </TooltipContent>
             </Tooltip>
