@@ -72,31 +72,33 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
                         <span className="text-xs text-gray-400">Status</span>
-                        <span
-                            className={`text-sm font-medium ${
-                                buildStatus === "success"
-                                    ? "text-green-400"
-                                    : buildStatus === "pending" ||
-                                        buildStatus === "in_progress"
-                                      ? "text-yellow-400"
-                                      : buildStatus === "done"
-                                        ? "text-blue-400"
-                                        : "text-red-400"
-                            }`}
-                        >
-                            {buildStatus === "success"
-                                ? "Successfully Deployed"
-                                : buildStatus === "pending"
-                                  ? "Deployment in Progress"
-                                  : buildStatus === "in_progress"
-                                    ? "AI Agent Fixing Errors for deployment failed"
-                                    : buildStatus === "done"
-                                      ? "AI Agent Fix Attempt Done. If there are still errors, please click the Fix Errors button again. It's free to fix errors."
-                                      : "Deployment Failed"}
+                        <div className="flex items-center gap-1">
+                            <span
+                                className={`text-sm font-medium ${
+                                    buildStatus === "success"
+                                        ? "text-green-400"
+                                        : buildStatus === "pending" ||
+                                            buildStatus === "in_progress"
+                                          ? "text-yellow-400"
+                                          : buildStatus === "done"
+                                            ? "text-blue-400"
+                                            : "text-red-400"
+                                }`}
+                            >
+                                {buildStatus === "success"
+                                    ? "Successfully Deployed"
+                                    : buildStatus === "pending"
+                                      ? "Deployment in Progress"
+                                      : buildStatus === "in_progress"
+                                        ? "AI Agent Fixing Errors for deployment failed"
+                                        : buildStatus === "done"
+                                          ? "AI Agent Fix Attempt Done. If there are still errors, please click the Fix Errors button again. It's free to fix errors."
+                                          : "Deployment Failed"}
+                            </span>
                             {buildStatus === "in_progress" && (
                                 <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
                             )}
-                        </span>
+                        </div>
                     </div>
                     <div className="flex flex-col gap-1">
                         <span className="text-xs text-gray-400">
