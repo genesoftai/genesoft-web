@@ -500,8 +500,8 @@ const Conversation: React.FC<ConversationProps> = ({
     };
 
     return (
-        <div className="flex flex-col w-full min-h-[85vh] h-full">
-            <Card className="flex flex-col w-full h-full min-h-[85vh] sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
+        <div className="flex flex-col w-full min-h-[70vh] h-full">
+            <Card className="flex flex-col w-full h-full min-h-[70vh] sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
                 {/* Channel Header */}
                 <CardHeader className="flex flex-row items-center justify-between px-4 py-2 bg-[#222529] border-b border-[#383838]">
                     <CardTitle className="text-lg font-semibold text-white flex items-center gap-2 justify-between w-full">
