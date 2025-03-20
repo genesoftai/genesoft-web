@@ -127,7 +127,7 @@ export default function Navbar() {
     const handleGoToDashboard = () => {
         if (userEmail) {
             if (projectId) {
-                router.push(`/dashboard/project/manage/${projectId}`);
+                router.push(`/dashboard/project/${projectId}/ai-agent`);
             } else {
                 router.push(`/dashboard`);
             }

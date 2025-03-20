@@ -234,19 +234,11 @@ const ManageFeaturePage = () => {
                             <div className="flex-1">
                                 <Conversation
                                     key={`mobile-conversation-${conversationKey}`}
-                                    type="feature"
-                                    channelName={feature?.name || ""}
-                                    channelDescription={
-                                        feature?.description || ""
-                                    }
                                     conversationId={conversation?.id || ""}
                                     initialMessages={messages || []}
                                     isLoading={
                                         isLoadingSetupFeatureConversation
                                     }
-                                    sprintOptions={sprintOptions || []}
-                                    selectedSprint={selectedSprint || ""}
-                                    onSprintChange={handleSprintChange}
                                     onSubmitConversation={
                                         handleSubmitConversation
                                     }
@@ -280,15 +272,9 @@ const ManageFeaturePage = () => {
                     >
                         <Conversation
                             key={`desktop-conversation-${conversationKey}`}
-                            type="feature"
-                            channelName={feature?.name || ""}
-                            channelDescription={feature?.description || ""}
                             conversationId={conversation?.id || ""}
                             initialMessages={messages || []}
                             isLoading={isLoadingSetupFeatureConversation}
-                            sprintOptions={sprintOptions || []}
-                            selectedSprint={selectedSprint || ""}
-                            onSprintChange={handleSprintChange}
                             onSubmitConversation={handleSubmitConversation}
                             status={conversation?.status || ""}
                             featureId={pathParams?.featureId as string}

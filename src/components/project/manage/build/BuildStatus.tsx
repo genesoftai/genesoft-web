@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { WebApplicationInfo } from "@/types/web-application";
+import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
 import { Loader2, TriangleAlert, Wrench } from "lucide-react";
 import { recheckBuild } from "@/actions/development";
 import { Button } from "@/components/ui/button";
@@ -79,7 +79,9 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                                     : buildStatus === "pending" ||
                                         buildStatus === "in_progress"
                                       ? "text-yellow-400"
-                                      : "text-red-400"
+                                      : buildStatus === "done"
+                                        ? "text-blue-400"
+                                        : "text-red-400"
                             }`}
                         >
                             {buildStatus === "success"
@@ -88,7 +90,9 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                                   ? "Deployment in Progress"
                                   : buildStatus === "in_progress"
                                     ? "AI Agent Fixing Errors for deployment failed"
-                                    : "Deployment Failed"}
+                                    : buildStatus === "done"
+                                      ? "AI Agent Fix Attempt Done. If there are still errors, please click the Fix Errors button again. It's free to fix errors."
+                                      : "Deployment Failed"}
                         </span>
                     </div>
                     <div className="flex flex-col gap-1">
@@ -121,7 +125,7 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                     </div>
                 </div>
 
-                {buildStatus === "failed" && (
+                {webApplicationInfo.readyStatus === ReadyStatus.ERROR && (
                     <div className="mt-4 p-3 bg-red-900/30 border border-red-500/30 rounded-md">
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
@@ -137,38 +141,27 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                                 </span>
                             </div>
 
-                            {buildStatus === "failed" &&
-                                webApplicationInfo.repositoryBuild
-                                    .error_logs && (
-                                    <div className="mt-2 p-2 bg-black/50 rounded border border-white/10 max-h-32 overflow-y-auto">
-                                        <pre className="text-xs text-red-300 font-mono whitespace-pre-wrap">
-                                            {
-                                                webApplicationInfo
-                                                    .repositoryBuild.error_logs
-                                            }
-                                        </pre>
-                                    </div>
-                                )}
-
-                            {/* <div className="flex justify-end mt-2">
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            className="bg-red-700 hover:bg-red-600 text-white"
-                                                            onClick={
-                                                                handleFixErrors
-                                                            }
-                                                        >
-                                                            <Wrench className="h-4 w-4 mr-2" />
-                                                            {"Fix errors"}
-                                                            {isCheckingBuildErrors && (
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            )}
-                                                        </Button>
-                                                    </div> */}
+                            {webApplicationInfo?.repositoryBuild
+                                ?.error_logs && (
+                                <div className="mt-2 p-2 bg-black/50 rounded border border-white/10 max-h-32 overflow-y-auto">
+                                    <pre className="text-xs text-red-300 font-mono whitespace-pre-wrap">
+                                        {
+                                            webApplicationInfo.repositoryBuild
+                                                .error_logs
+                                        }
+                                    </pre>
+                                </div>
+                            )}
 
                             <p className="text-xs text-gray-400 self-end">
-                                Please contact support at support@genesoft.com
+                                Please click fix errors and or contact support
+                                at{" "}
+                                <a
+                                    href="mailto:support@genesoft.com"
+                                    className="text-blue-300 hover:text-blue-400"
+                                >
+                                    support@genesoft.com
+                                </a>
                             </p>
                         </div>
                     </div>

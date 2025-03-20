@@ -11,16 +11,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Send,
-    ChevronDown,
     Loader2,
     CircleCheck,
-    MessageCircleMore,
     Image,
+    BrainCircuit,
+    HistoryIcon,
 } from "lucide-react";
 import { Message } from "@/types/message";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import {
     CreateMessageDto,
+    getConversationsWithIterationsByProjectId,
     submitConversation,
     talkToProjectManager,
 } from "@/actions/conversation";
@@ -28,10 +29,14 @@ import { useProjectStore } from "@/stores/project-store";
 import SystemMessage from "./message/SystemMessage";
 import AIAgentMessage from "./message/AIAgentMessage";
 import UserMessage from "./message/UserMessage";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import { uploadFileFree } from "@/actions/file";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -41,14 +46,33 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getMonthlySprintsWithSubscription } from "@/actions/development";
+import {
+    checkBuildErrors,
+    getLatestIteration,
+    getMonthlySprintsWithSubscription,
+} from "@/actions/development";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { getOrganizationById } from "@/actions/organization";
 import { SubscriptionLookupKey } from "@/constants/subscription";
 import { useRouter } from "next/navigation";
 import { nextAppBaseUrl } from "@/constants/web";
 import { MonthlySprint } from "@/types/subscription";
-
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ConversationWithIterations } from "@/types/conversation";
+import ConversationWithIteration from "./ConversationWithIteration";
+import { formatDateToHumanReadable } from "@/utils/common/time";
+import { LatestIteration } from "@/types/development";
+import { getWebApplicationInfo } from "@/actions/web-application";
+import DevelopmentActivity from "../project/manage/development/DevelopmentActivity";
+import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
+import DeploymentStatus from "./Deployment";
+import { toast } from "@/hooks/use-toast";
+import posthog from "posthog-js";
 export type SprintOption = {
     id: string;
     name: string;
@@ -56,15 +80,9 @@ export type SprintOption = {
 };
 
 export interface ConversationProps {
-    type: string;
-    channelName?: string;
-    channelDescription?: string;
     initialMessages?: Message[];
     onSendMessage?: (message: string) => void;
     isLoading?: boolean;
-    sprintOptions?: SprintOption[];
-    selectedSprint?: string;
-    onSprintChange?: (sprintId: string) => void;
     conversationId: string;
     onSubmitConversation?: () => Promise<void>;
     status: string;
@@ -75,15 +93,9 @@ export interface ConversationProps {
 }
 
 const Conversation: React.FC<ConversationProps> = ({
-    type,
-    channelName = "Channel name",
-    channelDescription = "Channel description",
     conversationId,
     initialMessages = [],
     isLoading = false,
-    sprintOptions = [],
-    selectedSprint,
-    onSprintChange,
     onSubmitConversation,
     status,
     featureId,
@@ -93,14 +105,12 @@ const Conversation: React.FC<ConversationProps> = ({
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
     const { id: userId } = useGenesoftUserStore();
     const [isLoadingSendMessage, setIsLoadingSendMessage] =
         useState<boolean>(false);
     const [isLoadingSubmitConversation, setIsLoadingSubmitConversation] =
         useState<boolean>(false);
     const [errorStartSprint, setErrorStartSprint] = useState<string>("");
-    const [sprintName, setSprintName] = useState<string>("");
     const [isLoadingImageUpload, setIsLoadingImageUpload] =
         useState<boolean>(false);
     const [errorImageUpload, setErrorImageUpload] = useState<string>("");
@@ -119,10 +129,24 @@ const Conversation: React.FC<ConversationProps> = ({
         tier: "",
         remaining: 0,
     });
+    const [conversationsWithIterations, setConversationsWithIterations] =
+        useState<ConversationWithIterations[]>([]);
+    const [latestIteration, setLatestIteration] =
+        useState<LatestIteration | null>(null);
+    const [pollingCount, setPollingCount] = useState(0);
+    const [webApplicationInfo, setWebApplicationInfo] =
+        useState<WebApplicationInfo | null>(null);
+    const [isCheckingBuildErrors, setIsCheckingBuildErrors] =
+        useState<boolean>(false);
+
     const { id: organizationId } = useGenesoftOrganizationStore();
     const router = useRouter();
 
-    const { id: projectId } = useProjectStore();
+    const {
+        id: projectId,
+        name: projectName,
+        description: projectDescription,
+    } = useProjectStore();
     const {
         image: userImage,
         name: userName,
@@ -188,15 +212,11 @@ const Conversation: React.FC<ConversationProps> = ({
 
     const handleSubmitConversation = async () => {
         let status = "error";
-        if (sprintName.trim() === "") {
-            setErrorStartSprint("Please enter a sprint name");
-            return;
-        }
 
         setErrorStartSprint("");
         setIsLoadingSubmitConversation(true);
         try {
-            await submitConversation(conversationId, sprintName);
+            await submitConversation(conversationId);
             setupMonthlySprints();
             status = "submitted";
         } catch (error) {
@@ -340,6 +360,7 @@ const Conversation: React.FC<ConversationProps> = ({
 
     useEffect(() => {
         setupMonthlySprints();
+        setupConversationsWithIterations();
     }, []);
 
     const setupMonthlySprints = async () => {
@@ -355,6 +376,59 @@ const Conversation: React.FC<ConversationProps> = ({
         }
     };
 
+    const setupConversationsWithIterations = async () => {
+        try {
+            if (projectId) {
+                const response =
+                    await getConversationsWithIterationsByProjectId(projectId);
+                console.log({
+                    message: "Conversations with iterations",
+                    response,
+                });
+                setConversationsWithIterations(response);
+            }
+        } catch (error) {
+            console.error(
+                "Error setting up conversations with iterations:",
+                error,
+            );
+        }
+    };
+
+    const handleFixErrors = async () => {
+        posthog.capture("click_fix_errors_from_manage_project_web_preview");
+        if (!projectId) {
+            toast({
+                title: "Project ID is required",
+                description: "Please select a project",
+            });
+            return;
+        }
+        setIsCheckingBuildErrors(true);
+
+        try {
+            await checkBuildErrors(projectId);
+            toast({
+                title: "Genesoft software development AI Agent team working on fixing errors of your web application to help you deploy latest version",
+                description:
+                    "Please waiting for email notification when errors are fixed",
+                duration: 10000,
+            });
+        } catch (error) {
+            console.error("Error checking build errors:", error);
+            toast({
+                title: "Failed to check build errors",
+                description: "Please try again",
+                variant: "destructive",
+                duration: 10000,
+            });
+        } finally {
+            setIsCheckingBuildErrors(false);
+        }
+    };
+
+    // Kept for future subscription management functionality
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSubscription = async () => {
         const organization = await getOrganizationById(organizationId);
 
@@ -394,102 +468,225 @@ const Conversation: React.FC<ConversationProps> = ({
         }
     };
 
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (projectId) {
+            // Initial fetch
+            fetchLatestData();
+
+            // Set up polling every 10 seconds
+            interval = setInterval(() => {
+                fetchLatestData();
+                setPollingCount((prev) => prev + 1);
+            }, 5000);
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId]);
+
+    const fetchLatestData = async () => {
+        if (!projectId) return;
+
+        try {
+            const iterationInfo = await getLatestIteration(projectId);
+            const latestWebApplicationInfo =
+                await getWebApplicationInfo(projectId);
+
+            setLatestIteration(iterationInfo);
+            setWebApplicationInfo(latestWebApplicationInfo);
+        } catch (error) {
+            console.error("Error fetching latest data:", error);
+        }
+    };
+
     console.log({
         message: "Conversation: props",
-        type,
-        channelName,
-        channelDescription,
         isLoadingImageUpload,
         errorImageUpload,
         messages,
+        conversationsWithIterations,
     });
 
     return (
-        <>
-            <Card className="flex flex-col w-full max-h-[120vh] h-full sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
+        <div className="flex flex-col w-full min-h-[85vh] h-full">
+            <Card className="flex flex-col w-full h-full min-h-[85vh] sm:h-4/12 bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg">
                 {/* Channel Header */}
                 <CardHeader className="flex flex-row items-center justify-between px-4 py-2 bg-[#222529] border-b border-[#383838]">
                     <CardTitle className="text-lg font-semibold text-white flex items-center gap-2 justify-between w-full">
-                        {sprintOptions.length > 0 && (
-                            <div className="relative min-w-[100px]">
-                                <p className="text-gray-400 text-xs">
-                                    Select sprint
-                                </p>
-                                <div
-                                    className="flex items-center gap-1 bg-[#252a2e] hover:bg-[#2c3235] py-1 px-3 rounded-md cursor-pointer text-sm font-normal"
-                                    onClick={() =>
-                                        setIsSprintMenuOpen(!isSprintMenuOpen)
-                                    }
-                                >
-                                    {status === "submitted" ? (
+                        <div
+                            className={`flex justify-between items-center gap-3 rounded-lg relative z-0 w-full`}
+                        >
+                            <div className="flex flex-col gap-1 w-fit">
+                                <div className="flex items-center justify-center bg-gradient-to-r from-[#2a2d32] to-[#1e2124] px-3 py-1.5 rounded-full shadow-inner">
+                                    <span className="text-gray-400 text-xs font-medium flex items-center gap-1.5">
                                         <CircleCheck
-                                            size={16}
-                                            className="text-green-500"
+                                            size={12}
+                                            className="text-blue-400"
                                         />
-                                    ) : (
-                                        <MessageCircleMore
-                                            size={16}
-                                            className="text-blue-500"
-                                        />
-                                    )}
-                                    <span className="text-white">
-                                        {
-                                            sprintOptions.find(
-                                                (sprint) =>
-                                                    sprint.id ===
-                                                    selectedSprint,
-                                            )?.name
-                                        }
+                                        Generations:
+                                        <span className="text-white font-semibold">
+                                            {monthlySprints?.count || 0}
+                                        </span>
+                                        <span className="text-gray-500">/</span>
+                                        <span className="text-white font-semibold">
+                                            {(monthlySprints?.count || 0) +
+                                                (monthlySprints?.remaining ||
+                                                    0)}
+                                        </span>
                                     </span>
-                                    <ChevronDown size={16} />
                                 </div>
 
-                                {isSprintMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-1 bg-[#252a2e] rounded-md shadow-lg z-10 min-w-[200px]">
-                                        {sprintOptions.map((sprint) => (
-                                            <div
-                                                key={sprint.id}
-                                                className={`py-2 px-3 cursor-pointer hover:bg-[#2c3235] text-sm ${selectedSprint === sprint.id ? "bg-[#1e62d0] text-white" : "text-gray-300"} flex items-center gap-2`}
-                                                onClick={() => {
-                                                    if (onSprintChange) {
-                                                        setMessages([]);
-                                                        onSprintChange(
-                                                            sprint.id,
-                                                        );
-                                                    }
-                                                    setIsSprintMenuOpen(false);
-                                                }}
-                                            >
-                                                {sprint?.status ===
-                                                "submitted" ? (
-                                                    <CircleCheck
-                                                        size={16}
-                                                        className="text-green-500"
-                                                    />
-                                                ) : (
-                                                    <MessageCircleMore
-                                                        size={16}
-                                                        className="text-blue-500"
-                                                    />
-                                                )}
-                                                <span>{sprint.name}</span>
-                                            </div>
-                                        ))}
+                                {errorStartSprint && (
+                                    <div className="px-2 py-1 text-xs text-red-400 bg-red-500/10 rounded-md w-full flex flex-col gap-2">
+                                        <span className="text-red-400">
+                                            {errorStartSprint}
+                                        </span>
                                     </div>
                                 )}
                             </div>
-                        )}
+
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className={`bg-[#1e62d0] text-white hover:bg-[#1a56b8] hover:text-white w-fit h-10 rounded-md shadow-md transition-all duration-200 flex items-center gap-2 ${
+                                                latestIteration?.status !==
+                                                    "done" &&
+                                                "bg-gray-500 cursor-not-allowed"
+                                            }`}
+                                            onClick={handleSubmitConversation}
+                                            disabled={
+                                                isLoadingSubmitConversation ||
+                                                latestIteration?.status !==
+                                                    "done"
+                                            }
+                                        >
+                                            <span className="text-xs font-medium">
+                                                {isLoadingSubmitConversation
+                                                    ? "Generating..."
+                                                    : "Generate"}
+                                            </span>
+                                            {isLoadingSubmitConversation ? (
+                                                <Loader2 className="h-4 w-4 animate-spin ml-1" />
+                                            ) : (
+                                                <BrainCircuit className="h-4 w-4 ml-1" />
+                                            )}
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>
+                                            This will trigger AI Agent to build
+                                            your web app based on latest
+                                            conversation between you and
+                                            Genesoft Project Manager AI Agent
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                     </CardTitle>
                 </CardHeader>
 
                 {/* Messages Area */}
                 {!isLoading ? (
-                    <CardContent className="flex-grow p-0 overflow-hidden h-full pb-10">
+                    <CardContent className="flex-grow p-0 overflow-hidden h-[60vh] md:h-[calc(100vh-280px)]">
                         <ScrollArea
-                            className="min-h-[60vh] h-[80vh] md:min-h-[40vh] w-full conversation-scrollarea overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+                            className="h-full w-full conversation-scrollarea overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
                             scrollHideDelay={0}
                         >
-                            <div className="flex flex-col p-4 gap-4 pb-0 h-full">
+                            <div className="flex flex-col p-4 gap-4 pb-4 h-full">
+                                {conversationsWithIterations.length > 0 && (
+                                    <div className="flex flex-col gap-4 w-full">
+                                        {conversationsWithIterations?.map(
+                                            (conversation) => (
+                                                <Dialog key={conversation?.id}>
+                                                    <DialogTrigger asChild>
+                                                        <Card className="flex flex-col w-full bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg cursor-pointer hover:bg-[#222529] transition-colors">
+                                                            <CardHeader className="flex flex-row items-center justify-between px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838] transition-colors duration-200 shadow-sm">
+                                                                <CardTitle className="text-lg font-semibold text-white flex justify-between items-center w-full">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-blue-300 font-medium text-xs md:text-sm">
+                                                                            {conversation?.name ||
+                                                                                "Untitled"}
+                                                                        </span>
+                                                                        {/* <span className="px-2.5 py-1 text-xs rounded-full bg-[#2a2d32] text-gray-300 border border-[#3a3d42] shadow-inner">
+                                                                            {conversation?.updated_at
+                                                                                ? formatDateToHumanReadable(
+                                                                                      conversation.updated_at,
+                                                                                  )
+                                                                                : ""}
+                                                                        </span> */}
+                                                                    </div>
+                                                                    <HistoryIcon className="h-5 w-5 text-blue-300" />
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                        </Card>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="w-11/12 md:w-6/12 max-w-4xl p-0 bg-[#1a1d21] border border-[#383838] text-white rounded-lg">
+                                                        <DialogHeader className="px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838]">
+                                                            <DialogTitle className="text-lg font-semibold text-white flex flex-col md:flex-row items-center gap-3 pt-8 md:pt-4">
+                                                                <span className="text-blue-300 font-medium">
+                                                                    {conversation?.name ||
+                                                                        "Untitled"}
+                                                                </span>
+                                                                <span className="px-2.5 py-1 text-xs rounded-full bg-[#2a2d32] text-gray-300 border border-[#3a3d42] shadow-inner">
+                                                                    {conversation?.updated_at
+                                                                        ? formatDateToHumanReadable(
+                                                                              conversation.updated_at,
+                                                                          )
+                                                                        : ""}
+                                                                </span>
+                                                            </DialogTitle>
+                                                        </DialogHeader>
+                                                        <div className="max-h-[80vh] overflow-hidden">
+                                                            <ConversationWithIteration
+                                                                conversationWithIteration={
+                                                                    conversation
+                                                                }
+                                                                isOpen={true}
+                                                            />
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            ),
+                                        )}
+                                    </div>
+                                )}
+
+                                {latestIteration && (
+                                    <DevelopmentActivity
+                                        pollingCount={pollingCount}
+                                        latestIteration={latestIteration}
+                                        project={{
+                                            name: projectName,
+                                            description: projectDescription,
+                                        }}
+                                    />
+                                )}
+
+                                {webApplicationInfo?.readyStatus !==
+                                    ReadyStatus.BUILDING && (
+                                    <DeploymentStatus
+                                        webApplicationInfo={
+                                            webApplicationInfo as WebApplicationInfo
+                                        }
+                                        handleFixErrors={handleFixErrors}
+                                        isCheckingBuildErrors={
+                                            isCheckingBuildErrors
+                                        }
+                                        projectId={projectId}
+                                        latestIteration={
+                                            latestIteration as LatestIteration
+                                        }
+                                    />
+                                )}
+
                                 {messages.map((message, index) => (
                                     <div
                                         key={message.id}
@@ -519,6 +716,39 @@ const Conversation: React.FC<ConversationProps> = ({
                                         </div>
                                     </div>
                                 )}
+
+                                {latestIteration?.status === "done" &&
+                                    webApplicationInfo?.readyStatus ===
+                                        ReadyStatus.ERROR &&
+                                    (!webApplicationInfo?.repositoryBuild
+                                        ?.fix_triggered ||
+                                        webApplicationInfo?.repositoryBuild
+                                            ?.status === "done") && (
+                                        <div className="flex flex-col items-center justify-center p-4 bg-white text-black rounded-md">
+                                            <p className="text-lg font-semibold text-red-500">
+                                                Deployment Failed
+                                            </p>
+                                            <p className="text-sm">
+                                                There was an error during
+                                                deployment. Please click fix
+                                                errors to inform Genesoft
+                                                software development AI Agent
+                                                team to fix it.
+                                            </p>
+                                            <Button
+                                                variant="outline"
+                                                className="mt-2 text-white border-white bg-red-500 hover:bg-red-600 hover:text-white"
+                                                onClick={handleFixErrors}
+                                            >
+                                                {isCheckingBuildErrors
+                                                    ? "Fixing errors..."
+                                                    : "Fix Errors"}
+                                                {isCheckingBuildErrors && (
+                                                    <Loader2 className="h-4 w-4 animate-spin ml-1 text-white" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    )}
                             </div>
                             <style jsx global>{`
                                 .conversation-scrollarea pre,
@@ -663,122 +893,6 @@ const Conversation: React.FC<ConversationProps> = ({
                                     </Button>
                                 </div>
                             </div>
-
-                            <div
-                                className={`flex flex-col items-center gap-3 mt-2 bg-[#1e2124] p-3 rounded-lg border border-[#383838]/50 relative z-0`}
-                            >
-                                <div className="flex items-center justify-center bg-gradient-to-r from-[#2a2d32] to-[#1e2124] px-3 py-1.5 rounded-full shadow-inner">
-                                    <span className="text-gray-400 text-xs font-medium flex items-center gap-1.5">
-                                        <CircleCheck
-                                            size={12}
-                                            className="text-blue-400"
-                                        />
-                                        Usage:
-                                        <span className="text-white font-semibold">
-                                            {monthlySprints?.count || 0}
-                                        </span>
-                                        <span className="text-gray-500">/</span>
-                                        <span className="text-white font-semibold">
-                                            {(monthlySprints?.count || 0) +
-                                                (monthlySprints?.remaining ||
-                                                    0)}
-                                        </span>
-                                        <span className="text-blue-400 font-medium ml-0.5">
-                                            Sprints
-                                        </span>
-                                    </span>
-                                </div>
-
-                                {monthlySprints?.remaining <= 0 ? (
-                                    <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
-                                        <div className="flex flex-col gap-1.5 w-full">
-                                            <Label className="text-red-400 text-xs font-medium flex items-center gap-2">
-                                                <span>
-                                                    You have exceeded the
-                                                    maximum number of sprints
-                                                    for free tier. Please
-                                                    upgrade to a startup plan to
-                                                    continue.
-                                                </span>
-                                            </Label>
-                                        </div>
-                                        <Button
-                                            variant="link"
-                                            className="bg-genesoft text-white hover:bg-genesoft/80 w-fit self-center"
-                                            onClick={handleSubscription}
-                                        >
-                                            Upgrade to a startup plan
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col md:flex-row items-center md:gap-4 w-full justify-between">
-                                        <div className="flex flex-col gap-1.5 w-full">
-                                            <Label className="text-gray-300 text-xs font-medium flex items-center gap-2">
-                                                <span>Sprint name</span>
-                                            </Label>
-                                            <Input
-                                                value={sprintName}
-                                                onChange={(e) =>
-                                                    setSprintName(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                placeholder="Enter sprint name to help you remember conversation ..."
-                                                className="text-xs md:text-sm w-full bg-[#2b2d31] border-[#383838] focus:border-[#1e62d0] text-white placeholder:text-gray-500 transition-colors"
-                                            />
-                                        </div>
-
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="bg-[#1e62d0] text-white hover:bg-[#1a56b8] hover:text-white w-fit h-10 px-4 rounded-md shadow-md transition-all duration-200 flex items-center gap-2 mt-6"
-                                            onClick={handleSubmitConversation}
-                                            disabled={
-                                                isLoadingSubmitConversation
-                                            }
-                                        >
-                                            <span className="text-xs md:text-sm font-medium">
-                                                {isLoadingSubmitConversation
-                                                    ? "Starting Sprint..."
-                                                    : "Start Sprint"}
-                                            </span>
-                                            {isLoadingSubmitConversation ? (
-                                                <Loader2 className="h-4 w-4 animate-spin ml-1" />
-                                            ) : (
-                                                <CircleCheck className="h-4 w-4 ml-1" />
-                                            )}
-                                        </Button>
-                                    </div>
-                                )}
-
-                                {errorStartSprint ? (
-                                    <div className="px-2 py-1 text-sm text-red-400 bg-red-500/10 rounded-md w-full flex flex-col gap-2">
-                                        <span className="text-red-400">
-                                            {errorStartSprint}
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <div className="px-2 py-1 text-xs md:text-sm text-gray-400 italic w-full">
-                                        {isLoadingSubmitConversation
-                                            ? "Genesoft Project Manager is summarizing and submitting tasks to the development team..."
-                                            : "Submit the conversation to the software development team to begin implementation"}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </CardFooter>
-                )}
-
-                {status === "submitted" && (
-                    <CardFooter className="flex items-center justify-between p-3 bg-[#222529] border-t border-[#383838]">
-                        <div className="flex flex-col w-full gap-2">
-                            <div className="flex items-center gap-2 w-full bg-[#2b2d31] rounded-md p-1">
-                                <p className="text-gray-400 text-xs">
-                                    {
-                                        "This conversation has been submitted to the development team. If you need to talk to Genesoft Project Manager, please talk on next sprint conversation."
-                                    }
-                                </p>
-                            </div>
                         </div>
                     </CardFooter>
                 )}
@@ -862,7 +976,7 @@ const Conversation: React.FC<ConversationProps> = ({
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </>
+        </div>
     );
 };
 
