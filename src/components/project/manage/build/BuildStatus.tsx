@@ -93,6 +93,9 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                                     : buildStatus === "done"
                                       ? "AI Agent Fix Attempt Done. If there are still errors, please click the Fix Errors button again. It's free to fix errors."
                                       : "Deployment Failed"}
+                            {buildStatus === "in_progress" && (
+                                <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
+                            )}
                         </span>
                     </div>
                     <div className="flex flex-col gap-1">
