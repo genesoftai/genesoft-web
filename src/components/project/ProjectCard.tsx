@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
+import { useProjectStore } from "@/stores/project-store";
 
 interface ProjectCardProps {
     id: string;
@@ -28,6 +29,18 @@ export function ProjectCard({
     target_audience,
 }: ProjectCardProps) {
     const router = useRouter();
+    const { updateProjectStore } = useProjectStore();
+
+    const handleManageProject = () => {
+        updateProjectStore({
+            id,
+            name,
+            description,
+            purpose,
+            target_audience,
+        });
+        router.push(`/dashboard/project/${id}/ai-agent`);
+    };
 
     return (
         <Card className="w-full md:w-8/12 h-8/12 md:h-auto bg-primary-dark text-white flex flex-col border-none mb-4 md:mb-0">
@@ -61,9 +74,7 @@ export function ProjectCard({
             <CardFooter className="flex justify-end md:justify-start self-center md:self-end">
                 <Button
                     className="bg-genesoft text-white rounded-lg text-xs md:text-base"
-                    onClick={() =>
-                        router.push(`/dashboard/project/manage/${id}`)
-                    }
+                    onClick={handleManageProject}
                 >
                     <span className="text-xs md:text-base">Manage</span>
                 </Button>

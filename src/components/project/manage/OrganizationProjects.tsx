@@ -18,7 +18,7 @@ const OrganizationProjects = ({ organizationId }: Props) => {
 
     const handleCreateProject = () => {
         posthog.capture("click_create_project_from_organization_projects");
-        router.push("/dashboard/project/create/info");
+        router.push("/");
     };
 
     const setUpOrganizationProjects = async () => {

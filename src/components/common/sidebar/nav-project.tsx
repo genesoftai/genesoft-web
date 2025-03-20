@@ -1,13 +1,6 @@
 "use client";
 
-import {
-    Loader2,
-    ScanEye,
-    Info,
-    Database,
-    Users,
-    CloudUpload,
-} from "lucide-react";
+import { Loader2, ScanEye, Info } from "lucide-react";
 import React, { useState } from "react";
 import {
     SidebarGroup,
@@ -18,15 +11,10 @@ import {
 import { useProjectStore } from "@/stores/project-store";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { AddFeatureDialog } from "@/components/project/features/AddFeatureDialog";
-import { Feature } from "@/types/project";
-import { useChannelStore } from "@/stores/channel-store";
-import { sleep } from "@/utils/common/time";
-import { createFeature } from "@/actions/feature";
 
 export function NavProject() {
     const { id, name, branding } = useProjectStore();
-    const { updateChannelStore } = useChannelStore();
+
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,28 +22,6 @@ export function NavProject() {
         message: "NavProject: branding",
         branding,
     });
-
-    const handleAddFeature = async (feature: Feature) => {
-        let featureId = "";
-        try {
-            setIsLoading(true);
-            const newFeature = await createFeature({
-                project_id: id,
-                name: feature.name,
-                description: feature.description,
-            });
-            featureId = newFeature.id;
-            updateChannelStore({ id: newFeature.id, category: "feature" });
-            sleep(1000);
-        } catch (error) {
-            console.error("Error adding feature:", error);
-        } finally {
-            setIsLoading(false);
-            router.push(
-                `/dashboard/project/manage/${id}/features/${featureId}`,
-            );
-        }
-    };
 
     if (!id) {
         return null;
@@ -74,13 +40,21 @@ export function NavProject() {
                     router.push(`/dashboard/project/manage/${id}`);
                 }}
             >
-                <Image
-                    src={branding?.logo_url || ""}
-                    alt={name}
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                />
+                {branding?.logo_url ? (
+                    <Image
+                        src={branding?.logo_url || ""}
+                        alt={name}
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                    />
+                ) : (
+                    <div className="rounded-full bg-white/10 size-8 flex items-center justify-center">
+                        <span className="text-white text-sm">
+                            {name.charAt(0).toUpperCase()}
+                        </span>
+                    </div>
+                )}
                 <span
                     className={`truncate`}
                     style={

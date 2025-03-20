@@ -1,74 +1,43 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Wrench, Loader2 } from "lucide-react";
 import { Project } from "@/types/project";
-import { checkBuildErrors, getLatestIteration } from "@/actions/development";
-import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState, useRef } from "react";
 import { getWebApplicationInfo } from "@/actions/web-application";
-import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
-import { DeploymentStatusBadge } from "../web-application/DeploymentStatus";
-import posthog from "posthog-js";
-import { formatDateToHumanReadable } from "@/utils/common/time";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import BuildStatus from "./build/BuildStatus";
-import DevelopmentActivity from "./development/DevelopmentActivity";
 import WebApplication from "../web-application/WebApplication";
-import { LatestIteration } from "@/types/development";
+import { WebApplicationInfo } from "@/types/web-application";
 interface WebPreviewProps {
     project: Project | null;
     onPage?: string;
 }
 
 export function WebPreview({ project, onPage }: WebPreviewProps) {
-    const { toast } = useToast();
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
-    const [isCheckingBuildErrors, setIsCheckingBuildErrors] = useState(false);
-    const [latestIteration, setLatestIteration] =
-        useState<LatestIteration | null>(null);
     const [pollingCount, setPollingCount] = useState(0);
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [activeTab, setActiveTab] = useState("preview");
 
     const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
 
-    const handleFixErrors = async () => {
-        posthog.capture("click_fix_errors_from_manage_project_web_preview");
-        if (!project?.id) {
-            toast({
-                title: "Project ID is required",
-                description: "Please select a project",
-            });
-            return;
-        }
-        setIsCheckingBuildErrors(true);
-
-        try {
-            await checkBuildErrors(project?.id);
-            toast({
-                title: "Genesoft software development AI Agent team working on fixing errors of your web application to help you deploy latest version",
-                description:
-                    "Please waiting for email notification when errors are fixed",
-                duration: 10000,
-            });
-        } catch (error) {
-            console.error("Error checking build errors:", error);
-            toast({
-                title: "Failed to check build errors",
-                description: "Please try again",
-                variant: "destructive",
-                duration: 10000,
-            });
-        } finally {
-            setIsCheckingBuildErrors(false);
-        }
-    };
-
     useEffect(() => {
         if (project?.id) {
             fetchLatestData();
         }
+        let interval: NodeJS.Timeout;
+
+        if (project?.id) {
+            // Initial fetch
+            fetchLatestData();
+
+            // Set up polling every 10 seconds
+            interval = setInterval(() => {
+                fetchLatestData();
+                setPollingCount((prev) => prev + 1);
+            }, 30000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, [project?.id]);
 
     const fetchLatestData = async () => {
@@ -91,6 +60,7 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
     };
 
     const handleRefresh = () => {
+        setWebApplicationInfo(null);
         refreshIframe();
         fetchLatestData();
     };

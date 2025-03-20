@@ -31,7 +31,6 @@ import posthog from "posthog-js";
 import TeamMangement from "@/components/organization/team/TeamMangement";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { Project } from "@/types/project";
-import { ProjectCard } from "@/components/project/ProjectCard";
 import OrganizationProjects from "@/components/project/manage/OrganizationProjects";
 
 const pageName = "OrganizationInfoPage";
@@ -69,22 +68,20 @@ const OrganizationInfoPage = () => {
 
     const setUpOrganizationProjects = async () => {
         const projects = await getOrganizationProjects(organizationId);
-        console.log({
-            message: `${pageName}: Organization projects`,
-            projects,
-        });
+
         setOrganizationProjects(projects);
     };
 
     const setupUserOrganization = async () => {
         setLoading(true);
         const user = await getUserByEmail({ email });
-        if (!user.organization) {
+        if (!organizationId) {
             router.push("/dashboard");
         }
         const organization = await getOrganizationById(organizationId);
         const organizationUsers = await getOrganizationUsers(organizationId);
         setOrganizationUsers(organizationUsers);
+        setOrganizationProjects(organizationProjects);
         setHasOrganization(user.organization !== null);
         setOrganization(organization);
         updateGenesoftUser(user);
@@ -102,10 +99,7 @@ const OrganizationInfoPage = () => {
                 name: organizationName,
                 description: organizationDescription,
             });
-            console.log({
-                message: `${pageName}: Organization created successfully`,
-                result,
-            });
+
             setHasOrganization(true);
         } catch (error) {
             console.error(error);
@@ -123,13 +117,6 @@ const OrganizationInfoPage = () => {
         );
         setOrganizationUsers(organizationUsers);
     };
-
-    console.log({
-        message: `${pageName}: Overview`,
-        email,
-        hasOrganization,
-        organization,
-    });
 
     if (loading) {
         return (
@@ -164,7 +151,7 @@ const OrganizationInfoPage = () => {
                 </div>
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0 w-full">
-                {hasOrganization && (
+                {organization && (
                     <div className="min-h-[100vh] flex-1 rounded-xl bg-secondary-dark md:min-h-min p-4 w-full flex flex-col">
                         <p className="text-xl md:text-2xl p-4 text-subtext-in-dark-bg font-bold">
                             Organization Information

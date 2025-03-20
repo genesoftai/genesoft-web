@@ -27,6 +27,7 @@ import { SketchPicker } from "react-color";
 import { Textarea } from "@/components/ui/textarea";
 import { hexToRgba, rgbaToHex } from "@/utils/common/color";
 import posthog from "posthog-js";
+import { useCreateProjectStore } from "@/stores/create-project-store";
 
 const UpdateProjectBrandingPage = () => {
     posthog.capture("pageview_update_project_branding");
@@ -39,6 +40,7 @@ const UpdateProjectBrandingPage = () => {
     const [selectedColor, setSelectedColor] = useState(hexToRgba("#000000"));
     const [webTheme, setWebTheme] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
+    const { updateCreateProjectStore } = useCreateProjectStore();
 
     useEffect(() => {
         const { projectId } = pathParams;
@@ -46,7 +48,9 @@ const UpdateProjectBrandingPage = () => {
     }, [pathParams]);
 
     useEffect(() => {
-        setupProject();
+        if (projectId) {
+            setupProject();
+        }
     }, [projectId]);
 
     const setupProject = async () => {
@@ -54,6 +58,14 @@ const UpdateProjectBrandingPage = () => {
         console.log({
             message: "setupProject",
             project,
+        });
+        updateCreateProjectStore({
+            branding: {
+                logo_url: project.branding?.logo_url,
+                color: project.branding?.color,
+                theme: project.branding?.theme,
+                perception: project.branding?.perception,
+            },
         });
         setLogoUrl(project.branding?.logo_url || "");
         setPerception(project.branding?.perception || "");
