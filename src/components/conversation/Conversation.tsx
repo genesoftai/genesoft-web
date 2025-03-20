@@ -381,10 +381,6 @@ const Conversation: React.FC<ConversationProps> = ({
             if (projectId) {
                 const response =
                     await getConversationsWithIterationsByProjectId(projectId);
-                console.log({
-                    message: "Conversations with iterations",
-                    response,
-                });
                 setConversationsWithIterations(response);
             }
         } catch (error) {
@@ -502,14 +498,6 @@ const Conversation: React.FC<ConversationProps> = ({
             console.error("Error fetching latest data:", error);
         }
     };
-
-    console.log({
-        message: "Conversation: props",
-        isLoadingImageUpload,
-        errorImageUpload,
-        messages,
-        conversationsWithIterations,
-    });
 
     return (
         <div className="flex flex-col w-full min-h-[85vh] h-full">
