@@ -3,8 +3,8 @@ import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
 import React from "react";
 import { DeploymentStatusBadge } from "../project/web-application/DeploymentStatus";
 import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
-import { Wrench } from "lucide-react";
+import { Loader2, Wrench, AppWindow } from "lucide-react";
+
 import BuildStatus from "../project/manage/build/BuildStatus";
 import { LatestIteration } from "@/types/development";
 
@@ -23,11 +23,13 @@ const DeploymentStatus = ({
     projectId,
     latestIteration,
 }: Props) => {
+    console.log(webApplicationInfo);
     return (
         <div className="flex flex-col gap-4 w-full p-4">
             <div className="flex flex-col gap-1 w-full sm:w-fit">
-                <div className="text-sm font-medium text-gray-300">
-                    Web Application Status
+                <div className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <AppWindow className="h-4 w-4 text-genesoft" />
+                    <p>Web Application Status</p>
                 </div>
                 <div className="flex flex-col items-center justify-between md:flex-row w-full md:w-fit gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
                     <DeploymentStatusBadge
@@ -51,8 +53,7 @@ const DeploymentStatus = ({
                 </div>
 
                 <div className="flex flex-col items-center md:flex-row w-full gap-2 p-4">
-                    {latestIteration?.status === "done" &&
-                        webApplicationInfo?.readyStatus === ReadyStatus.ERROR &&
+                    {webApplicationInfo?.readyStatus === ReadyStatus.ERROR &&
                         !webApplicationInfo?.repositoryBuild?.fix_triggered && (
                             <div className="flex flex-col items-start gap-2">
                                 <Button

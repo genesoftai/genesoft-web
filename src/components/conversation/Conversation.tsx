@@ -658,8 +658,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     />
                                 )}
 
-                                {webApplicationInfo?.readyStatus !==
-                                    ReadyStatus.BUILDING && (
+                                {webApplicationInfo?.readyStatus && (
                                     <DeploymentStatus
                                         webApplicationInfo={
                                             webApplicationInfo as WebApplicationInfo
@@ -705,9 +704,8 @@ const Conversation: React.FC<ConversationProps> = ({
                                     </div>
                                 )}
 
-                                {latestIteration?.status === "done" &&
-                                    webApplicationInfo?.readyStatus ===
-                                        ReadyStatus.ERROR &&
+                                {webApplicationInfo?.readyStatus ===
+                                    ReadyStatus.ERROR &&
                                     (!webApplicationInfo?.repositoryBuild
                                         ?.fix_triggered ||
                                         webApplicationInfo?.repositoryBuild
