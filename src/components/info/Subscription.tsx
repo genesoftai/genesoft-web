@@ -39,12 +39,9 @@ const pricingTiers: PricingTier[] = [
         price: "$0",
         priceDescription: "Free forever",
         features: [
-            "1 project",
-            "10 sprints per month",
-            "Moderate AI Model (Claude Haiku, backup by o1-mini)",
-            "Project in organization deleted in 7 days",
+            "10 generations per month",
             "Maximum 2 team members",
-            "Infrastructure: Database, Authentication, Storage, and Hosting",
+            "No Infrastructure management with AI Agents: Database, Authentication, Storage, and Payments",
             "Email Support",
         ],
         buttonText: "Get Started",
@@ -56,14 +53,12 @@ const pricingTiers: PricingTier[] = [
         price: "$30",
         priceDescription: "per month",
         features: [
-            "1 project",
-            "40 sprints per month",
-            "Advanced AI Model (Claude Sonnet 3.7, backup by o1-mini)",
+            "100 generations per month",
             "Unlimited team members",
-            "Project not deleted while in subscription",
-            "Infrastructure: Database, Authentication, Storage, and Hosting",
-            "Email Support, Infrastructure setup support, Dedicated Support, and Code Edition Support",
-            "Extra sprints: $0.3 per sprint",
+            "Infrastructure management with AI agents: Database, Authentication, Storage, and Payments (coming soon)",
+            "Domain setup (coming soon)",
+            "Email Support, Infrastructure setup support, Dedicated Support",
+            "Extra generations: $0.3 per generation",
         ],
         buttonText: "Sign Up",
         highlighted: true,
@@ -74,12 +69,10 @@ const pricingTiers: PricingTier[] = [
     //     price: "$99",
     //     priceDescription: "per month",
     //     features: [
-    //         "2 projects",
-    //         "60 sprints per month",
-    //         "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
-    //         "Dedicated Support",
-    //         "Project not deleted while in subscription",
-    //         "Extra sprints: $1 per sprint",
+    //         "200 generations per month",
+    //         "Unlimited team members",
+    //         "Infrastructure management with AI agents: Database, Authentication, Storage, and Payments",
+    //         "Extra generations: $0.2 per generation",
     //     ],
     //     buttonText: "Sign Up",
     // },
@@ -89,12 +82,10 @@ const pricingTiers: PricingTier[] = [
     //     price: "$199",
     //     priceDescription: "per month",
     //     features: [
-    //         "3 Projects",
-    //         "100 sprints per month",
-    //         "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
-    //         "Expert Software developer support",
-    //         "2 Environments per project: Development and Production",
-    //         "Extra sprints: $1 per sprint",
+    //         "600 generations per month",
+    //         "Unlimited team members",
+    //         "Infrastructure management with AI agents: Database, Authentication, Storage, and Payments",
+    //         "Extra generations: $0.1 per generation",
     //     ],
     //     buttonText: "Sign Up",
     // },
@@ -105,11 +96,10 @@ const enterpriseTier = {
     description: "Customized solutions for your organization",
     features: [
         "Unlimited projects",
-        "Unlimited sprints",
+        "Unlimited generations",
         "2 Environments per project",
         "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
         "Email Support, Infrastructure setup support, Dedicated Support, and Code Edition Support",
-        "Project not deleted while in subscription",
     ],
     buttonText: "Contact Us",
 };
@@ -254,7 +244,7 @@ export default function Subscription() {
                                     {tier.features.map((feature, j) => (
                                         <li
                                             key={j}
-                                            className="flex items-start"
+                                            className="flex items-center"
                                         >
                                             <div className="mr-2 mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-genesoft/20">
                                                 <Check className="h-3 w-3 text-genesoft" />
@@ -274,7 +264,7 @@ export default function Subscription() {
                                             ? "bg-genesoft hover:bg-genesoft/90 text-white"
                                             : tier.buttonVariant === "outline"
                                               ? "border-line-in-dark-bg text-black hover:text-white hover:bg-genesoft"
-                                              : "bg-secondary-dark hover:bg-tertiary-dark text-white",
+                                              : "bg-white text-black hover:text-white hover:bg-genesoft",
                                     )}
                                     variant={tier.buttonVariant || "default"}
                                     onClick={() => handleButtonClick(tier.name)}
@@ -288,7 +278,17 @@ export default function Subscription() {
                                               ? monthlySprints?.tier === "free"
                                                   ? "Manage Subscription"
                                                   : "Downgrade"
-                                              : tier.buttonText
+                                              : tier.name === "Launch Tier"
+                                                ? monthlySprints?.tier ===
+                                                  "launch"
+                                                    ? "Manage Subscription"
+                                                    : "Upgrade"
+                                                : tier.name === "Scale Tier"
+                                                  ? monthlySprints?.tier ===
+                                                    "scale"
+                                                      ? "Manage Subscription"
+                                                      : "Upgrade"
+                                                  : tier.buttonText
                                         : tier.buttonText}
                                 </Button>
                             </CardFooter>
