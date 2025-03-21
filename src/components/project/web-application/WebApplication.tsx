@@ -40,6 +40,20 @@ const WebApplication = ({
                     </a>
                 </div>
 
+                <div className="overflow-hidden cursor-pointer">
+                    {webApplicationInfo?.url && (
+                        <a
+                            href={webApplicationInfo.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 transition-colors truncate hover:underline cursor-pointer"
+                            style={{ display: "block", maxWidth: "100%" }}
+                        >
+                            {webApplicationInfo.url}
+                        </a>
+                    )}
+                </div>
+
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"

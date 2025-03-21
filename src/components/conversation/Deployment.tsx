@@ -53,7 +53,8 @@ const DeploymentStatus = ({
                 </div>
 
                 <div className="flex flex-col items-center md:flex-row w-full gap-2 p-4">
-                    {webApplicationInfo?.readyStatus === ReadyStatus.ERROR &&
+                    {latestIteration?.status === "done" &&
+                        webApplicationInfo?.readyStatus === ReadyStatus.ERROR &&
                         !webApplicationInfo?.repositoryBuild?.fix_triggered && (
                             <div className="flex flex-col items-start gap-2">
                                 <Button

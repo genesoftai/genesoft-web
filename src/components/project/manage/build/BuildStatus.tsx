@@ -100,16 +100,7 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                             )}
                         </div>
                     </div>
-                    <div className="flex flex-col gap-1">
-                        <span className="text-xs text-gray-400">
-                            Started On
-                        </span>
-                        <span className="text-sm text-white">
-                            {new Date(
-                                webApplicationInfo.repositoryBuild.created_at,
-                            ).toLocaleString()}
-                        </span>
-                    </div>
+
                     <div className="flex flex-col gap-1">
                         <span className="text-xs text-gray-400">
                             Last Updated

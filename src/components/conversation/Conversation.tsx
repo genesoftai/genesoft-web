@@ -708,8 +708,9 @@ const Conversation: React.FC<ConversationProps> = ({
                                     </div>
                                 )}
 
-                                {webApplicationInfo?.readyStatus ===
-                                    ReadyStatus.ERROR &&
+                                {latestIteration?.status === "done" &&
+                                    webApplicationInfo?.readyStatus ===
+                                        ReadyStatus.ERROR &&
                                     (!webApplicationInfo?.repositoryBuild
                                         ?.fix_triggered ||
                                         webApplicationInfo?.repositoryBuild
