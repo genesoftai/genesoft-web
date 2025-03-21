@@ -215,6 +215,10 @@ const Conversation: React.FC<ConversationProps> = ({
 
         setErrorStartSprint("");
         setIsLoadingSubmitConversation(true);
+        if (monthlySprints?.remaining < 1) {
+            handleSubscription();
+            return;
+        }
         try {
             await submitConversation(conversationId);
             setupMonthlySprints();
