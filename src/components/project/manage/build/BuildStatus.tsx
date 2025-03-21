@@ -165,7 +165,7 @@ const BuildStatus = ({ projectId, webApplicationInfo }: BuildStatusProps) => {
                                     href="mailto:support@genesoft.com"
                                     className="text-blue-300 hover:text-blue-400"
                                 >
-                                    support@genesoft.com
+                                    support@genesoftai.com
                                 </a>
                             </p>
                         </div>

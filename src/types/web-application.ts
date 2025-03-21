@@ -7,6 +7,7 @@ export enum ReadyStatus {
     BUILDING = "BUILDING",
     READY = "READY",
     ERROR = "ERROR",
+    QUEUED = "QUEUED",
 }
 
 export enum DevelopmentStatus {

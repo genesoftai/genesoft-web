@@ -13,7 +13,6 @@ import { uploadFileFree } from "@/actions/file";
 import posthog from "posthog-js";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCreateProjectStore } from "@/stores/create-project-store";
-import { useUserStore } from "@/stores/user-store";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 
 interface ProjectCreationBoxProps {
