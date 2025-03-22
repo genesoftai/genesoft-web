@@ -50,10 +50,10 @@ const pricingTiers: PricingTier[] = [
     {
         name: "Startup Tier",
         description: "For small team and growing projects",
-        price: "$30",
+        price: "$20",
         priceDescription: "per month",
         features: [
-            "100 generations per month",
+            "50 generations per month",
             "Unlimited team members",
             "Infrastructure management with AI agents: Database, Authentication, Storage, and Payments (coming soon)",
             "Domain setup (coming soon)",
