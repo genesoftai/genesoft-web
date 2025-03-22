@@ -256,6 +256,8 @@ export default function Navbar() {
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
                         </button>
 
+                     
+
                         <button
                             onClick={() => {
                                 router.push("/subscription");
@@ -264,6 +266,16 @@ export default function Navbar() {
                         >
                             Pricing
                         </button>
+
+                        <a
+                            href="https://discord.gg/5jRywzzqDd"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                        >
+                            Discord
+                            <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                        </a>
                     </div>
                 </div>
 
@@ -345,6 +357,16 @@ export default function Navbar() {
                                 >
                                     Support
                                 </button>
+                                <a
+                                    href="https://discord.gg/5jRywzzqDd"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Discord
+                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                                </a>
                             </div>
 
                             {userEmail ? (
