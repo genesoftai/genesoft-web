@@ -513,7 +513,7 @@ const Conversation: React.FC<ConversationProps> = ({
                             className={`flex justify-between items-center gap-3 rounded-lg relative z-0 w-full`}
                         >
                             <div className="flex flex-col gap-1 w-fit">
-                                <div className="flex items-center justify-center bg-gradient-to-r from-[#2a2d32] to-[#1e2124] px-3 py-1.5 rounded-full shadow-inner">
+                                {/* <div className="flex items-center justify-center bg-gradient-to-r from-[#2a2d32] to-[#1e2124] px-3 py-1.5 rounded-full shadow-inner">
                                     <span className="text-gray-400 text-xs font-medium flex items-center gap-1.5">
                                         <CircleCheck
                                             size={12}
@@ -530,7 +530,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                                     0)}
                                         </span>
                                     </span>
-                                </div>
+                                </div> */}
 
                                 {errorStartSprint && (
                                     <div className="px-2 py-1 text-xs text-red-400 bg-red-500/10 rounded-md w-full flex flex-col gap-2">
