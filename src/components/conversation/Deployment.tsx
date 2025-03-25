@@ -23,7 +23,6 @@ const DeploymentStatus = ({
     projectId,
     latestIteration,
 }: Props) => {
-    console.log(webApplicationInfo);
     return (
         <div className="flex flex-col gap-4 w-full p-4">
             <div className="flex flex-col gap-1 w-full sm:w-fit">
