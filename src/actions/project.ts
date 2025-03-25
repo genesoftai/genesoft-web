@@ -13,8 +13,6 @@ import {
     EditFeatureRequest,
 } from "../types/project";
 
-export const maxDuration = 300;
-
 export async function createProject(payload: CreateProjectRequest) {
     const url = `${genesoftCoreApiServiceBaseUrl}/project`;
 
