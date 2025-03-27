@@ -39,7 +39,7 @@ const pricingTiers: PricingTier[] = [
         price: "$0",
         priceDescription: "Free forever",
         features: [
-            "10 generations per month",
+            "5 generations per month",
             "Maximum 2 team members",
             "No Infrastructure management with AI Agents: Database, Authentication, Storage, and Payments",
             "Email Support",
