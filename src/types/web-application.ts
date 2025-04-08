@@ -39,4 +39,6 @@ export interface WebApplicationInfo {
     developmentDoneAt: number;
     readyStatus: ReadyStatus;
     repositoryBuild: RepositoryBuild;
+    codesandboxUrl: string | null;
+    codesandboxId: string | null;
 }

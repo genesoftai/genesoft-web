@@ -31,6 +31,12 @@ export type TalkToProjectManagerDto = {
     page_id?: string;
 };
 
+export type TalkToBackendDeveloperDto = {
+    project_id: string;
+    conversation_id: string;
+    message: CreateMessageDto;
+};
+
 export type CreateConversationDto = {
     project_id: string;
     name?: string;
@@ -194,6 +200,33 @@ export async function talkToProjectManager(payload: TalkToProjectManagerDto) {
             throw new Error(error.response?.data.message);
         }
         throw new Error("Failed to talk to project manager");
+    }
+}
+
+export async function talkToBackendDeveloper(
+    payload: TalkToBackendDeveloperDto,
+) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/talk/backend-developer`;
+
+    console.log({
+        message: "talkToBackendDeveloper",
+        payload,
+        url,
+    });
+
+    try {
+        const res = await axios.post(url, payload, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error talking to backend developer:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error("Failed to talk to backend developer");
     }
 }
 

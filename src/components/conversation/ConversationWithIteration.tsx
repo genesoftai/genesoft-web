@@ -137,6 +137,7 @@ const ConversationWithIteration = ({
                                             status={
                                                 conversationWithIteration.status
                                             }
+                                            sender_id={message.sender_id || ""}
                                         />
                                     )}
                                 </div>

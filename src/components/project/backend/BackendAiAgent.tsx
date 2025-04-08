@@ -1,56 +1,45 @@
-"use client";
-
-import {
-    getActiveConversationByProjectId,
-    getConversationById,
-} from "@/actions/conversation";
-import { getProjectById } from "@/actions/project";
-import PageLoading from "@/components/common/PageLoading";
-import { WebPreview } from "@/components/project/manage/WebPreview";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useProjectStore } from "@/stores/project-store";
+import { ConversationMessageForWeb, Message } from "@/types/message";
 import { Project } from "@/types/project";
-import { MessageSquare, MonitorPlay } from "lucide-react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { ConversationMessageForWeb, Message } from "@/types/message";
+import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
-import Image from "next/image";
-import ServicesIntegrationSheet from "@/components/project/services/ServicesIntegrationSheet";
-import Conversation from "@/components/conversation/Conversation";
-import BackendAiAgent from "@/components/project/backend/BackendAiAgent";
+import { MonitorPlay } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+import { Collapsible } from "@/components/ui/collapsible";
+import { CollapsibleContent } from "@radix-ui/react-collapsible";
+import { getConversationById } from "@/actions/conversation";
+import { getActiveConversationByProjectId } from "@/actions/conversation";
+import PageLoading from "@/components/common/PageLoading";
+import BackendConversation from "@/components/conversation/BackendConversation";
+import { BackendPreview } from "../manage/BackendPreview";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import BackendAiAgentProgress from "./BackendAiAgentProgress";
 
-const ManagePagePage = () => {
-    const pathParams = useParams();
-    const { id: projectId, updateProjectStore } = useProjectStore();
-    const [project, setProject] = useState<Project | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([]);
+type Props = {
+    project: Project;
+};
+
+const BackendAiAgent = ({ project }: Props) => {
+    const router = useRouter();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [conversation, setConversation] =
-        useState<ConversationMessageForWeb | null>(null);
+    const [activeTab, setActiveTab] = useState("conversation");
+    const [activeTabOverview, setActiveTabOverview] = useState("preview");
+    const [conversationKey, setConversationKey] = useState(0);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [isLoadingSetupPageConversation, setIsLoadingSetupPageConversation] =
         useState<boolean>(false);
-    const [conversationKey, setConversationKey] = useState<number>(0);
-    const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState("conversation");
-    const router = useRouter();
-
-    const setupProject = async () => {
-        setLoading(true);
-        try {
-            const projectData = await getProjectById(projectId);
-            setProject(projectData);
-            updateProjectStore(projectData);
-        } catch (error) {
-            console.error("Error fetching project:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [conversation, setConversation] =
+        useState<ConversationMessageForWeb | null>(null);
+    const pathParams = useParams();
+    const [loading, setLoading] = useState(false);
 
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
@@ -61,11 +50,8 @@ const ManagePagePage = () => {
         setupProjectGeneration(projectId as string);
     }, [pathParams]);
 
-    useEffect(() => {
-        setupProject();
-    }, [projectId]);
-
     const setupActivePageConversation = async (projectId: string) => {
+        setLoading(true);
         setIsLoadingSetupPageConversation(true);
         try {
             const activeConversation =
@@ -79,6 +65,7 @@ const ManagePagePage = () => {
             console.error("Error fetching active project conversation:", error);
         } finally {
             setIsLoadingSetupPageConversation(false);
+            setLoading(false);
         }
     };
 
@@ -94,15 +81,6 @@ const ManagePagePage = () => {
 
     if (loading) {
         return <PageLoading text="Loading page information..." />;
-    }
-
-    console.log({
-        message: "project",
-        project,
-    });
-
-    if (project?.project_template_type.startsWith("backend")) {
-        return <BackendAiAgent project={project} />;
     }
 
     return (
@@ -124,29 +102,42 @@ const ManagePagePage = () => {
                     </div>
                 </div>
 
-                <ServicesIntegrationSheet
-                    isOpen={isServicesSheetOpen}
-                    onOpenChange={setIsServicesSheetOpen}
-                />
-
-                {/* Toggle Button - Only visible on md and up */}
-                <div className="hidden md:block">
-                    <ToggleButton
-                        isCollapsed={isCollapsed}
-                        setIsCollapsed={setIsCollapsed}
-                        className="ml-auto"
-                    />
-                </div>
+                <Tabs
+                    value={activeTabOverview}
+                    onValueChange={setActiveTabOverview}
+                    className="flex-1 flex flex-col max-w-xs md:max-w-sm rounded-lg"
+                >
+                    <TabsList className="grid self-center w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
+                        <TabsTrigger
+                            value="preview"
+                            className="flex items-center gap-2 text-xs md:text-sm"
+                            onClick={() => setActiveTabOverview("preview")}
+                        >
+                            <MessageSquare className="h-2 w-2 md:h-4 md:w-4" />
+                            <span>Preview</span>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="ai-agent-progress"
+                            className="flex items-center gap-2 text-xs md:text-sm"
+                            onClick={() =>
+                                setActiveTabOverview("ai-agent-progress")
+                            }
+                        >
+                            <MonitorPlay className="h-2 w-2 md:h-4 md:w-4" />
+                            <span>AI Agent progress</span>
+                        </TabsTrigger>
+                    </TabsList>
+                </Tabs>
             </div>
 
             {/* Mobile View (Tabs) - Only visible below md breakpoint */}
-            <div className="md:hidden flex-1 flex flex-col w-full items-center">
+            <div className="md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
                     className="flex-1 flex flex-col h-[calc(100vh-60px)]"
                 >
-                    <TabsList className="grid w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
+                    <TabsList className="grid self-center w-full sm:w-6/12 grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
                         <TabsTrigger
                             value="conversation"
                             className="flex items-center gap-2"
@@ -168,7 +159,7 @@ const ManagePagePage = () => {
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
                     >
                         <div className="flex-1 min-w-0 h-auto">
-                            <Conversation
+                            <BackendConversation
                                 key={`mobile-conversation-${conversationKey}`}
                                 conversationId={conversation?.id || ""}
                                 initialMessages={messages || []}
@@ -188,21 +179,49 @@ const ManagePagePage = () => {
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
                     >
                         <div className="flex-1">
-                            <WebPreview project={project} />
+                            <BackendPreview project={project} />
                         </div>
                     </TabsContent>
                 </Tabs>
             </div>
 
             {/* Desktop View - Only visible at md breakpoint and up */}
-            <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-1">
-                {/* Conversation Section */}
+            <ResizablePanelGroup
+                direction="horizontal"
+                className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
+            >
+                <ResizablePanel defaultSize={50}>
+                    <BackendConversation
+                        key={`desktop-conversation-${conversationKey}`}
+                        conversationId={conversation?.id || ""}
+                        initialMessages={messages || []}
+                        isLoading={isLoadingSetupPageConversation}
+                        onSubmitConversation={handleSubmitConversation}
+                        status={conversation?.status || ""}
+                        pageId={pathParams?.pageId as string}
+                        onSendImageWithMessage={handleSendImageWithMessage}
+                    />
+                </ResizablePanel>
+                <ResizableHandle
+                    className="bg-primary-dark w-1 rounded-full"
+                    withHandle
+                />
+                <ResizablePanel defaultSize={50}>
+                    {activeTabOverview === "preview" && (
+                        <BackendPreview project={project} />
+                    )}
+                    {activeTabOverview === "ai-agent-progress" && (
+                        <BackendAiAgentProgress project={project} />
+                    )}
+                </ResizablePanel>
+            </ResizablePanelGroup>
+            {/* <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-1">
                 <div
                     className={`flex-1 min-w-0 ${
                         isCollapsed ? "lg:w-full" : "lg:max-w-[60%]"
                     } h-[calc(100vh-60px)]`}
                 >
-                    <Conversation
+                    <BackendConversation
                         key={`desktop-conversation-${conversationKey}`}
                         conversationId={conversation?.id || ""}
                         initialMessages={messages || []}
@@ -214,7 +233,6 @@ const ManagePagePage = () => {
                     />
                 </div>
 
-                {/* WebPreview Section - Collapsible */}
                 <Collapsible
                     className={`transition-all duration-300 ease-in-out ${
                         isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"
@@ -227,13 +245,13 @@ const ManagePagePage = () => {
                         forceMount
                     >
                         <div className="h-full overflow-auto">
-                            <WebPreview project={project} />
+                            <BackendPreview project={project} />
                         </div>
                     </CollapsibleContent>
                 </Collapsible>
-            </div>
+            </div> */}
         </div>
     );
 };
 
-export default ManagePagePage;
+export default BackendAiAgent;
