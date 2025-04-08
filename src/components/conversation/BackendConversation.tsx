@@ -16,6 +16,7 @@ import {
     CreateMessageDto,
     getConversationsWithIterationsByProjectId,
     submitConversation,
+    talkToBackendDeveloper,
     talkToProjectManager,
 } from "@/actions/conversation";
 import { useProjectStore } from "@/stores/project-store";
@@ -60,10 +61,7 @@ import { ConversationWithIterations } from "@/types/conversation";
 import ConversationWithIteration from "./ConversationWithIteration";
 import { formatDateToHumanReadable } from "@/utils/common/time";
 import { LatestIteration } from "@/types/development";
-import { getWebApplicationInfo } from "@/actions/web-application";
 import DevelopmentActivity from "../project/manage/development/DevelopmentActivity";
-import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
-import DeploymentStatus from "./Deployment";
 import { toast } from "@/hooks/use-toast";
 import posthog from "posthog-js";
 export type SprintOption = {
@@ -85,14 +83,12 @@ export interface ConversationProps {
     onSendImageWithMessage?: (messages: Message[]) => Promise<void>;
 }
 
-const Conversation: React.FC<ConversationProps> = ({
+const BackendConversation: React.FC<ConversationProps> = ({
     conversationId,
     initialMessages = [],
     isLoading = false,
     onSubmitConversation,
     status,
-    featureId,
-    pageId,
     onSendImageWithMessage,
 }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -127,8 +123,6 @@ const Conversation: React.FC<ConversationProps> = ({
     const [latestIteration, setLatestIteration] =
         useState<LatestIteration | null>(null);
     const [pollingCount, setPollingCount] = useState(0);
-    const [webApplicationInfo, setWebApplicationInfo] =
-        useState<WebApplicationInfo | null>(null);
     const [isCheckingBuildErrors, setIsCheckingBuildErrors] =
         useState<boolean>(false);
 
@@ -185,12 +179,10 @@ const Conversation: React.FC<ConversationProps> = ({
             setMessages([...messages, tempMessage]);
 
             setInputValue("");
-            const result = await talkToProjectManager({
+            const result = await talkToBackendDeveloper({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
-                feature_id: featureId,
-                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
@@ -319,8 +311,6 @@ const Conversation: React.FC<ConversationProps> = ({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
-                feature_id: featureId,
-                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
@@ -486,11 +476,7 @@ const Conversation: React.FC<ConversationProps> = ({
 
         try {
             const iterationInfo = await getLatestIteration(projectId);
-            const latestWebApplicationInfo =
-                await getWebApplicationInfo(projectId);
-
             setLatestIteration(iterationInfo);
-            setWebApplicationInfo(latestWebApplicationInfo);
         } catch (error) {
             console.error("Error fetching latest data:", error);
         }
@@ -506,25 +492,6 @@ const Conversation: React.FC<ConversationProps> = ({
                             className={`flex justify-between items-center gap-3 rounded-lg relative z-0 w-full`}
                         >
                             <div className="flex flex-col gap-1 w-fit">
-                                {/* <div className="flex items-center justify-center bg-gradient-to-r from-[#2a2d32] to-[#1e2124] px-3 py-1.5 rounded-full shadow-inner">
-                                    <span className="text-gray-400 text-xs font-medium flex items-center gap-1.5">
-                                        <CircleCheck
-                                            size={12}
-                                            className="text-blue-400"
-                                        />
-                                        Generations:
-                                        <span className="text-white font-semibold">
-                                            {monthlySprints?.count || 0}
-                                        </span>
-                                        <span className="text-gray-500">/</span>
-                                        <span className="text-white font-semibold">
-                                            {(monthlySprints?.count || 0) +
-                                                (monthlySprints?.remaining ||
-                                                    0)}
-                                        </span>
-                                    </span>
-                                </div> */}
-
                                 {errorStartSprint && (
                                     <div className="px-2 py-1 text-xs text-red-400 bg-red-500/10 rounded-md w-full flex flex-col gap-2">
                                         <span className="text-red-400">
@@ -600,20 +567,13 @@ const Conversation: React.FC<ConversationProps> = ({
                                                                             {conversation?.name ||
                                                                                 "Untitled"}
                                                                         </span>
-                                                                        {/* <span className="px-2.5 py-1 text-xs rounded-full bg-[#2a2d32] text-gray-300 border border-[#3a3d42] shadow-inner">
-                                                                            {conversation?.updated_at
-                                                                                ? formatDateToHumanReadable(
-                                                                                      conversation.updated_at,
-                                                                                  )
-                                                                                : ""}
-                                                                        </span> */}
                                                                     </div>
                                                                     <HistoryIcon className="h-5 w-5 text-blue-300" />
                                                                 </CardTitle>
                                                             </CardHeader>
                                                         </Card>
                                                     </DialogTrigger>
-                                                    <DialogContent className="w-11/12 md:w-6/12 max-w-4xl p-0 bg-[#1a1d21] border border-[#383838] text-white rounded-lg">
+                                                    <DialogContent className="w-11/12 md:w-8/12 max-w-5xl p-0 bg-[#1a1d21] border border-[#383838] text-white rounded-lg">
                                                         <DialogHeader className="px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838]">
                                                             <DialogTitle className="text-lg font-semibold text-white flex flex-col md:flex-row items-center gap-3 pt-8 md:pt-4">
                                                                 <span className="text-blue-300 font-medium">
@@ -655,22 +615,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     />
                                 )}
 
-                                {webApplicationInfo?.readyStatus && (
-                                    <DeploymentStatus
-                                        webApplicationInfo={
-                                            webApplicationInfo as WebApplicationInfo
-                                        }
-                                        handleFixErrors={handleFixErrors}
-                                        isCheckingBuildErrors={
-                                            isCheckingBuildErrors
-                                        }
-                                        projectId={projectId}
-                                        latestIteration={
-                                            latestIteration as LatestIteration
-                                        }
-                                    />
-                                )}
-
+                                {/* This is the place that root cause of non-responsive conversation */}
                                 {messages.map((message, index) => (
                                     <div
                                         key={message.id}
@@ -687,6 +632,9 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 index={index}
                                                 messagesEndRef={messagesEndRef}
                                                 status={status}
+                                                sender_id={
+                                                    message.sender_id as string
+                                                }
                                             />
                                         )}
                                     </div>
@@ -696,43 +644,10 @@ const Conversation: React.FC<ConversationProps> = ({
                                     <div className="flex justify-center mb-4">
                                         <div className="bg-[#252a2e] text-gray-400 text-xs py-1 px-3 rounded-md flex items-center gap-2 animate-pulse">
                                             <Loader2 className="h-3 w-3 animate-spin" />
-                                            Project Manager is thinking...
+                                            AI Agent is thinking...
                                         </div>
                                     </div>
                                 )}
-
-                                {latestIteration?.status === "done" &&
-                                    webApplicationInfo?.readyStatus ===
-                                        ReadyStatus.ERROR &&
-                                    (!webApplicationInfo?.repositoryBuild
-                                        ?.fix_triggered ||
-                                        webApplicationInfo?.repositoryBuild
-                                            ?.status === "done") && (
-                                        <div className="flex flex-col items-center justify-center p-4 bg-white text-black rounded-md">
-                                            <p className="text-lg font-semibold text-red-500">
-                                                Deployment Failed
-                                            </p>
-                                            <p className="text-sm">
-                                                There was an error during
-                                                deployment. Please click fix
-                                                errors to inform Genesoft
-                                                software development AI Agent
-                                                team to fix it.
-                                            </p>
-                                            <Button
-                                                variant="outline"
-                                                className="mt-2 text-white border-white bg-red-500 hover:bg-red-600 hover:text-white"
-                                                onClick={handleFixErrors}
-                                            >
-                                                {isCheckingBuildErrors
-                                                    ? "Fixing errors..."
-                                                    : "Fix Errors"}
-                                                {isCheckingBuildErrors && (
-                                                    <Loader2 className="h-4 w-4 animate-spin ml-1 text-white" />
-                                                )}
-                                            </Button>
-                                        </div>
-                                    )}
                             </div>
                             <style jsx global>{`
                                 .conversation-scrollarea pre,
@@ -964,4 +879,4 @@ const Conversation: React.FC<ConversationProps> = ({
     );
 };
 
-export default Conversation;
+export default BackendConversation;
