@@ -43,7 +43,7 @@ interface ProjectCreationBoxProps {
         description: string;
         logo?: string;
         color?: string;
-        project_type?: string;
+        project_type: string;
         backend_requirements?: string;
     }) => void;
     initialValues?: {

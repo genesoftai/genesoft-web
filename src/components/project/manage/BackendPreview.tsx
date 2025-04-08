@@ -111,7 +111,10 @@ export function BackendPreview({ project, onPage }: WebPreviewProps) {
 
                         <div className="overflow-hidden cursor-pointer">
                             <a
-                                href={backendServiceInfo?.codesandboxPreviewUrl}
+                                href={
+                                    backendServiceInfo?.codesandboxPreviewUrl ||
+                                    ""
+                                }
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-400 hover:text-blue-300 transition-colors truncate hover:underline cursor-pointer"

@@ -687,6 +687,9 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 index={index}
                                                 messagesEndRef={messagesEndRef}
                                                 status={status}
+                                                sender_id={
+                                                    message.sender_id || ""
+                                                }
                                             />
                                         )}
                                     </div>
