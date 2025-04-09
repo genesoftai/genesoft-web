@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
 import StripeSection from "./StripeSection";
 import FirebaseSection from "./FirebaseSection";
+import GitHubSection from "./GitHubSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getStripeEnvs } from "@/actions/integration";
 import { getFirebaseEnvs } from "@/actions/integration";
@@ -74,6 +75,9 @@ export const ServicesIntegrationSheet = ({
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                     <div className="py-6 space-y-6">
+                        <GitHubSection
+                            projectId={projectId}
+                        />
                         <FirebaseSection
                             projectId={projectId}
                             firebaseEnv={firebaseEnv as FirebaseEnv}

@@ -111,6 +111,7 @@ export default function LandingPage() {
         });
 
         if (user_id) {
+
             posthog.capture("onboarding_complete_from_landing_page");
             handleCreateProjectFromOnboarding({
                 description,
@@ -145,6 +146,7 @@ export default function LandingPage() {
             const res = await createProjectFromOnboarding({
                 user_id: user_id,
                 project_description: description,
+                project_type: 'web',
                 branding: {
                     logo_url: logo,
                     color: color,
