@@ -376,6 +376,7 @@ export const editFeature = async ({
 
 export type CreateProjectFromOnboardingDto = {
     user_id: string;
+    project_type: string;
     project_description: string;
     branding?: {
         logo_url?: string;
@@ -386,6 +387,8 @@ export type CreateProjectFromOnboardingDto = {
 export async function createProjectFromOnboarding(
     payload: CreateProjectFromOnboardingDto,
 ) {
+    payload.project_type = 'web'
+    console.log('genesoftCoreApiServiceBaseUrl', genesoftCoreApiServiceBaseUrl)
     const url = `${genesoftCoreApiServiceBaseUrl}/project/onboarding`;
     try {
         const res = await axios.post(url, payload, {
@@ -396,6 +399,7 @@ export async function createProjectFromOnboarding(
         return res.data;
     } catch (error) {
         console.error("Error creating project from onboarding:", error);
+        console.error(error?.response)
         throw new Error("Failed to create project from onboarding");
     }
 }

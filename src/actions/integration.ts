@@ -60,3 +60,23 @@ export const updateEnvs = async (payload: UpdateEnvs) => {
         throw new Error("Failed to update stripe envs");
     }
 };
+
+export const requestGithubAccess = async (projectId: string, uid: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/github-access`;
+    try {
+        // Get the current user ID from the client-side session
+        console.log({
+            url,
+            uid,
+        });
+        const response = await axios.post(url, { uid }, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error requesting GitHub access:", error);
+        throw new Error("Failed to request GitHub access");
+    }
+};
