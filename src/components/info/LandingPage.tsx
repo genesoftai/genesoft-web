@@ -13,6 +13,7 @@ import {
     Code,
     Search,
     Loader2,
+    Waypoints,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -64,6 +65,8 @@ export default function LandingPage() {
         is_onboarding,
         description: projectDescription,
         branding: projectBranding,
+        project_type: projectType,
+        backend_requirements: backendRequirements,
         clearCreateProjectStore,
     } = useCreateProjectStore();
     const [
@@ -74,8 +77,9 @@ export default function LandingPage() {
     const { updateGenesoftOrganization } = useGenesoftOrganizationStore();
 
     const heroContent = [
-        "Push your idea to the world in minutes",
-        "Collaborate with your team and our AI agents to build web application for your business idea",
+        "Deliver full stack web app project 10x faster with AI Agents",
+        "Collaborate with project manager, frontend developer, backend developer AI Agents to build web and backend services for your software project",
+        "Build by developer for developer",
     ];
 
     const nextStage = () => {
@@ -86,10 +90,14 @@ export default function LandingPage() {
         description,
         logo,
         color,
+        project_type,
+        backend_requirements,
     }: {
         description: string;
         logo?: string;
         color?: string;
+        project_type: string;
+        backend_requirements?: string;
     }) => {
         console.log({
             message: "onboarding complete",
@@ -97,6 +105,8 @@ export default function LandingPage() {
                 description,
                 logo,
                 color,
+                project_type,
+                backend_requirements,
             },
         });
 
@@ -107,6 +117,8 @@ export default function LandingPage() {
                 description,
                 logo,
                 color,
+                project_type,
+                backend_requirements,
             });
             setIsCreatingProjectFromOnboarding(true);
         } else {
@@ -119,10 +131,14 @@ export default function LandingPage() {
         description,
         logo,
         color,
+        project_type,
+        backend_requirements,
     }: {
         description: string;
         logo?: string;
         color?: string;
+        project_type: string;
+        backend_requirements?: string;
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
@@ -135,6 +151,8 @@ export default function LandingPage() {
                     logo_url: logo,
                     color: color,
                 },
+                project_type: project_type,
+                backend_requirements: backend_requirements,
             });
             if (res.error) {
                 posthog.capture(
@@ -180,6 +198,8 @@ export default function LandingPage() {
                 description: projectDescription,
                 logo: projectBranding?.logo_url,
                 color: projectBranding?.color,
+                project_type: projectType || "web",
+                backend_requirements: backendRequirements || "",
             });
         }
     }, [is_onboarding, user_id, projectDescription]);
@@ -199,8 +219,8 @@ export default function LandingPage() {
                         <div className="inline-flex items-center bg-tertiary-dark rounded-full px-4 py-2 mb-8 border border-line-in-dark-bg">
                             <Sparkles className="h-4 w-4 mr-2 text-genesoft" />
                             <span className="text-sm">
-                                AI Agents workspace to build app for
-                                non-technical product owner
+                                AI Agents workspace to build full stack web
+                                application for software developer
                             </span>
                         </div>
 
@@ -226,6 +246,7 @@ export default function LandingPage() {
                                     description: projectDescription,
                                     logo: projectBranding?.logo_url,
                                     color: projectBranding?.color,
+                                    project_type: projectType,
                                 }}
                             />
                         ) : (
@@ -375,28 +396,28 @@ export default function LandingPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {[
                                 {
-                                    title: "Non-Tech User Experience",
+                                    title: "Built for Developer",
                                     description:
-                                        "Built for Non-Tech Product Owner to get their own web application without headache for technical stuff that is not your expertise",
+                                        "Technical experience of AI Agents integrated with cloud based development experience so you can setup and test web integrated with API service easily",
                                     icon: UserCheck,
                                 },
                                 {
                                     title: "Cost Effective",
                                     description:
-                                        "10x cheaper than hiring in-house developer or software development outsourcing",
+                                        "10x cheaper than hiring in-house developer, we empower you to get 10x productivity with AI Agents",
                                     icon: CircleDollarSign,
                                 },
                                 {
                                     title: "Improve Anytime",
                                     description:
-                                        "Improve latest version of web application anytime follow your feedback and requirements, no need to waiting for working hour, no sick leave, no holiday, and no motivation issue.",
+                                        "Improve latest version of web application and API service anytime follow your feedback and requirements, no need to waiting for working hour, no sick leave, no holiday, and no motivation issue.",
                                     icon: Rocket,
                                 },
                                 {
-                                    title: "No Ownership Problem",
+                                    title: "Separate but integrated",
                                     description:
-                                        "No need to worry about ownership problem, all code and data is yours, you can get them anytime you want to leave Genesoft.",
-                                    icon: FileCheck,
+                                        "Genesoft help you develop web and API service separately but you can integrated them together so AI Agents can work together",
+                                    icon: Waypoints,
                                 },
                             ].map((advantage, index) => (
                                 <Card
@@ -453,11 +474,12 @@ export default function LandingPage() {
                     <div className="container mx-auto px-4">
                         <div className="max-w-3xl mx-auto">
                             <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
-                                Ready to transform your business?
+                                Ready to get your software project done 10x
+                                faster?
                             </h2>
                             <p className="text-lg text-subtext-in-dark-bg/90 mb-8 max-w-2xl mx-auto">
-                                Get started with your web application today and
-                                see results in days, not months
+                                Get started with your web application and API
+                                service today and see results in day, not week
                             </p>
 
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4">
@@ -472,7 +494,7 @@ export default function LandingPage() {
                                     className="w-64 md:w-auto px-8 py-6 text-xl bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
                                 >
                                     <Sparkles className="mr-2 h-5 w-5" /> Get
-                                    your web now!
+                                    your project done now!
                                 </Button>
 
                                 <Button

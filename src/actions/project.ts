@@ -376,12 +376,13 @@ export const editFeature = async ({
 
 export type CreateProjectFromOnboardingDto = {
     user_id: string;
-    project_type: string;
-    project_description: string;
+    project_description?: string;
     branding?: {
         logo_url?: string;
         color?: string;
     };
+    project_type: string;
+    backend_requirements?: string;
 };
 
 export async function createProjectFromOnboarding(
@@ -390,6 +391,11 @@ export async function createProjectFromOnboarding(
     payload.project_type = 'web'
     console.log('genesoftCoreApiServiceBaseUrl', genesoftCoreApiServiceBaseUrl)
     const url = `${genesoftCoreApiServiceBaseUrl}/project/onboarding`;
+    console.log({
+        message: "createProjectFromOnboarding",
+        payload,
+        url,
+    });
     try {
         const res = await axios.post(url, payload, {
             headers: {

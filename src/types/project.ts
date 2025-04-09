@@ -9,6 +9,8 @@ export interface Project {
     created_at: string;
     updated_at: string;
     branding: Branding;
+    project_template_type: string;
+    backend_requirements: string;
 }
 
 export interface Page {
