@@ -22,6 +22,7 @@ import Image from "next/image";
 import ServicesIntegrationSheet from "@/components/project/services/ServicesIntegrationSheet";
 import Conversation from "@/components/conversation/Conversation";
 import BackendAiAgent from "@/components/project/backend/BackendAiAgent";
+import { EnvironmentVariablesSheet } from "@/components/project/services/EnvironmentVariablesSheet";
 
 const ManagePagePage = () => {
     const pathParams = useParams();
@@ -36,6 +37,7 @@ const ManagePagePage = () => {
         useState<boolean>(false);
     const [conversationKey, setConversationKey] = useState<number>(0);
     const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
+    const [isEnvSheetOpen, setIsEnvSheetOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("conversation");
     const router = useRouter();
 
@@ -101,7 +103,7 @@ const ManagePagePage = () => {
         project,
     });
 
-    if (project?.project_template_type.startsWith("backend")) {
+    if (project?.project_template_type?.startsWith("backend")) {
         return <BackendAiAgent project={project} />;
     }
 
@@ -127,6 +129,11 @@ const ManagePagePage = () => {
                 <ServicesIntegrationSheet
                     isOpen={isServicesSheetOpen}
                     onOpenChange={setIsServicesSheetOpen}
+                />
+
+                <EnvironmentVariablesSheet
+                    isOpen={isEnvSheetOpen}
+                    onOpenChange={setIsEnvSheetOpen}
                 />
 
                 {/* Toggle Button - Only visible on md and up */}
