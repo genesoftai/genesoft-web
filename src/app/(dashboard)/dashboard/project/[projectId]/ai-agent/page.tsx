@@ -126,15 +126,17 @@ const ManagePagePage = () => {
                     </div>
                 </div>
 
-                <ServicesIntegrationSheet
-                    isOpen={isServicesSheetOpen}
-                    onOpenChange={setIsServicesSheetOpen}
-                />
+                <div className="flex items-center gap-[6px]">
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
 
-                <EnvironmentVariablesSheet
-                    isOpen={isEnvSheetOpen}
-                    onOpenChange={setIsEnvSheetOpen}
-                />
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+                </div>
 
                 {/* Toggle Button - Only visible on md and up */}
                 <div className="hidden md:block">
