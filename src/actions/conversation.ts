@@ -23,6 +23,12 @@ export type CreatePageDto = {
     reference_link_ids?: string[];
 };
 
+export type TalkToWebAiAgentsDto = {
+    project_id: string;
+    conversation_id: string;
+    message: CreateMessageDto;
+};
+
 export type TalkToProjectManagerDto = {
     project_id: string;
     conversation_id: string;
@@ -175,6 +181,25 @@ export async function addMessageToConversation(
             throw new Error(error.response?.data.message);
         }
         throw new Error("Failed to add message to conversation");
+    }
+}
+
+export async function talkToWebAiAgents(payload: TalkToWebAiAgentsDto) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/talk/web-ai-agents`;
+
+    try {
+        const res = await axios.post(url, payload, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error talking to web ai agents:", error);
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data.message);
+        }
+        throw new Error("Failed to talk to web ai agents");
     }
 }
 

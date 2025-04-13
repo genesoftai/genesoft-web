@@ -1,7 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Project } from "@/types/project";
-import { useEffect, useState, useRef } from "react";
-import { getWebApplicationInfo } from "@/actions/web-application";
+import { useState, useRef } from "react";
 import { WebApplicationInfo } from "@/types/web-application";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Loader2, RotateCcw, Smartphone } from "lucide-react";
@@ -9,60 +8,27 @@ import { Globe } from "lucide-react";
 import { Monitor } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { CodeSandbox } from "@codesandbox/sdk";
-import { getCodesandboxApiKey } from "@/actions/codesandbox";
 interface WebPreviewProps {
     project: Project | null;
     onPage?: string;
+    webApplicationInfo: WebApplicationInfo | null;
+    onRefresh?: () => void;
 }
 
 type Mode = "normal" | "dev";
 
-export function WebPreview({ project, onPage }: WebPreviewProps) {
-    const [webApplicationInfo, setWebApplicationInfo] =
-        useState<WebApplicationInfo | null>(null);
-    const [pollingCount, setPollingCount] = useState(0);
+export function WebPreview({
+    project,
+    onPage,
+    webApplicationInfo,
+    onRefresh,
+}: WebPreviewProps) {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const [activeTab, setActiveTab] = useState("preview");
     const [mode, setMode] = useState<Mode>("normal");
     const [previewUrl, setPreviewUrl] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
-
-    useEffect(() => {
-        if (project?.id) {
-            fetchLatestData();
-        }
-        // let interval: NodeJS.Timeout;
-
-        // if (project?.id) {
-        //     // Initial fetch
-        //     fetchLatestData();
-
-        //     // Set up polling every 10 seconds
-        //     interval = setInterval(() => {
-        //         fetchLatestData();
-        //         setPollingCount((prev) => prev + 1);
-        //     }, 30000);
-        // }
-        // return () => {
-        //     if (interval) clearInterval(interval);
-        // };
-    }, [project?.id]);
-
-    const fetchLatestData = async () => {
-        console.log("fetchLatestData", project?.id);
-        if (!project?.id) return;
-
-        try {
-            const webAppInfo = await getWebApplicationInfo(project?.id);
-
-            setWebApplicationInfo(webAppInfo);
-        } catch (error) {
-            console.error("Error fetching latest data:", error);
-        }
-    };
 
     const refreshIframe = () => {
         if (iframeRef.current) {
@@ -71,38 +37,11 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
     };
 
     const handleRefresh = () => {
-        setWebApplicationInfo(null);
         refreshIframe();
-        fetchLatestData();
+        if (onRefresh) {
+            onRefresh();
+        }
     };
-
-    // useEffect(() => {
-    //     if (webApplicationInfo?.developmentStatus === "development_done") {
-    //         setupCodesandboxPreviewUrl();
-    //     }
-    // }, [webApplicationInfo]);
-
-    // const setupCodesandboxPreviewUrl = async () => {
-    //     try {
-    //         setIsLoading(true);
-    //         const apiKey = await getCodesandboxApiKey();
-    //         const sdk = new CodeSandbox(apiKey);
-    //         if (webApplicationInfo?.codesandboxId) {
-    //             const sandbox = await sdk.sandbox.open(
-    //                 webApplicationInfo?.codesandboxId,
-    //             );
-    //             await sandbox.shells.run("pnpm install");
-    //             await sandbox.shells.run("pnpm run dev");
-    //             const portInfo = await sandbox.ports.waitForPort(3000);
-    //             const url = portInfo.getPreviewUrl();
-    //             setPreviewUrl(url);
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
 
     console.log({
         webApplicationInfo,
@@ -112,11 +51,11 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
 
     return (
         <Card
-            className={`bg-primary-dark text-white border-none max-w-[420px] md:max-w-[1024px] self-center w-fit`}
+            className={`bg-primary-dark text-white border-none self-center w-full h-full`}
         >
-            <CardContent className="flex flex-col gap-6 px-0">
+            <CardContent className="flex flex-col items-center gap-6 px-0 h-full">
                 <div
-                    className={`relative w-full aspect-video rounded-lg overflow-hidden ${onPage !== "manage-project" && viewMode === "mobile" && "h-[720px] max-w-[360px] md:max-w-[380px]"} ${onPage !== "manage-project" && viewMode === "desktop" && "h-[100vh] max-w-[1024px]"}`}
+                    className={`relative w-full h-full aspect-video rounded-lg`}
                 >
                     <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
                         {/* Browser controls */}
@@ -195,52 +134,17 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
                         </div>
                     </div>
 
-                    {/* {webApplicationInfo?.url ? (
-                <div
-                    className={`relative flex justify-center w-full h-[calc(100%-40px)] `}
-                >
-                    <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
-                    <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
-                    <iframe
-                        ref={iframeRef}
-                        className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" && "w-[360px] md:w-[380px] h-[720px] rounded-b-lg mx-auto"} ${onPage === "manage-project" && viewMode === "desktop" ? "w-full h-full rounded-b-lg" : "w-full h-[720px] rounded-b-lg mx-auto"}`}
-                        src={webApplicationInfo.url}
-                        title="Web Application Preview"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        sandbox="allow-scripts allow-same-origin"
-                    ></iframe>
-                </div>
-            ) : (
-                <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative">
-                    <div className="absolute inset-0 bg-space-pattern animate-fade bg-cover"></div>
-                    <div className="p-6 rounded-xl bg-black/60 border border-white/5 flex flex-col items-center gap-3 shadow-lg transform transition-transform duration-500 hover:scale-105">
-                        <Globe className="h-10 w-10 text-blue-300 animate-pulse" />
-                        <p className="text-white text-center text-sm sm:text-base">
-                            Deploying your latest version of web application...
-                        </p>
-                        <div className="text-xs text-gray-300 max-w-[250px] text-center mt-1">
-                            Please hold on while we prepare your application for
-                            viewing.
-                        </div>
-                        <div className="mt-4">
-                            <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
-                        </div>
-                    </div>
-                </div>
-            )} */}
-
                     {/* Code sandbox */}
                     {previewUrl || webApplicationInfo?.url ? (
                         mode === "dev" ? (
                             <div
-                                className={`relative flex justify-center w-full h-[calc(100%-40px)] `}
+                                className={`relative flex justify-center w-full h-full pb-8`}
                             >
                                 <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
                                 <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                                 <iframe
                                     ref={iframeRef}
-                                    className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" && "w-[360px] md:w-[380px] h-[720px] rounded-b-lg mx-auto"} ${onPage === "manage-project" && viewMode === "desktop" ? "w-full h-full rounded-b-lg" : "w-full h-[720px] rounded-b-lg mx-auto"}`}
+                                    className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" ? "w-[360px] md:w-[380px] h-[720px]" : "w-full h-full"} rounded-b-lg`}
                                     src={
                                         webApplicationInfo?.codesandboxUrl
                                             ? `${webApplicationInfo?.codesandboxUrl}?embed=1`
@@ -254,13 +158,13 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
                             </div>
                         ) : (
                             <div
-                                className={`relative flex justify-center w-full h-[calc(100%-40px)] `}
+                                className={`relative flex justify-center w-full h-full`}
                             >
                                 <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
                                 <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                                 <iframe
                                     ref={iframeRef}
-                                    className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" && "w-[360px] md:w-[380px] h-[720px] rounded-b-lg mx-auto"} ${onPage === "manage-project" && viewMode === "desktop" ? "w-full h-full rounded-b-lg" : "w-full h-[720px] rounded-b-lg mx-auto"}`}
+                                    className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" ? "w-[360px] md:w-[380px] h-[720px]" : "w-full h-full"} rounded-b-lg`}
                                     src={previewUrl || webApplicationInfo?.url}
                                     title="Web Application Preview"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -270,7 +174,7 @@ export function WebPreview({ project, onPage }: WebPreviewProps) {
                             </div>
                         )
                     ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-[calc(100%-40px)] bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative">
+                        <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative">
                             <div className="absolute inset-0 bg-space-pattern animate-fade bg-cover"></div>
                             <div className="p-6 rounded-xl bg-black/60 border border-white/5 flex flex-col items-center gap-3 shadow-lg transform transition-transform duration-500 hover:scale-105">
                                 <Globe className="h-10 w-10 text-blue-300 animate-pulse" />

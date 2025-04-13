@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import { useCreateProjectStore } from "@/stores/create-project-store";
@@ -35,7 +35,7 @@ import { useProjectStore } from "@/stores/project-store";
 type UserData = { user: User } | { user: null };
 
 export function NavUser() {
-    const supabase = createClient();
+    const supabase = createSupabaseClient();
     const { isMobile } = useSidebar();
     const [userEmail, setUserEmail] = useState("");
     const [userData, setUserData] = useState<UserData>();

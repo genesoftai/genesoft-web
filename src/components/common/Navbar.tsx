@@ -1,14 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, ExternalLink, ChevronDown, AppWindow, Send } from "lucide-react";
+import {
+    Menu,
+    ExternalLink,
+    ChevronDown,
+    Send,
+    Folders,
+    Users,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import GenesoftLogo from "@/components/common/GenesoftLogo";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseClient } from "@/utils/supabase/client";
 import UserNav from "./UserNav";
 import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
@@ -40,7 +47,7 @@ import { sendSupportEmail } from "@/actions/email";
 type UserData = { user: User } | { user: null };
 
 export default function Navbar() {
-    const supabase = createClient();
+    const supabase = createSupabaseClient();
     const [isOpen, setIsOpen] = useState(false);
     const [userEmail, setUserEmail] = useState("");
     const [userData, setUserData] = useState<UserData>();
@@ -137,6 +144,18 @@ export default function Navbar() {
         }
     };
 
+    const handleGoToCollections = () => {
+        if (userEmail) {
+            if (organizationId) {
+                router.push(`/dashboard/collection`);
+            } else {
+                router.push(`/dashboard`);
+            }
+        } else {
+            posthog.capture("click_collections_from_navbar_but_not_logged_in");
+            router.push("/signin");
+        }
+    };
     const handleSupportClick = (e: React.MouseEvent) => {
         e.preventDefault();
         setSupportDialogOpen(true);
@@ -220,20 +239,38 @@ export default function Navbar() {
                                 </span>
                             </Button>
                             <div className="absolute left-0 top-full pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
-                                <div className="bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-2 shadow-lg min-w-[200px]">
+                                <div className="flex flex-col gap-2 bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-2 shadow-lg min-w-[200px]">
                                     <div
                                         onClick={handleGoToDashboard}
-                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer"
+                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer w-full"
                                     >
                                         <div className="w-8 h-8 rounded-full bg-genesoft/20 flex items-center justify-center mr-2">
-                                            <AppWindow className="h-4 w-4 text-genesoft" />
+                                            <Users className="h-4 w-4 text-genesoft" />
                                         </div>
                                         <div>
                                             <p className="font-medium">
                                                 AI Agent Workspace
                                             </p>
                                             <p className="text-xs text-subtext-in-dark-bg/70">
-                                                for web development
+                                                Talk with AI Agents to develop
+                                                and manage software
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        onClick={handleGoToCollections}
+                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer w-full"
+                                    >
+                                        <div className="w-8 h-8 rounded-full bg-genesoft/20 flex items-center justify-center mr-2">
+                                            <Folders className="h-4 w-4 text-genesoft" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">
+                                                Collections
+                                            </p>
+                                            <p className="text-xs text-subtext-in-dark-bg/70 w-full truncate">
+                                                Integrate web and backend
+                                                projects
                                             </p>
                                         </div>
                                     </div>
@@ -255,8 +292,6 @@ export default function Navbar() {
                             Support
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
                         </button>
-
-                     
 
                         <button
                             onClick={() => {

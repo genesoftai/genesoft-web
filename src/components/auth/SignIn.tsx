@@ -9,7 +9,7 @@ import { ArrowLeft, EyeIcon, EyeOffIcon } from "lucide-react";
 import { validateEmail } from "@/utils/auth/email";
 import { useRouter } from "next/navigation";
 import SimpleLoading from "@/components/common/SimpleLoading";
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseClient } from "@/utils/supabase/client";
 import GenesoftLogo from "@/components/common/GenesoftLogo";
 import posthog from "posthog-js";
 const StreamingText = ({
@@ -48,7 +48,7 @@ export default function SignIn() {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    const supabase = createClient();
+    const supabase = createSupabaseClient();
 
     const heroContent = [
         "AI Agent workspace for small business and startup team",

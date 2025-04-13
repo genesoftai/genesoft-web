@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { requestGithubAccess } from "@/actions/integration";
 import { Button } from "@/components/ui/button";
 import { Github, Loader2 } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseClient } from "@/utils/supabase/client";
 
 type GitHubSectionProps = {
     projectId: string;
@@ -12,9 +12,7 @@ type GitHubSectionProps = {
 
 export const GitHubSection = ({ projectId }: GitHubSectionProps) => {
     const [loading, setLoading] = useState(false);
-    const supabase = createClient();
-
-  
+    const supabase = createSupabaseClient();
 
     const handleRequestGithubAccess = async () => {
         try {
@@ -36,10 +34,13 @@ export const GitHubSection = ({ projectId }: GitHubSectionProps) => {
         <div className="space-y-4">
             <div className="flex items-center space-x-2">
                 <Github className="h-5 w-5" />
-                <h3 className="text-lg font-medium text-white">GitHub Integration</h3>
+                <h3 className="text-lg font-medium text-white">
+                    GitHub Integration
+                </h3>
             </div>
             <p className="text-sm text-subtext-in-dark-bg">
-                Connect your project with GitHub to enable source control and collaboration features.
+                Connect your project with GitHub to enable source control and
+                collaboration features.
             </p>
             <div className="pt-2">
                 <Button
@@ -62,4 +63,4 @@ export const GitHubSection = ({ projectId }: GitHubSectionProps) => {
     );
 };
 
-export default GitHubSection; 
+export default GitHubSection;
