@@ -7,7 +7,6 @@ import {
     UserCheck,
     CircleDollarSign,
     Rocket,
-    FileCheck,
     Sparkles,
     Command,
     Code,
@@ -28,6 +27,7 @@ import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 
 import Showcases from "./Showcases";
 import ProjectCreationBox from "../project/ProjectCreationBox";
+import { useCollectionStore } from "@/stores/collection-store";
 
 const StreamingText = ({
     text,
@@ -69,6 +69,7 @@ export default function LandingPage() {
         backend_requirements: backendRequirements,
         clearCreateProjectStore,
     } = useCreateProjectStore();
+    const { updateCollectionStore } = useCollectionStore();
     const [
         isCreatingProjectFromOnboarding,
         setIsCreatingProjectFromOnboarding,
@@ -111,7 +112,6 @@ export default function LandingPage() {
         });
 
         if (user_id) {
-
             posthog.capture("onboarding_complete_from_landing_page");
             handleCreateProjectFromOnboarding({
                 description,
@@ -142,11 +142,20 @@ export default function LandingPage() {
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
+        console.log({
+            message: "create project from onboarding",
+            data: {
+                description,
+                logo,
+                color,
+                project_type,
+                backend_requirements,
+            },
+        });
         try {
             const res = await createProjectFromOnboarding({
                 user_id: user_id,
                 project_description: description,
-                project_type: 'web',
                 branding: {
                     logo_url: logo,
                     color: color,
@@ -162,18 +171,45 @@ export default function LandingPage() {
                 alert("Failed to create project, Please try again.");
             } else {
                 clearCreateProjectStore();
-                projectId = res.project.id;
-                const projectInfo = await getProjectById(projectId);
-                const organizationInfo = await getOrganizationById(
-                    projectInfo.organization_id,
-                );
-                updateProjectStore(projectInfo);
-                updateGenesoftOrganization({
-                    id: organizationInfo.id,
-                    name: organizationInfo.name,
-                    description: organizationInfo.description,
-                    image: organizationInfo.image,
-                });
+                if (res?.project) {
+                    projectId = res.project.id;
+                    const projectInfo = await getProjectById(projectId);
+                    const organizationInfo = await getOrganizationById(
+                        projectInfo.organization_id,
+                    );
+                    updateProjectStore(projectInfo);
+                    updateGenesoftOrganization({
+                        id: organizationInfo.id,
+                        name: organizationInfo.name,
+                        description: organizationInfo.description,
+                        image: organizationInfo.image,
+                    });
+                } else if (res?.backendProject && res?.collection) {
+                    projectId = res.backendProject.id;
+                    const projectInfo = await getProjectById(projectId);
+                    const organizationInfo = await getOrganizationById(
+                        projectInfo.organization_id,
+                    );
+                    updateProjectStore(projectInfo);
+                    updateGenesoftOrganization({
+                        id: organizationInfo.id,
+                        name: organizationInfo.name,
+                        description: organizationInfo.description,
+                        image: organizationInfo.image,
+                    });
+                    updateCollectionStore({
+                        id: res.collection.id,
+                        name: res.collection.name,
+                        description: res.collection.description,
+                        is_active: res.collection.is_active,
+                        web_project_id: res.webProject.id,
+                        backend_service_project_ids: [projectId],
+                        organization_id: res.collection.organization_id,
+                        created_at: res.collection.created_at,
+                        updated_at: res.collection.updated_at,
+                    });
+                }
+
                 posthog.capture(
                     "landing_page_create_project_from_onboarding_success",
                 );

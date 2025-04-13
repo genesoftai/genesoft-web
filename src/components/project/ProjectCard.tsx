@@ -17,6 +17,9 @@ import NestjsLogo from "@public/tech/nestjs.svg";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getFirstCharacterUppercase } from "@/utils/common/text";
+import { AppWindow, Server } from "lucide-react";
+import { useCollectionStore } from "@/stores/collection-store";
+import { getCollectionByWebProjectId } from "@/actions/collection";
 
 interface ProjectCardProps {
     id: string;
@@ -40,6 +43,8 @@ export function ProjectCard({
     const router = useRouter();
     const { updateProjectStore } = useProjectStore();
     const [projectType, setProjectType] = useState("");
+    const { updateCollectionStore } = useCollectionStore();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (project_template_type.startsWith("backend")) {
@@ -49,15 +54,43 @@ export function ProjectCard({
         }
     }, [project_template_type]);
 
-    const handleManageProject = () => {
-        updateProjectStore({
-            id,
-            name,
-            description,
-            purpose,
-            target_audience,
-        });
-        router.push(`/dashboard/project/${id}/ai-agent`);
+    const handleManageProject = async () => {
+        setIsLoading(true);
+        try {
+            updateProjectStore({
+                id,
+                name,
+                description,
+                purpose,
+                target_audience,
+            });
+            await handleSetupCollectionForWorkspace();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+            router.push(`/dashboard/project/${id}/ai-agent`);
+        }
+    };
+
+    const handleSetupCollectionForWorkspace = async () => {
+        try {
+            const collection = await getCollectionByWebProjectId(id);
+            updateCollectionStore({
+                id: collection.id,
+                name: collection.name,
+                description: collection.description,
+                is_active: collection.is_active,
+                web_project_id: collection.web_project_id,
+                backend_service_project_ids:
+                    collection.backend_service_project_ids,
+                organization_id: collection.organization_id,
+                created_at: collection.created_at,
+                updated_at: collection.updated_at,
+            });
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
@@ -65,9 +98,17 @@ export function ProjectCard({
             <CardHeader>
                 <CardTitle className="text-base md:text-xl flex flex-row items-center gap-2 justify-between">
                     <div className="flex flex-col items-start gap-2">
-                        <span className="text-lg md:text-xl font-bold">
-                            {name}
-                        </span>
+                        <div className="flex flex-row items-center gap-2">
+                            {projectType === "backend" ? (
+                                <Server className="w-6 h-6 text-amber-500" />
+                            ) : (
+                                <AppWindow className="w-6 h-6 text-genesoft" />
+                            )}
+                            <span className="text-lg md:text-xl font-bold">
+                                {name}
+                            </span>
+                        </div>
+
                         <p className="flex flex-row items-center gap-2">
                             <span className="text-xs md:text-base text-subtext-in-dark-bg">
                                 {getFirstCharacterUppercase(projectType)}
@@ -137,12 +178,16 @@ export function ProjectCard({
                 </CardContent>
             )}
 
-            <CardFooter className="flex justify-end md:justify-start self-center md:self-end">
+            <CardFooter className="flex justify-end md:justify-start self-center md:self-end mt-4">
                 <Button
                     className="bg-genesoft text-white rounded-lg text-xs md:text-base"
                     onClick={handleManageProject}
                 >
-                    <span className="text-xs md:text-base">Manage</span>
+                    <span className="text-xs md:text-base">
+                        {isLoading
+                            ? "Loading workspace..."
+                            : "AI Agents workspace"}
+                    </span>
                 </Button>
             </CardFooter>
         </Card>

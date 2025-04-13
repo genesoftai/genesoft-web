@@ -241,12 +241,14 @@ const ProjectCreationBox = ({
                         setProjectType(value);
                     }}
                 >
-                    <SelectTrigger className="w-[80%] md:w-full">
+                    <SelectTrigger className="w-[100%] md:w-full h-18">
                         <SelectValue placeholder="Select a project type" />
                     </SelectTrigger>
                     <SelectContent className="w-[200px] md:w-full">
                         <SelectGroup>
-                            <SelectLabel>Project Type</SelectLabel>
+                            <SelectLabel className="text-gray-500">
+                                Project Type
+                            </SelectLabel>
                             <SelectItem
                                 value="web"
                                 className="flex items-center gap-2"
@@ -258,7 +260,15 @@ const ProjectCreationBox = ({
                                     height={20}
                                     className="rounded-full"
                                 />
-                                <span>Web (Frontend only, Next.js)</span>
+                                <div className="flex flex-col items-start gap-2">
+                                    <span className="font-bold">
+                                        Web (Next.js)
+                                    </span>
+                                    <span className="text-xs hidden md:block">
+                                        For static websites like portfolio,
+                                        blog, landing pages, and etc
+                                    </span>
+                                </div>
                             </SelectItem>
                             <SelectItem
                                 value="web-and-backend"
@@ -281,10 +291,18 @@ const ProjectCreationBox = ({
                                     />
                                 </div>
 
-                                <span>
-                                    Web and Backend service (Full Stack, Next.js
-                                    and Nest.js)
-                                </span>
+                                <div className="flex flex-col items-start gap-2">
+                                    <span className="font-bold">
+                                        Full Stack for Web integrated with
+                                        Backend service (Next.js and Nest.js)
+                                    </span>
+                                    <span className="text-xs hidden md:block">
+                                        For professional web application with
+                                        advanced backend services use case like
+                                        e-commerce, SaaS, Specialized services,
+                                        and complex data processing systems
+                                    </span>
+                                </div>
                             </SelectItem>
                             <SelectItem
                                 value="backend"
@@ -297,10 +315,20 @@ const ProjectCreationBox = ({
                                     height={20}
                                     className="rounded-full"
                                 />
-                                Backend service (Backend only, Nest.js)
+                                <div className="flex flex-col items-start gap-2">
+                                    <span className="font-bold">
+                                        Backend service (Nest.js)
+                                    </span>
+                                    <span className="text-xs hidden md:block">
+                                        For specialized services or
+                                        microservices architecture like API
+                                        services, developer services, and
+                                        complex data processing systems
+                                    </span>
+                                </div>
                             </SelectItem>
                             <SelectItem value="mobile" disabled>
-                                Mobile (Coming soon)
+                                Mobile App (Coming soon)
                             </SelectItem>
                             <SelectItem value="ai-agents" disabled>
                                 AI Agents (Coming soon)

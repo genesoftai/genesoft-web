@@ -7,11 +7,10 @@ import {
 import { getProjectById } from "@/actions/project";
 import PageLoading from "@/components/common/PageLoading";
 import { WebPreview } from "@/components/project/manage/WebPreview";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProjectStore } from "@/stores/project-store";
 import { Project } from "@/types/project";
-import { MessageSquare, MonitorPlay } from "lucide-react";
+import { AppWindow, MessageSquare, MonitorPlay, Server } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { ConversationMessageForWeb, Message } from "@/types/message";
@@ -22,8 +21,15 @@ import Image from "next/image";
 import ServicesIntegrationSheet from "@/components/project/services/ServicesIntegrationSheet";
 import Conversation from "@/components/conversation/Conversation";
 import BackendAiAgent from "@/components/project/backend/BackendAiAgent";
+import { ResizableHandle } from "@/components/ui/resizable";
+import { ResizablePanel } from "@/components/ui/resizable";
+import { ResizablePanelGroup } from "@/components/ui/resizable";
+import BackendGenerations from "@/components/project/backend/BackendGenerations";
+import { useCollectionStore } from "@/stores/collection-store";
+import { getWebApplicationInfo } from "@/actions/web-application";
+import { WebApplicationInfo } from "@/types/web-application";
 
-const ManagePagePage = () => {
+const AiAgentPage = () => {
     const pathParams = useParams();
     const { id: projectId, updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
@@ -38,6 +44,15 @@ const ManagePagePage = () => {
     const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("conversation");
     const router = useRouter();
+    const [activeTabForCollection, setActiveTabForCollection] = useState("web");
+    const [activeTabOverview, setActiveTabOverview] = useState("preview");
+    const {
+        id: collectionId,
+        web_project_id,
+        backend_service_project_ids,
+    } = useCollectionStore();
+    const [webApplicationInfo, setWebApplicationInfo] =
+        useState<WebApplicationInfo | null>(null);
 
     const setupProject = async () => {
         setLoading(true);
@@ -45,6 +60,13 @@ const ManagePagePage = () => {
             const projectData = await getProjectById(projectId);
             setProject(projectData);
             updateProjectStore(projectData);
+            if (
+                projectData?.project_template_type &&
+                projectData?.project_template_type.startsWith("web")
+            ) {
+                console.log("fetchLatestData", projectData?.id);
+                fetchLatestData();
+            }
         } catch (error) {
             console.error("Error fetching project:", error);
         } finally {
@@ -63,6 +85,7 @@ const ManagePagePage = () => {
 
     useEffect(() => {
         setupProject();
+        setupTabForCollection();
     }, [projectId]);
 
     const setupActivePageConversation = async (projectId: string) => {
@@ -82,6 +105,33 @@ const ManagePagePage = () => {
         }
     };
 
+    if (loading) {
+        return <PageLoading text="Loading page information..." />;
+    }
+
+    const handleGoToWebProject = () => {
+        if (web_project_id) {
+            updateProjectStore({
+                id: web_project_id,
+            });
+            router.push(`/dashboard/project/${web_project_id}/ai-agent`);
+        }
+    };
+
+    const handleGoToBackendProject = () => {
+        if (
+            backend_service_project_ids &&
+            backend_service_project_ids.length > 0
+        ) {
+            updateProjectStore({
+                id: backend_service_project_ids[0],
+            });
+            router.push(
+                `/dashboard/project/${backend_service_project_ids[0]}/ai-agent`,
+            );
+        }
+    };
+
     const handleSubmitConversation = async () => {
         window.location.reload();
     };
@@ -92,17 +142,38 @@ const ManagePagePage = () => {
         setConversationKey((prevKey) => prevKey + 1);
     };
 
-    if (loading) {
-        return <PageLoading text="Loading page information..." />;
-    }
+    const fetchLatestData = async () => {
+        console.log("fetchLatestData", project?.id);
+        if (!projectId) return;
 
-    console.log({
-        message: "project",
-        project,
-    });
+        try {
+            const webAppInfo = await getWebApplicationInfo(projectId);
 
-    if (project?.project_template_type.startsWith("backend")) {
-        return <BackendAiAgent project={project} />;
+            setWebApplicationInfo(webAppInfo);
+        } catch (error) {
+            console.error("Error fetching latest data:", error);
+        }
+    };
+
+    const setupTabForCollection = () => {
+        if (projectId === web_project_id) {
+            setActiveTabForCollection("web");
+        } else {
+            setActiveTabForCollection("backend");
+        }
+    };
+
+    if (
+        project?.project_template_type &&
+        project?.project_template_type.startsWith("backend")
+    ) {
+        return (
+            <BackendAiAgent
+                project={project}
+                handleGoToBackendProject={handleGoToBackendProject}
+                handleGoToWebProject={handleGoToWebProject}
+            />
+        );
     }
 
     return (
@@ -122,6 +193,33 @@ const ManagePagePage = () => {
                     <div className="flex flex-col items-center gap-1">
                         <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
                     </div>
+
+                    {collectionId && (
+                        <Tabs
+                            defaultValue="web"
+                            className="w-auto"
+                            value={activeTabForCollection}
+                        >
+                            <TabsList className="bg-primary-dark border-line-in-dark-bg">
+                                <TabsTrigger
+                                    value="web"
+                                    className="text-white flex items-center gap-2"
+                                    onClick={handleGoToWebProject}
+                                >
+                                    <AppWindow className="h-4 w-4" />
+                                    <span>Web</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="backend"
+                                    className="text-white flex items-center gap-2"
+                                    onClick={handleGoToBackendProject}
+                                >
+                                    <Server className="h-4 w-4" />
+                                    <span>Backend</span>
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    )}
                 </div>
 
                 <ServicesIntegrationSheet
@@ -188,20 +286,22 @@ const ManagePagePage = () => {
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
                     >
                         <div className="flex-1">
-                            <WebPreview project={project} />
+                            <WebPreview
+                                project={project}
+                                webApplicationInfo={webApplicationInfo}
+                            />
                         </div>
                     </TabsContent>
                 </Tabs>
             </div>
 
             {/* Desktop View - Only visible at md breakpoint and up */}
-            <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-1">
-                {/* Conversation Section */}
-                <div
-                    className={`flex-1 min-w-0 ${
-                        isCollapsed ? "lg:w-full" : "lg:max-w-[60%]"
-                    } h-[calc(100vh-60px)]`}
-                >
+
+            <ResizablePanelGroup
+                direction="horizontal"
+                className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
+            >
+                <ResizablePanel defaultSize={50}>
                     <Conversation
                         key={`desktop-conversation-${conversationKey}`}
                         conversationId={conversation?.id || ""}
@@ -212,28 +312,27 @@ const ManagePagePage = () => {
                         pageId={pathParams?.pageId as string}
                         onSendImageWithMessage={handleSendImageWithMessage}
                     />
-                </div>
+                </ResizablePanel>
+                <ResizableHandle
+                    className="bg-primary-dark w-1 rounded-full"
+                    withHandle
+                />
 
-                {/* WebPreview Section - Collapsible */}
-                <Collapsible
-                    className={`transition-all duration-300 ease-in-out ${
-                        isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"
-                    } h-[calc(100vh-60px)]`}
-                    open={!isCollapsed}
-                    onOpenChange={(open) => setIsCollapsed(!open)}
-                >
-                    <CollapsibleContent
-                        className="w-full h-full data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
-                        forceMount
-                    >
-                        <div className="h-full overflow-auto">
-                            <WebPreview project={project} />
-                        </div>
-                    </CollapsibleContent>
-                </Collapsible>
-            </div>
+                <ResizablePanel defaultSize={50}>
+                    {activeTabOverview === "preview" && (
+                        <WebPreview
+                            project={project}
+                            webApplicationInfo={webApplicationInfo}
+                            onRefresh={fetchLatestData}
+                        />
+                    )}
+                    {activeTabOverview === "generations" && (
+                        <BackendGenerations project={project} />
+                    )}
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </div>
     );
 };
 
-export default ManagePagePage;
+export default AiAgentPage;

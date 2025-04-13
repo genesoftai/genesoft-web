@@ -16,7 +16,7 @@ import {
     CreateMessageDto,
     getConversationsWithIterationsByProjectId,
     submitConversation,
-    talkToProjectManager,
+    talkToWebAiAgents,
 } from "@/actions/conversation";
 import { useProjectStore } from "@/stores/project-store";
 import SystemMessage from "./message/SystemMessage";
@@ -91,8 +91,6 @@ const Conversation: React.FC<ConversationProps> = ({
     isLoading = false,
     onSubmitConversation,
     status,
-    featureId,
-    pageId,
     onSendImageWithMessage,
 }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -185,12 +183,10 @@ const Conversation: React.FC<ConversationProps> = ({
             setMessages([...messages, tempMessage]);
 
             setInputValue("");
-            const result = await talkToProjectManager({
+            const result = await talkToWebAiAgents({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
-                feature_id: featureId,
-                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
@@ -315,12 +311,10 @@ const Conversation: React.FC<ConversationProps> = ({
             };
             setMessages([...messages, tempMessage]);
 
-            const result = await talkToProjectManager({
+            const result = await talkToWebAiAgents({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
-                feature_id: featureId,
-                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
@@ -674,7 +668,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                 {messages.map((message, index) => (
                                     <div
                                         key={message.id}
-                                        className={`group max-w-full w-full overflow-hidden ${index === messages.length - 1 ? "message-new" : ""}`}
+                                        className={`group max-w-[500px] w-full overflow-hidden px-4 ${index === messages.length - 1 ? "message-new" : ""}`}
                                     >
                                         {message.sender_type === "system" ? (
                                             <SystemMessage message={message} />
@@ -699,7 +693,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     <div className="flex justify-center mb-4">
                                         <div className="bg-[#252a2e] text-gray-400 text-xs py-1 px-3 rounded-md flex items-center gap-2 animate-pulse">
                                             <Loader2 className="h-3 w-3 animate-spin" />
-                                            Project Manager is thinking...
+                                            AI Agents are thinking...
                                         </div>
                                     </div>
                                 )}

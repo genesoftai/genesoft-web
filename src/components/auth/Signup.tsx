@@ -8,7 +8,7 @@ import { ArrowLeft, EyeIcon, EyeOffIcon } from "lucide-react";
 import { signup } from "@/app/(auth)/signup/actions";
 import SimpleLoading from "@/components/common/SimpleLoading";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { createSupabaseClient } from "@/utils/supabase/client";
 import posthog from "posthog-js";
 
 export default function Signup() {
@@ -19,7 +19,7 @@ export default function Signup() {
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
 
-    const supabase = createClient();
+    const supabase = createSupabaseClient();
 
     const router = useRouter();
 

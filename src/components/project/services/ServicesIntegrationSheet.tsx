@@ -75,9 +75,7 @@ export const ServicesIntegrationSheet = ({
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                     <div className="py-6 space-y-6">
-                        <GitHubSection
-                            projectId={projectId}
-                        />
+                        <GitHubSection projectId={projectId} />
                         <FirebaseSection
                             projectId={projectId}
                             firebaseEnv={firebaseEnv as FirebaseEnv}
