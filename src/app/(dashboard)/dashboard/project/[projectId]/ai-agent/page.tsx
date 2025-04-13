@@ -28,6 +28,7 @@ import BackendGenerations from "@/components/project/backend/BackendGenerations"
 import { useCollectionStore } from "@/stores/collection-store";
 import { getWebApplicationInfo } from "@/actions/web-application";
 import { WebApplicationInfo } from "@/types/web-application";
+import { EnvironmentVariablesSheet } from "@/components/project/services/EnvironmentVariablesSheet";
 
 const AiAgentPage = () => {
     const pathParams = useParams();
@@ -42,6 +43,7 @@ const AiAgentPage = () => {
         useState<boolean>(false);
     const [conversationKey, setConversationKey] = useState<number>(0);
     const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
+    const [isEnvSheetOpen, setIsEnvSheetOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("conversation");
     const router = useRouter();
     const [activeTabForCollection, setActiveTabForCollection] = useState("web");
@@ -222,10 +224,17 @@ const AiAgentPage = () => {
                     )}
                 </div>
 
-                <ServicesIntegrationSheet
-                    isOpen={isServicesSheetOpen}
-                    onOpenChange={setIsServicesSheetOpen}
-                />
+                <div className="flex items-center gap-[6px]">
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
+
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+                </div>
 
                 {/* Toggle Button - Only visible on md and up */}
                 <div className="hidden md:block">
