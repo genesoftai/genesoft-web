@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, Image, BrainCircuit, HistoryIcon } from "lucide-react";
+import { Send, Loader2, Image, BrainCircuit } from "lucide-react";
 import { Message } from "@/types/message";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import {
     CreateMessageDto,
-    getConversationsWithIterationsByProjectId,
     submitConversation,
     talkToBackendDeveloper,
     talkToProjectManager,
@@ -24,13 +23,7 @@ import SystemMessage from "./message/SystemMessage";
 import AIAgentMessage from "./message/AIAgentMessage";
 import UserMessage from "./message/UserMessage";
 import { uploadFileFree } from "@/actions/file";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -41,7 +34,6 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-    checkBuildErrors,
     getLatestIteration,
     getMonthlySprintsWithSubscription,
 } from "@/actions/development";
@@ -57,13 +49,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ConversationWithIterations } from "@/types/conversation";
-import ConversationWithIteration from "./ConversationWithIteration";
-import { formatDateToHumanReadable } from "@/utils/common/time";
+
 import { LatestIteration } from "@/types/development";
-import DevelopmentActivity from "../project/manage/development/DevelopmentActivity";
-import { toast } from "@/hooks/use-toast";
-import posthog from "posthog-js";
 export type SprintOption = {
     id: string;
     name: string;
@@ -100,9 +87,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
     const [isLoadingSubmitConversation, setIsLoadingSubmitConversation] =
         useState<boolean>(false);
     const [errorStartSprint, setErrorStartSprint] = useState<string>("");
-    const [isLoadingImageUpload, setIsLoadingImageUpload] =
-        useState<boolean>(false);
-    const [errorImageUpload, setErrorImageUpload] = useState<string>("");
     const [imageUploadUrl, setImageUploadUrl] = useState<string>("");
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [isImageMessageDialogOpen, setIsImageMessageDialogOpen] =
@@ -118,22 +102,14 @@ const BackendConversation: React.FC<ConversationProps> = ({
         tier: "",
         remaining: 0,
     });
-    const [conversationsWithIterations, setConversationsWithIterations] =
-        useState<ConversationWithIterations[]>([]);
+
     const [latestIteration, setLatestIteration] =
         useState<LatestIteration | null>(null);
-    const [pollingCount, setPollingCount] = useState(0);
-    const [isCheckingBuildErrors, setIsCheckingBuildErrors] =
-        useState<boolean>(false);
 
     const { id: organizationId } = useGenesoftOrganizationStore();
     const router = useRouter();
 
-    const {
-        id: projectId,
-        name: projectName,
-        description: projectDescription,
-    } = useProjectStore();
+    const { id: projectId } = useProjectStore();
     const {
         image: userImage,
         name: userName,
@@ -240,9 +216,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setIsLoadingImageUpload(true);
-        setErrorImageUpload("");
-
         try {
             const timestamp = new Date().getTime();
             const fileName = `${conversationId}-${timestamp}`;
@@ -256,20 +229,12 @@ const BackendConversation: React.FC<ConversationProps> = ({
                 file,
             );
 
-            if (res.error) {
-                setErrorImageUpload(res.error);
-                return;
-            }
-
             setImageUploadUrl(res.url);
             setFileId(res.id);
             // Open the image message dialog after successful upload
             setIsImageMessageDialogOpen(true);
         } catch (err) {
-            setErrorImageUpload("Failed to upload image. Please try again.");
             console.error(err);
-        } finally {
-            setIsLoadingImageUpload(false);
         }
     };
 
@@ -347,7 +312,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
 
     useEffect(() => {
         setupMonthlySprints();
-        setupConversationsWithIterations();
     }, []);
 
     const setupMonthlySprints = async () => {
@@ -360,53 +324,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
                     "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue.",
                 );
             }
-        }
-    };
-
-    const setupConversationsWithIterations = async () => {
-        try {
-            if (projectId) {
-                const response =
-                    await getConversationsWithIterationsByProjectId(projectId);
-                setConversationsWithIterations(response);
-            }
-        } catch (error) {
-            console.error(
-                "Error setting up conversations with iterations:",
-                error,
-            );
-        }
-    };
-
-    const handleFixErrors = async () => {
-        posthog.capture("click_fix_errors_from_manage_project_web_preview");
-        if (!projectId) {
-            toast({
-                title: "Project ID is required",
-                description: "Please select a project",
-            });
-            return;
-        }
-        setIsCheckingBuildErrors(true);
-
-        try {
-            await checkBuildErrors(projectId);
-            toast({
-                title: "Genesoft software development AI Agent team working on fixing errors of your web application to help you deploy latest version",
-                description:
-                    "Please waiting for email notification when errors are fixed",
-                duration: 10000,
-            });
-        } catch (error) {
-            console.error("Error checking build errors:", error);
-            toast({
-                title: "Failed to check build errors",
-                description: "Please try again",
-                variant: "destructive",
-                duration: 10000,
-            });
-        } finally {
-            setIsCheckingBuildErrors(false);
         }
     };
 
@@ -461,7 +378,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
             // Set up polling every 10 seconds
             interval = setInterval(() => {
                 fetchLatestData();
-                setPollingCount((prev) => prev + 1);
             }, 10000);
         }
 
@@ -553,68 +469,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
                             scrollHideDelay={0}
                         >
                             <div className="flex flex-col p-4 gap-4 pb-4 h-full">
-                                {conversationsWithIterations.length > 0 && (
-                                    <div className="flex flex-col gap-4 w-full">
-                                        {conversationsWithIterations?.map(
-                                            (conversation) => (
-                                                <Dialog key={conversation?.id}>
-                                                    <DialogTrigger asChild>
-                                                        <Card className="flex flex-col w-full bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg cursor-pointer hover:bg-[#222529] transition-colors">
-                                                            <CardHeader className="flex flex-row items-center justify-between px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838] transition-colors duration-200 shadow-sm">
-                                                                <CardTitle className="text-lg font-semibold text-white flex justify-between items-center w-full">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className="text-blue-300 font-medium text-xs md:text-sm">
-                                                                            {conversation?.name ||
-                                                                                "Untitled"}
-                                                                        </span>
-                                                                    </div>
-                                                                    <HistoryIcon className="h-5 w-5 text-blue-300" />
-                                                                </CardTitle>
-                                                            </CardHeader>
-                                                        </Card>
-                                                    </DialogTrigger>
-                                                    <DialogContent className="w-11/12 md:w-8/12 max-w-5xl p-0 bg-[#1a1d21] border border-[#383838] text-white rounded-lg">
-                                                        <DialogHeader className="px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838]">
-                                                            <DialogTitle className="text-lg font-semibold text-white flex flex-col md:flex-row items-center gap-3 pt-8 md:pt-4">
-                                                                <span className="text-blue-300 font-medium">
-                                                                    {conversation?.name ||
-                                                                        "Untitled"}
-                                                                </span>
-                                                                <span className="px-2.5 py-1 text-xs rounded-full bg-[#2a2d32] text-gray-300 border border-[#3a3d42] shadow-inner">
-                                                                    {conversation?.updated_at
-                                                                        ? formatDateToHumanReadable(
-                                                                              conversation.updated_at,
-                                                                          )
-                                                                        : ""}
-                                                                </span>
-                                                            </DialogTitle>
-                                                        </DialogHeader>
-                                                        <div className="max-h-[80vh] overflow-hidden">
-                                                            <ConversationWithIteration
-                                                                conversationWithIteration={
-                                                                    conversation
-                                                                }
-                                                                isOpen={true}
-                                                            />
-                                                        </div>
-                                                    </DialogContent>
-                                                </Dialog>
-                                            ),
-                                        )}
-                                    </div>
-                                )}
-
-                                {latestIteration && (
-                                    <DevelopmentActivity
-                                        pollingCount={pollingCount}
-                                        latestIteration={latestIteration}
-                                        project={{
-                                            name: projectName,
-                                            description: projectDescription,
-                                        }}
-                                    />
-                                )}
-
                                 {/* This is the place that root cause of non-responsive conversation */}
                                 {messages.map((message, index) => (
                                     <div

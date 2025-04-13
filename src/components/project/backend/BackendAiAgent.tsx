@@ -5,12 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ToggleButton } from "@/components/ui/toggle-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MonitorPlay } from "lucide-react";
+import { AppWindow, MonitorPlay, Server } from "lucide-react";
 import { MessageSquare } from "lucide-react";
-import { Collapsible } from "@/components/ui/collapsible";
-import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import { getConversationById } from "@/actions/conversation";
 import { getActiveConversationByProjectId } from "@/actions/conversation";
 import PageLoading from "@/components/common/PageLoading";
@@ -21,15 +18,23 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import BackendAiAgentProgress from "./BackendAiAgentProgress";
+import BackendGenerations from "./BackendGenerations";
+import { useCollectionStore } from "@/stores/collection-store";
+import { useProjectStore } from "@/stores/project-store";
 
 type Props = {
     project: Project;
+    handleGoToWebProject: () => void;
+    handleGoToBackendProject: () => void;
 };
 
-const BackendAiAgent = ({ project }: Props) => {
+const BackendAiAgent = ({
+    project,
+    handleGoToWebProject,
+    handleGoToBackendProject,
+}: Props) => {
     const router = useRouter();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const { id: projectId } = useProjectStore();
     const [activeTab, setActiveTab] = useState("conversation");
     const [activeTabOverview, setActiveTabOverview] = useState("preview");
     const [conversationKey, setConversationKey] = useState(0);
@@ -44,6 +49,9 @@ const BackendAiAgent = ({ project }: Props) => {
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
     };
+    const [activeTabForCollection, setActiveTabForCollection] =
+        useState("backend");
+    const { id: collectionId, web_project_id } = useCollectionStore();
 
     useEffect(() => {
         const { projectId } = pathParams;
@@ -79,6 +87,18 @@ const BackendAiAgent = ({ project }: Props) => {
         setConversationKey((prevKey) => prevKey + 1);
     };
 
+    useEffect(() => {
+        setupTabForCollection();
+    }, [projectId]);
+
+    const setupTabForCollection = () => {
+        if (projectId === web_project_id) {
+            setActiveTabForCollection("web");
+        } else {
+            setActiveTabForCollection("backend");
+        }
+    };
+
     if (loading) {
         return <PageLoading text="Loading page information..." />;
     }
@@ -100,6 +120,33 @@ const BackendAiAgent = ({ project }: Props) => {
                     <div className="flex flex-col items-center gap-1">
                         <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
                     </div>
+
+                    {collectionId && (
+                        <Tabs
+                            defaultValue="web"
+                            className="w-auto"
+                            value={activeTabForCollection}
+                        >
+                            <TabsList className="bg-primary-dark border-line-in-dark-bg">
+                                <TabsTrigger
+                                    value="web"
+                                    className="text-white flex items-center gap-2"
+                                    onClick={handleGoToWebProject}
+                                >
+                                    <AppWindow className="h-4 w-4" />
+                                    <span>Web</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="backend"
+                                    className="text-white flex items-center gap-2"
+                                    onClick={handleGoToBackendProject}
+                                >
+                                    <Server className="h-4 w-4" />
+                                    <span>Backend</span>
+                                </TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    )}
                 </div>
 
                 <Tabs
@@ -113,18 +160,17 @@ const BackendAiAgent = ({ project }: Props) => {
                             className="flex items-center gap-2 text-xs md:text-sm"
                             onClick={() => setActiveTabOverview("preview")}
                         >
-                            <MessageSquare className="h-2 w-2 md:h-4 md:w-4" />
+                            <MonitorPlay className="h-2 w-2 md:h-4 md:w-4" />
+
                             <span>Preview</span>
                         </TabsTrigger>
                         <TabsTrigger
-                            value="ai-agent-progress"
+                            value="generations"
                             className="flex items-center gap-2 text-xs md:text-sm"
-                            onClick={() =>
-                                setActiveTabOverview("ai-agent-progress")
-                            }
+                            onClick={() => setActiveTabOverview("generations")}
                         >
-                            <MonitorPlay className="h-2 w-2 md:h-4 md:w-4" />
-                            <span>AI Agent progress</span>
+                            <MessageSquare className="h-2 w-2 md:h-4 md:w-4" />
+                            <span>Generations</span>
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
@@ -210,8 +256,8 @@ const BackendAiAgent = ({ project }: Props) => {
                     {activeTabOverview === "preview" && (
                         <BackendPreview project={project} />
                     )}
-                    {activeTabOverview === "ai-agent-progress" && (
-                        <BackendAiAgentProgress project={project} />
+                    {activeTabOverview === "generations" && (
+                        <BackendGenerations project={project} />
                     )}
                 </ResizablePanel>
             </ResizablePanelGroup>
