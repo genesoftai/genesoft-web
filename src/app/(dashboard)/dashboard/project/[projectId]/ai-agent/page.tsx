@@ -68,6 +68,10 @@ const AiAgentPage = () => {
         setProject(project);
     };
 
+    if (loading) {
+        return <PageLoading text="Loading project information..." />;
+    }
+
     if (
         project?.project_template_type &&
         project?.project_template_type.startsWith("backend")
@@ -95,8 +99,6 @@ const AiAgentPage = () => {
             />
         );
     }
-
-    return <PageLoading text="Loading project information..." />;
 };
 
 export default AiAgentPage;
