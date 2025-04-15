@@ -405,7 +405,6 @@ export type CreateProjectFromOnboardingDto = {
 export async function createProjectFromOnboarding(
     payload: CreateProjectFromOnboardingDto,
 ) {
-    payload.project_type = "web";
     console.log("genesoftCoreApiServiceBaseUrl", genesoftCoreApiServiceBaseUrl);
     const url = `${genesoftCoreApiServiceBaseUrl}/project/onboarding`;
     console.log({

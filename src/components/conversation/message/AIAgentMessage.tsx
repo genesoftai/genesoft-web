@@ -29,25 +29,86 @@ type AIAgentMessageProps = {
     message: Message;
     messagesLength: number;
     index: number;
-    messagesEndRef: React.RefObject<HTMLDivElement | null>;
     status: string;
     sender_id: string;
+};
+
+const StreamingText = ({
+    text,
+    speed = 5,
+    onComplete,
+}: {
+    text: string;
+    speed: number;
+    onComplete: () => void;
+}) => {
+    const [displayedText, setDisplayedText] = useState("");
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [htmlContent, setHtmlContent] = useState("");
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (currentIndex < text.length) {
+            const timeoutId = setTimeout(async () => {
+                const newDisplayedText = displayedText + text[currentIndex];
+                setDisplayedText(newDisplayedText);
+                setCurrentIndex((prev) => prev + 1);
+
+                // Process with markdown every few characters for better performance
+                if (
+                    currentIndex % 5 === 0 ||
+                    currentIndex === text.length - 1
+                ) {
+                    const file = await processor.process(newDisplayedText);
+                    const processedContent = String(file);
+                    setHtmlContent(processedContent);
+
+                    // Smooth scroll during streaming
+                    if (containerRef.current) {
+                        containerRef.current.scrollIntoView({
+                            behavior: "smooth",
+                            block: "end",
+                        });
+                    }
+                }
+            }, speed);
+
+            return () => clearTimeout(timeoutId);
+        } else if (onComplete) {
+            onComplete();
+        }
+    }, [text, speed, currentIndex, displayedText, onComplete]);
+
+    return (
+        <div ref={containerRef}>
+            <div
+                className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(htmlContent),
+                }}
+            />
+            <div
+                className="text-white rounded-lg w-full block md:hidden text-xs"
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(htmlContent),
+                }}
+            />
+        </div>
+    );
 };
 
 const AIAgentMessage = ({
     message,
     messagesLength,
     index,
-    messagesEndRef,
     sender_id,
 }: AIAgentMessageProps) => {
     const [htmlContent, setHtmlContent] = useState("");
     const isLatestMessage = index === messagesLength - 1;
     const [senderName, setSenderName] = useState("");
-    const [streamedContent, setStreamedContent] = useState("");
-    const [isStreaming, setIsStreaming] = useState(false);
     const [streamComplete, setStreamComplete] = useState(false);
     const messageRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setupContent();
@@ -65,51 +126,31 @@ const AIAgentMessage = ({
 
     // Auto scroll to bottom on new messages
     useEffect(() => {
-        if (isLatestMessage) {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
-            // Start streaming if this is the latest message
-            if (message?.content && !streamComplete) {
-                streamContent(message.content);
-            }
+        if (isLatestMessage && !streamComplete && containerRef.current) {
+            containerRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+            });
         }
-    }, [messagesEndRef, isLatestMessage, message?.content, streamComplete]);
+    }, [isLatestMessage, streamComplete]);
 
-    // Scroll to this message when streaming updates
-    useEffect(() => {
-        if (isStreaming && isLatestMessage) {
-            messageRef.current?.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [streamedContent, isStreaming, isLatestMessage]);
-
-    const streamContent = async (content: string) => {
-        setIsStreaming(true);
-        setStreamedContent("");
-
-        const chars = content.split("");
-        let currentContent = "";
-
-        for (let i = 0; i < chars.length; i++) {
-            currentContent += chars[i];
-            setStreamedContent(currentContent);
-
-            // Process with markdown every few characters for better performance
-            if (i % 20 === 0 || i === chars.length - 1) {
-                const file = await processor.process(currentContent);
-                const processedContent = String(file);
-                setHtmlContent(processedContent);
-            }
-
-            // Control streaming speed
-            await new Promise((resolve) => setTimeout(resolve, 5));
-        }
+    const handleStreamComplete = async () => {
+        setStreamComplete(true);
 
         // Final processing to ensure complete content is rendered
-        const file = await processor.process(content);
-        const processedContent = String(file);
-        setHtmlContent(processedContent);
-        setIsStreaming(false);
-        setStreamComplete(true);
+        if (message?.content) {
+            const file = await processor.process(message.content);
+            const processedContent = String(file);
+            setHtmlContent(processedContent);
+        }
+
+        // Final scroll after streaming completes
+        if (containerRef.current) {
+            containerRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+            });
+        }
     };
 
     const setupContent = async () => {
@@ -125,7 +166,10 @@ const AIAgentMessage = ({
     };
 
     return (
-        <div className="flex flex-col items-start gap-2 group p-2 rounded-md w-full">
+        <div
+            ref={containerRef}
+            className="flex flex-col items-start gap-2 group p-2 rounded-md w-full"
+        >
             <div className="flex items-center gap-2">
                 <div>
                     <Avatar className="h-8 w-8 sm:h-9 sm:w-9 rounded-md flex-shrink-0">
@@ -171,26 +215,31 @@ const AIAgentMessage = ({
             </div>
 
             <div className="flex-1 min-w-0 max-w-full">
-                <div
-                    ref={(el) => {
-                        if (isLatestMessage) {
-                            messagesEndRef.current = el;
-                            messageRef.current = el;
-                        }
-                    }}
-                    className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block max-w-[200px] overflow-scroll"
-                    dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(htmlContent),
-                    }}
-                />
+                {isLatestMessage && !streamComplete ? (
+                    <StreamingText
+                        text={message?.content || ""}
+                        speed={5}
+                        onComplete={handleStreamComplete}
+                    />
+                ) : (
+                    <>
+                        <div
+                            ref={messageRef}
+                            className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
+                            dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(htmlContent),
+                            }}
+                        />
 
-                <div
-                    ref={isLatestMessage ? messageRef : null}
-                    className="text-white rounded-lg w-full block md:hidden text-xs"
-                    dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(htmlContent),
-                    }}
-                />
+                        <div
+                            ref={messageRef}
+                            className="text-white rounded-lg w-full block md:hidden text-xs"
+                            dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(htmlContent),
+                            }}
+                        />
+                    </>
+                )}
             </div>
         </div>
     );

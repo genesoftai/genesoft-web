@@ -15,6 +15,20 @@ export type UpdateCollectionRequest = {
     description: string;
 };
 
+export async function getCollectionById(collectionId: string) {
+    const url = `${genesoftCoreApiServiceBaseUrl}/collection/${collectionId}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function createCollection(payload: CreateCollectionRequest) {
     const url = `${genesoftCoreApiServiceBaseUrl}/collection`;
     try {

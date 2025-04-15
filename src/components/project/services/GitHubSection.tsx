@@ -46,7 +46,7 @@ export const GitHubSection = ({ projectId }: GitHubSectionProps) => {
                 <Button
                     onClick={handleRequestGithubAccess}
                     variant="outline"
-                    className="w-full bg-primary-dark border-line-in-dark-bg hover:bg-primary-dark/80 text-white"
+                    className="w-full bg-primary-dark border-line-in-dark-bg hover:bg-genesoft/80 text-white hover:text-white"
                     disabled={loading}
                 >
                     {loading ? (

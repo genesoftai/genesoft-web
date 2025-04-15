@@ -205,6 +205,7 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                                             webProject.backend_requirements ||
                                             ""
                                         }
+                                        collectionId={collection.id}
                                     />
                                 )}
                             </div>
@@ -242,6 +243,7 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                                                 project.backend_requirements ||
                                                 ""
                                             }
+                                            collectionId={collection.id}
                                         />
                                     </div>
                                 ))}

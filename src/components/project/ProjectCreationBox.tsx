@@ -195,6 +195,9 @@ const ProjectCreationBox = ({
                 has_logo: !!brandingImage,
                 has_color: true,
             });
+            console.log({
+                message: "create project from onboarding ProjectCreationBox",
+            });
             onComplete({
                 description: projectDescription,
                 logo: brandingImage,
@@ -326,12 +329,6 @@ const ProjectCreationBox = ({
                                         complex data processing systems
                                     </span>
                                 </div>
-                            </SelectItem>
-                            <SelectItem value="mobile" disabled>
-                                Mobile App (Coming soon)
-                            </SelectItem>
-                            <SelectItem value="ai-agents" disabled>
-                                AI Agents (Coming soon)
                             </SelectItem>
                         </SelectGroup>
                     </SelectContent>

@@ -13,14 +13,14 @@ import { formatDateToHumanReadable } from "@/utils/common/time";
 import { ConversationWithIterations } from "@/types/conversation";
 import { getConversationsWithIterationsByProjectId } from "@/actions/conversation";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import AIAgentAnalyzing from "../common/AIAgentAnalyzing";
 import GenesoftLoading from "@/components/common/GenesoftLoading";
+import AIAgentAnalyzing from "../common/AIAgentAnalyzing";
 
 interface Props {
     project: Project | null;
 }
 
-const BackendGenerations = ({ project }: Props) => {
+const WebGenerations = ({ project }: Props) => {
     const [latestIteration, setLatestIteration] =
         useState<LatestIteration | null>(null);
     const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ const BackendGenerations = ({ project }: Props) => {
     }
 
     console.log({
-        message: "backend generations",
+        message: "web generations",
         project,
         latestIteration,
         conversationsWithIterations,
@@ -94,7 +94,7 @@ const BackendGenerations = ({ project }: Props) => {
         !latestIteration.iteration_tasks ||
         latestIteration.iteration_tasks.length === 0
     ) {
-        return <AIAgentAnalyzing projectType={"backend"} />;
+        return <AIAgentAnalyzing projectType={"web"} />;
     }
 
     return (
@@ -161,8 +161,7 @@ const BackendGenerations = ({ project }: Props) => {
                             latestIteration={latestIteration}
                             project={{
                                 name: project?.name || "",
-                                description:
-                                    project?.backend_requirements || "",
+                                description: project?.description || "",
                             }}
                         />
                     )}
@@ -172,4 +171,4 @@ const BackendGenerations = ({ project }: Props) => {
     );
 };
 
-export default BackendGenerations;
+export default WebGenerations;

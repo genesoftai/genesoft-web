@@ -41,4 +41,6 @@ export interface WebApplicationInfo {
     repositoryBuild: RepositoryBuild;
     codesandboxUrl: string | null;
     codesandboxId: string | null;
+    codesandboxPreviewUrl: string | null;
+    sandboxId: string | null;
 }

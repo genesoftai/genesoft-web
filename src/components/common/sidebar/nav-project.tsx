@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, ScanEye, Info } from "lucide-react";
+import { Loader2, ScanEye, Info, Users } from "lucide-react";
 import React, { useState } from "react";
 import {
     SidebarGroup,
@@ -97,9 +97,9 @@ export function NavProject() {
                         className="text-white hover:bg-secondary-dark"
                     >
                         <a href={`/dashboard/project/${id}/ai-agent`}>
-                            <ScanEye className="text-subtext-in-dark-bg" />
+                            <Users className="text-subtext-in-dark-bg" />
                             <span className="text-subtext-in-dark-bg">
-                                Conversation
+                                AI Agents Workspace
                             </span>
                         </a>
                     </SidebarMenuButton>

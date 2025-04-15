@@ -137,6 +137,7 @@ export interface UpdateProjectRequest {
     description?: string;
     purpose?: string;
     target_audience?: string;
+    backend_requirements?: string;
     branding?: {
         logo_url?: string;
         color?: string;

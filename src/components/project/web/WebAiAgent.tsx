@@ -1,43 +1,45 @@
+import React, { useEffect, useState } from "react";
+import {
+    ResizablePanel,
+    ResizablePanelGroup,
+    ResizableHandle,
+} from "@/components/ui/resizable";
+import Image from "next/image";
+import { useCollectionStore } from "@/stores/collection-store";
+import { useParams, useRouter } from "next/navigation";
 import { ConversationMessageForWeb, Message } from "@/types/message";
 import { Project } from "@/types/project";
-import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppWindow, MonitorPlay, Server } from "lucide-react";
-import { MessageSquare } from "lucide-react";
+import { useProjectStore } from "@/stores/project-store";
 import { getConversationById } from "@/actions/conversation";
 import { getActiveConversationByProjectId } from "@/actions/conversation";
 import PageLoading from "@/components/common/PageLoading";
-import BackendConversation from "@/components/conversation/BackendConversation";
-import { BackendPreview } from "../manage/BackendPreview";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import BackendGenerations from "./BackendGenerations";
-import { useCollectionStore } from "@/stores/collection-store";
-import { useProjectStore } from "@/stores/project-store";
-import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AppWindow, MessageSquare, MonitorPlay, Server } from "lucide-react";
+import { WebPreview } from "../manage/WebPreview";
+import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
+import Conversation from "@/components/conversation/Conversation";
+import WebGenerations from "./WebGenerations";
+import ServicesIntegrationSheet from "../services/ServicesIntegrationSheet";
+import WebProjectInfoSheet from "../services/WebProjectInfoSheet";
+import { getCollectionByWebProjectId } from "@/actions/collection";
 import { getLatestIteration } from "@/actions/development";
 
 type Props = {
-    project: Project;
-    handleGoToWebProject: () => void;
+    project: Project | null;
     handleGoToBackendProject: () => void;
+    handleGoToWebProject: () => void;
     onSaveProjectInfo: (project: Project) => void;
 };
 
-const BackendAiAgent = ({
+const WebAiAgent = ({
     project,
-    handleGoToWebProject,
     handleGoToBackendProject,
+    handleGoToWebProject,
     onSaveProjectInfo,
 }: Props) => {
     const router = useRouter();
+    const { id: projectId } = useProjectStore();
     const [activeTab, setActiveTab] = useState("conversation");
     const [activeTabOverview, setActiveTabOverview] = useState("preview");
     const [conversationKey, setConversationKey] = useState(0);
@@ -48,25 +50,14 @@ const BackendAiAgent = ({
         useState<ConversationMessageForWeb | null>(null);
     const pathParams = useParams();
     const [loading, setLoading] = useState(false);
+    const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
+    const [activeTabForCollection, setActiveTabForCollection] = useState("web");
+    const { id: collectionId, web_project_id } = useCollectionStore();
     const [isProjectInfoSheetOpen, setIsProjectInfoSheetOpen] = useState(false);
-
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
     };
-    const [activeTabForCollection, setActiveTabForCollection] =
-        useState("backend");
-    const { id: collectionId } = useCollectionStore();
-
-    useEffect(() => {
-        const { projectId } = pathParams;
-        setupProjectGeneration(projectId as string);
-    }, [pathParams]);
-
-    useEffect(() => {
-        if (project) {
-            checkLatestIteration();
-        }
-    }, [project]);
+    const [collectionForProject, setCollectionForProject] = useState(null);
 
     const setupActivePageConversation = async (projectId: string) => {
         setLoading(true);
@@ -86,6 +77,7 @@ const BackendAiAgent = ({
             setLoading(false);
         }
     };
+
     const checkLatestIteration = async () => {
         if (!project?.id) return;
 
@@ -100,7 +92,8 @@ const BackendAiAgent = ({
     };
 
     const handleSubmitConversation = async () => {
-        window.location.reload();
+        setActiveTab("conversation");
+        setActiveTabOverview("generations");
     };
 
     const handleSendImageWithMessage = async (messages: Message[]) => {
@@ -113,12 +106,24 @@ const BackendAiAgent = ({
         onSaveProjectInfo(project);
     };
 
+    useEffect(() => {
+        const { projectId } = pathParams;
+        setupProjectGeneration(projectId as string);
+    }, [pathParams]);
+
+    useEffect(() => {
+        if (project) {
+            checkLatestIteration();
+        }
+    }, [project]);
+
     if (loading) {
         return <PageLoading text="Loading page information..." />;
     }
+    console.log(web_project_id, projectId);
 
     return (
-        <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1">
+        <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full">
             <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                 <div className="flex items-center gap-4">
                     <Image
@@ -131,21 +136,14 @@ const BackendAiAgent = ({
                             router.push("/");
                         }}
                     />
-                    <div className="flex flex-col items-center gap-1">
+                    <div className="flex items-center gap-1">
                         <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
                     </div>
 
-                    <BackendProjectInfoSheet
-                        isOpen={isProjectInfoSheetOpen}
-                        onOpenChange={setIsProjectInfoSheetOpen}
-                        project={project as Project}
-                        onSave={handleSaveProjectInfo}
-                    />
-
-                    {collectionId && (
+                    {collectionId && web_project_id === projectId && (
                         <Tabs
                             defaultValue="web"
-                            className="w-auto"
+                            className="w-auto hidden md:flex"
                             value={activeTabForCollection}
                         >
                             <TabsList className="bg-primary-dark border-line-in-dark-bg">
@@ -170,6 +168,19 @@ const BackendAiAgent = ({
                     )}
                 </div>
 
+                <div className="flex items-center gap-2 hidden md:flex">
+                    <WebProjectInfoSheet
+                        isOpen={isProjectInfoSheetOpen}
+                        onOpenChange={setIsProjectInfoSheetOpen}
+                        project={project as Project}
+                        onSave={handleSaveProjectInfo}
+                    />
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
+                </div>
+
                 <Tabs
                     value={activeTabOverview}
                     onValueChange={setActiveTabOverview}
@@ -182,7 +193,6 @@ const BackendAiAgent = ({
                             onClick={() => setActiveTabOverview("preview")}
                         >
                             <MonitorPlay className="h-2 w-2 md:h-4 md:w-4" />
-
                             <span>Preview</span>
                         </TabsTrigger>
                         <TabsTrigger
@@ -226,7 +236,7 @@ const BackendAiAgent = ({
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
                     >
                         <div className="flex-1 min-w-0 h-auto">
-                            <BackendConversation
+                            <Conversation
                                 key={`mobile-conversation-${conversationKey}`}
                                 conversationId={conversation?.id || ""}
                                 initialMessages={messages || []}
@@ -246,79 +256,46 @@ const BackendAiAgent = ({
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
                     >
                         <div className="flex-1">
-                            <BackendPreview project={project} />
+                            <WebPreview project={project} />
                         </div>
                     </TabsContent>
                 </Tabs>
             </div>
 
-            {/* Desktop View - Only visible at md breakpoint and up */}
-            <ResizablePanelGroup
-                direction="horizontal"
-                className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
-            >
-                <ResizablePanel defaultSize={50}>
-                    <BackendConversation
-                        key={`desktop-conversation-${conversationKey}`}
-                        conversationId={conversation?.id || ""}
-                        initialMessages={messages || []}
-                        isLoading={isLoadingSetupPageConversation}
-                        onSubmitConversation={handleSubmitConversation}
-                        status={conversation?.status || ""}
-                        pageId={pathParams?.pageId as string}
-                        onSendImageWithMessage={handleSendImageWithMessage}
-                    />
-                </ResizablePanel>
-                <ResizableHandle
-                    className="bg-primary-dark w-1 rounded-full"
-                    withHandle
-                />
-                <ResizablePanel defaultSize={50}>
-                    {activeTabOverview === "preview" && (
-                        <BackendPreview project={project} />
-                    )}
-                    {activeTabOverview === "generations" && (
-                        <BackendGenerations project={project} />
-                    )}
-                </ResizablePanel>
-            </ResizablePanelGroup>
-            {/* <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-1">
-                <div
-                    className={`flex-1 min-w-0 ${
-                        isCollapsed ? "lg:w-full" : "lg:max-w-[60%]"
-                    } h-[calc(100vh-60px)]`}
+            <div className="hidden md:flex">
+                {/* Desktop View - Only visible at md breakpoint and up */}
+                <ResizablePanelGroup
+                    direction="horizontal"
+                    className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
                 >
-                    <BackendConversation
-                        key={`desktop-conversation-${conversationKey}`}
-                        conversationId={conversation?.id || ""}
-                        initialMessages={messages || []}
-                        isLoading={isLoadingSetupPageConversation}
-                        onSubmitConversation={handleSubmitConversation}
-                        status={conversation?.status || ""}
-                        pageId={pathParams?.pageId as string}
-                        onSendImageWithMessage={handleSendImageWithMessage}
+                    <ResizablePanel defaultSize={50}>
+                        <Conversation
+                            key={`desktop-conversation-${conversationKey}`}
+                            conversationId={conversation?.id || ""}
+                            initialMessages={messages || []}
+                            isLoading={isLoadingSetupPageConversation}
+                            onSubmitConversation={handleSubmitConversation}
+                            status={conversation?.status || ""}
+                            pageId={pathParams?.pageId as string}
+                            onSendImageWithMessage={handleSendImageWithMessage}
+                        />
+                    </ResizablePanel>
+                    <ResizableHandle
+                        className="bg-primary-dark w-1 rounded-full"
+                        withHandle
                     />
-                </div>
-
-                <Collapsible
-                    className={`transition-all duration-300 ease-in-out ${
-                        isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"
-                    } h-[calc(100vh-60px)]`}
-                    open={!isCollapsed}
-                    onOpenChange={(open) => setIsCollapsed(!open)}
-                >
-                    <CollapsibleContent
-                        className="w-full h-full data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
-                        forceMount
-                    >
-                        <div className="h-full overflow-auto">
-                            <BackendPreview project={project} />
-                        </div>
-                    </CollapsibleContent>
-                </Collapsible>
-            </div> */}
+                    <ResizablePanel defaultSize={50}>
+                        {activeTabOverview === "preview" && (
+                            <WebPreview project={project} />
+                        )}
+                        {activeTabOverview === "generations" && (
+                            <WebGenerations project={project} />
+                        )}
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            </div>
         </div>
     );
 };
 
-export default BackendAiAgent;
+export default WebAiAgent;

@@ -76,14 +76,14 @@ export const ServicesIntegrationSheet = ({
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                     <div className="py-6 space-y-6">
                         <GitHubSection projectId={projectId} />
-                        <FirebaseSection
+                        {/* <FirebaseSection
                             projectId={projectId}
                             firebaseEnv={firebaseEnv as FirebaseEnv}
                         />
                         <StripeSection
                             projectId={projectId}
                             stripeEnv={stripeEnv as StripeEnv}
-                        />
+                        /> */}
                     </div>
                 </ScrollArea>
             </SheetContent>

@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { getFirstCharacterUppercase } from "@/utils/common/text";
 import { AppWindow, Server } from "lucide-react";
 import { useCollectionStore } from "@/stores/collection-store";
-import { getCollectionByWebProjectId } from "@/actions/collection";
+import { getCollectionById } from "@/actions/collection";
 
 interface ProjectCardProps {
     id: string;
@@ -29,6 +29,7 @@ interface ProjectCardProps {
     target_audience: string;
     project_template_type: string;
     backend_requirements: string;
+    collectionId?: string;
 }
 
 export function ProjectCard({
@@ -39,6 +40,7 @@ export function ProjectCard({
     target_audience,
     project_template_type,
     backend_requirements,
+    collectionId,
 }: ProjectCardProps) {
     const router = useRouter();
     const { updateProjectStore } = useProjectStore();
@@ -54,7 +56,7 @@ export function ProjectCard({
         }
     }, [project_template_type]);
 
-    const handleManageProject = async () => {
+    const handleGoToAiAgentWorkspace = async () => {
         setIsLoading(true);
         try {
             updateProjectStore({
@@ -64,7 +66,9 @@ export function ProjectCard({
                 purpose,
                 target_audience,
             });
-            await handleSetupCollectionForWorkspace();
+            if (collectionId) {
+                await handleSetupCollectionForWorkspace();
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -75,7 +79,7 @@ export function ProjectCard({
 
     const handleSetupCollectionForWorkspace = async () => {
         try {
-            const collection = await getCollectionByWebProjectId(id);
+            const collection = await getCollectionById(collectionId as string);
             updateCollectionStore({
                 id: collection.id,
                 name: collection.name,
@@ -181,7 +185,7 @@ export function ProjectCard({
             <CardFooter className="flex justify-end md:justify-start self-center md:self-end mt-4">
                 <Button
                     className="bg-genesoft text-white rounded-lg text-xs md:text-base"
-                    onClick={handleManageProject}
+                    onClick={handleGoToAiAgentWorkspace}
                 >
                     <span className="text-xs md:text-base">
                         {isLoading

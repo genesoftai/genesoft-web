@@ -142,12 +142,6 @@ export function BackendPreview({ project, onPage }: WebPreviewProps) {
                             <BackendServiceTerminal
                                 sandboxId={backendServiceInfo?.sandboxId || ""}
                             />
-                            <Button
-                                variant="outline"
-                                className={`border-none text-black px-4 py-2 text-sm transition-colors `}
-                            >
-                                Deploy
-                            </Button>
                         </div>
                     </div>
 
