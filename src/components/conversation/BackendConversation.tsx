@@ -473,7 +473,11 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                 {messages.map((message, index) => (
                                     <div
                                         key={message.id}
-                                        className={`group max-w-full w-full overflow-hidden ${index === messages.length - 1 ? "message-new" : ""}`}
+                                        className={`group max-w-full w-full overflow-hidden ${
+                                            index === messages.length - 1
+                                                ? "message-new"
+                                                : ""
+                                        }`}
                                     >
                                         {message.sender_type === "system" ? (
                                             <SystemMessage message={message} />
@@ -484,7 +488,6 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                                 message={message}
                                                 messagesLength={messages.length}
                                                 index={index}
-                                                messagesEndRef={messagesEndRef}
                                                 status={status}
                                                 sender_id={
                                                     message.sender_id as string

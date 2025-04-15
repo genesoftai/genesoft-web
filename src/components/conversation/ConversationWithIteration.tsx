@@ -133,7 +133,6 @@ const ConversationWithIteration = ({
                                             message={message}
                                             messagesLength={messages.length}
                                             index={index}
-                                            messagesEndRef={messagesEndRef}
                                             status={
                                                 conversationWithIteration.status
                                             }

@@ -142,27 +142,23 @@ export default function LandingPage() {
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
-        console.log({
-            message: "create project from onboarding",
-            data: {
-                description,
-                logo,
-                color,
-                project_type,
-                backend_requirements,
-            },
-        });
+        let collectionId = "";
         try {
-            const res = await createProjectFromOnboarding({
-                user_id: user_id,
+            const payload = {
+                user_id,
                 project_description: description,
                 branding: {
                     logo_url: logo,
-                    color: color,
+                    color,
                 },
-                project_type: project_type,
-                backend_requirements: backend_requirements,
+                project_type,
+                backend_requirements,
+            };
+            console.log({
+                message: "create project from onboarding",
+                payload,
             });
+            const res = await createProjectFromOnboarding(payload);
             if (res.error) {
                 posthog.capture(
                     "landing_page_create_project_from_onboarding_failed",
@@ -208,6 +204,7 @@ export default function LandingPage() {
                         created_at: res.collection.created_at,
                         updated_at: res.collection.updated_at,
                     });
+                    collectionId = res.collection.id;
                 }
 
                 posthog.capture(
@@ -220,7 +217,11 @@ export default function LandingPage() {
                 "landing_page_create_project_from_onboarding_failed",
             );
         } finally {
-            if (projectId) {
+            if (collectionId) {
+                router.push(
+                    `/dashboard/collection/${collectionId}/collection-creation`,
+                );
+            } else if (projectId) {
                 router.push(`/dashboard/project/${projectId}/ai-agent`);
             }
             setIsCreatingProjectFromOnboarding(false);
@@ -230,6 +231,9 @@ export default function LandingPage() {
     useEffect(() => {
         if (is_onboarding && user_id && projectDescription) {
             posthog.capture("landing_page_viewed_after_onboarding");
+            console.log({
+                message: "create project from onboarding useEffect",
+            });
             handleCreateProjectFromOnboarding({
                 description: projectDescription,
                 logo: projectBranding?.logo_url,

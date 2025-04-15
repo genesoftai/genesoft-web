@@ -133,11 +133,12 @@ export default function Navbar() {
 
     const handleGoToDashboard = () => {
         if (userEmail) {
-            if (projectId) {
-                router.push(`/dashboard/project/${projectId}/ai-agent`);
-            } else {
-                router.push(`/dashboard`);
-            }
+            // if (projectId) {
+            //     router.push(`/dashboard/project/${projectId}/ai-agent`);
+            // } else {
+            //     router.push(`/dashboard`);
+            // }
+            router.push(`/dashboard`);
         } else {
             posthog.capture("click_dashboard_from_navbar_but_not_logged_in");
             router.push("/signin");
@@ -285,6 +286,13 @@ export default function Navbar() {
                             Dashboard
                         </p>
 
+                        <p
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
+                            onClick={handleGoToCollections}
+                        >
+                            Collections
+                        </p>
+
                         <button
                             onClick={handleSupportClick}
                             className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
@@ -383,6 +391,12 @@ export default function Navbar() {
                                 >
                                     Dashboard
                                 </Link>
+                                <p
+                                    className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
+                                    onClick={handleGoToCollections}
+                                >
+                                    Collections
+                                </p>
                                 <button
                                     className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center text-left"
                                     onClick={(e) => {

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Project } from "@/types/project";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { WebApplicationInfo } from "@/types/web-application";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Loader2, RotateCcw, Smartphone } from "lucide-react";
@@ -8,46 +8,79 @@ import { Globe } from "lucide-react";
 import { Monitor } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { getWebApplicationInfo } from "@/actions/web-application";
+import GenesoftLoading from "@/components/common/GenesoftLoading";
+import { WebTerminal } from "../web/WebTerminal";
+import { WebEnv } from "../web/WebEnv";
 interface WebPreviewProps {
     project: Project | null;
-    onPage?: string;
-    webApplicationInfo: WebApplicationInfo | null;
-    onRefresh?: () => void;
 }
 
 type Mode = "normal" | "dev";
 
-export function WebPreview({
-    project,
-    onPage,
-    webApplicationInfo,
-    onRefresh,
-}: WebPreviewProps) {
+export function WebPreview({ project }: WebPreviewProps) {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [mode, setMode] = useState<Mode>("normal");
-    const [previewUrl, setPreviewUrl] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [webApplicationInfo, setWebApplicationInfo] =
+        useState<WebApplicationInfo | null>(null);
 
     const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
 
+    const fetchLatestData = async () => {
+        console.log("fetchLatestData", project?.id);
+        if (!project?.id) return;
+        setIsLoading(true);
+        try {
+            const webAppInfo = await getWebApplicationInfo(project.id);
+
+            setWebApplicationInfo(webAppInfo);
+        } catch (error) {
+            console.error("Error fetching latest data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const refreshIframe = () => {
-        if (iframeRef.current) {
-            iframeRef.current.src = iframeRef.current.src;
+        setIsLoading(true);
+        try {
+            if (iframeRef.current) {
+                iframeRef.current.src = iframeRef.current.src;
+            }
+        } catch (error) {
+            console.error("Error refreshing iframe:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleRefresh = () => {
         refreshIframe();
-        if (onRefresh) {
-            onRefresh();
-        }
+        fetchLatestData();
     };
 
     console.log({
         webApplicationInfo,
-        previewUrl,
         isLoading,
     });
+
+    useEffect(() => {
+        if (project?.id) {
+            fetchLatestData();
+        }
+    }, [project]);
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center w-full h-full">
+                <GenesoftLoading />
+                <p className="text-white text-sm">
+                    Loading web application information...
+                </p>
+            </div>
+        );
+    }
 
     return (
         <Card
@@ -57,7 +90,7 @@ export function WebPreview({
                 <div
                     className={`relative w-full h-full aspect-video rounded-lg`}
                 >
-                    <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex items-center justify-between">
+                    <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex flex-col md:flex-row items-center justify-between">
                         {/* Browser controls */}
                         <div className="flex gap-1.5 items-center">
                             <div className="flex items-center space-x-2 text-green-500">
@@ -92,9 +125,14 @@ export function WebPreview({
                         </div>
 
                         <div className="overflow-hidden cursor-pointer">
-                            {webApplicationInfo?.url && (
+                            {(webApplicationInfo?.url ||
+                                webApplicationInfo?.codesandboxPreviewUrl) && (
                                 <a
-                                    href={webApplicationInfo.url}
+                                    href={
+                                        webApplicationInfo?.codesandboxPreviewUrl ||
+                                        webApplicationInfo?.url ||
+                                        ""
+                                    }
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-400 hover:text-blue-300 transition-colors truncate hover:underline cursor-pointer"
@@ -103,7 +141,8 @@ export function WebPreview({
                                         maxWidth: "100%",
                                     }}
                                 >
-                                    {webApplicationInfo.url}
+                                    {webApplicationInfo?.codesandboxPreviewUrl ||
+                                        webApplicationInfo?.url}
                                 </a>
                             )}
                         </div>
@@ -116,6 +155,13 @@ export function WebPreview({
                             >
                                 <RotateCcw className="h-4 w-4 text-white" />
                             </Button>
+
+                            <WebTerminal
+                                sandboxId={webApplicationInfo?.sandboxId || ""}
+                            />
+                            <WebEnv
+                                sandboxId={webApplicationInfo?.sandboxId || ""}
+                            />
 
                             <div className="hidden sm:flex items-center bg-gray-700/50 rounded-full overflow-hidden">
                                 <button
@@ -135,21 +181,16 @@ export function WebPreview({
                     </div>
 
                     {/* Code sandbox */}
-                    {previewUrl || webApplicationInfo?.url ? (
+                    {webApplicationInfo?.url ||
+                    webApplicationInfo?.codesandboxUrl ? (
                         mode === "dev" ? (
                             <div
                                 className={`relative flex justify-center w-full h-full pb-8`}
                             >
-                                <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
-                                <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                                 <iframe
                                     ref={iframeRef}
-                                    className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" ? "w-[360px] md:w-[380px] h-[720px]" : "w-full h-full"} rounded-b-lg`}
-                                    src={
-                                        webApplicationInfo?.codesandboxUrl
-                                            ? `${webApplicationInfo?.codesandboxUrl}?embed=1`
-                                            : webApplicationInfo?.url
-                                    }
+                                    className={`relative shadow-xl border border-white/10 w-full h-full`}
+                                    src={`${webApplicationInfo?.codesandboxUrl}?embed=1`}
                                     title="Web Application Preview"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     referrerPolicy="strict-origin-when-cross-origin"
@@ -160,12 +201,13 @@ export function WebPreview({
                             <div
                                 className={`relative flex justify-center w-full h-full`}
                             >
-                                <div className="absolute -inset-1 bg-gradient-to-r from-genesoft/30 via-blue-500/20 to-purple-500/30 rounded-lg opacity-30"></div>
-                                <div className="absolute inset-0 bg-grid-pattern bg-gray-900/20 mix-blend-overlay pointer-events-none"></div>
                                 <iframe
                                     ref={iframeRef}
                                     className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" ? "w-[360px] md:w-[380px] h-[720px]" : "w-full h-full"} rounded-b-lg`}
-                                    src={previewUrl || webApplicationInfo?.url}
+                                    src={
+                                        webApplicationInfo?.codesandboxPreviewUrl ||
+                                        webApplicationInfo?.url
+                                    }
                                     title="Web Application Preview"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     referrerPolicy="strict-origin-when-cross-origin"
