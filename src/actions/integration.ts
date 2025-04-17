@@ -265,25 +265,20 @@ export const subscribeDatabaseService = async (projectId: string, data: Subscrib
     }
 };
 
-export const getDatabaseSubscriptionStatus = async (projectId: string) => {
-    const url = `${genesoftCoreApiServiceBaseUrl}/projects/${projectId}/subscribe`;
+export const getDatabaseCredentials = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/database/credentials`;
+    console.log({
+        url,
+    });
     try {
         const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
             },
         });
-        const subscriptions = response.data;
-        // Check if there's a database subscription
-        for (const sub of subscriptions) {
-            if (sub.tier.indexOf('database-') !== -1) {
-                return { isSubscribed: true, status: sub.status, expiredAt: sub.expiredAt };
-            }
-        }
-        return { isSubscribed: false, status: 'none', expiredAt: null };
+        return response.data;
     } catch (error) {
-        console.error("Error getting database subscription status:", error);
-        throw new Error("Failed to get database subscription status");
+        console.error("Error getting database credentials:", error);
+        throw new Error("Failed to get database credentials");
     }
 };
-    

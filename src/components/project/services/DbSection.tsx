@@ -6,16 +6,26 @@ import { Database } from "lucide-react";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import GenesoftLoading from "@/components/common/GenesoftLoading";
-import { getDatabaseSubscriptionStatus, subscribeDatabaseService } from "@/actions/integration";
+import { getDatabaseCredentials, getSubscribeProject, subscribeDatabaseService } from "@/actions/integration";
 
 type DbSectionProps = {
     projectId: string;
 };
 
+type DatabaseConnectionDetails = {
+    db_name: string;
+    db_user: string;
+    db_password: string;
+    host: string;
+    port: number;
+};
+
 export const DbSection = ({ projectId }: DbSectionProps) => {
-    const [loading, setLoading] = useState(false);
+
+    const [subscribeLoading, setSubscribeLoading] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubscribed, setIsSubscribed] = useState(false);
+    const [dbConnectionDetails, setDbConnectionDetails] = useState<DatabaseConnectionDetails | null>(null);
     const [subscribe, setSubscribe] = useState({
         status: "none",
         expiredAt: null,
@@ -25,18 +35,19 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
     useEffect(() => {
         const fetchSubscriptionStatus = async () => {
             try {
-                setIsLoading(true);
-                const response = await getDatabaseSubscriptionStatus(projectId);
-                setIsSubscribed(response.isSubscribed);
-                setSubscribe({
-                    status: response.status,
-                    expiredAt: response.expiredAt,
-                });
+                const response = await getSubscribeProject(projectId);
+                for (const sub of response) { 
+                    if (sub.tier.indexOf('db-') !== -1) {
+                        setIsSubscribed(true);
+                        setSubscribe({
+                            status: sub.status,
+                            expiredAt: sub.expiredAt,
+                        });
+                    }
+                }
             } catch (error) {
                 console.error("Error fetching database subscription:", error);
                 toast.error("Failed to load database subscription status");
-            } finally {
-                setIsLoading(false);
             }
         };
 
@@ -55,7 +66,7 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
         }
         
         try {
-            setLoading(true);
+            setSubscribeLoading(true);
             // Get current URL for return URL
             const returnUrl = window.location.href;
             
@@ -73,7 +84,7 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
             console.error("Error subscribing to database service:", error);
             toast.error("Failed to subscribe to database service");
         } finally {
-            setLoading(false);
+            setSubscribeLoading(false);
         }
     };
 
@@ -81,6 +92,26 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
         () => subscribe.expiredAt ? new Date(subscribe.expiredAt) : null,
         [subscribe.expiredAt],
     );
+
+    useEffect(() => {
+        const fetchDatabaseCredentials = async () => {
+            try {
+                const credentials = await getDatabaseCredentials(projectId);
+                setDbConnectionDetails(credentials);
+            } catch (error) {
+                console.error("Error fetching database credentials:", error);
+                toast.error("Failed to load database connection details");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (isSubscribed) {
+            fetchDatabaseCredentials();
+        }else{
+            // setIsLoading(false);
+        }
+    }, [isSubscribed, projectId]);
 
     return (
         <div className="space-y-4">
@@ -110,8 +141,9 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                         </>
                     )}
                     
-                    {isSubscribed ? (
+                    {!isLoading && dbConnectionDetails ? (
                         <div className="bg-primary-dark/30 p-4 rounded-lg border border-white/10 space-y-2">
+                        
                             <h4 className="text-sm font-medium text-white">
                                 Database Connection Details
                             </h4>
@@ -121,7 +153,7 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                                         Connection URL:
                                     </span>
                                     <p className="text-subtext-in-dark-bg text-sm">
-                                        postgresql://user:password@your-database-host:5432/defaultdb
+                                        postgresql://{dbConnectionDetails?.db_user}:{dbConnectionDetails?.db_password}@{dbConnectionDetails?.host}:{dbConnectionDetails?.port}/{dbConnectionDetails?.db_name}
                                     </p>
                                 </div>
                                 <div>
@@ -129,7 +161,7 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                                         Host:
                                     </span>
                                     <p className="text-subtext-in-dark-bg text-sm">
-                                        your-database-host.genesoft.app
+                                        {dbConnectionDetails?.host}
                                     </p>
                                 </div>
                                 <div>
@@ -137,7 +169,23 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                                         Port:
                                     </span>
                                     <p className="text-subtext-in-dark-bg text-sm">
-                                        5432
+                                        {dbConnectionDetails?.port}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-white font-medium">
+                                        Username:
+                                    </span>
+                                    <p className="text-subtext-in-dark-bg text-sm">
+                                        {dbConnectionDetails?.db_user}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-white font-medium">
+                                        Database:
+                                    </span>
+                                    <p className="text-subtext-in-dark-bg text-sm">
+                                        {dbConnectionDetails?.db_name}
                                     </p>
                                 </div>
                                 <div>
@@ -145,56 +193,61 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                                         Password:
                                     </span>
                                     <p className="text-subtext-in-dark-bg text-sm">
-                                        ********
+                                        {"********"}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                    ) : (
-                        <>
-                            <div className="bg-primary-dark/30 p-4 rounded-lg border border-white/10 space-y-2">
-                                <h4 className="text-sm font-medium text-white">
-                                    Database Information
-                                </h4>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm">Type:</span>
-                                        <span className="text-sm">PostgreSQL</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm">Storage:</span>
-                                        <span className="text-sm">1GB</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm">Connections:</span>
-                                        <span className="text-sm">Up to 10 concurrent</span>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                                        <span className="text-sm font-medium">Price:</span>
-                                        <span className="text-sm">$10 per month</span>
+                    ) : null}
+
+
+                    {
+                        !isLoading && !isSubscribed && (
+                                <>
+                                <div className="bg-primary-dark/30 p-4 rounded-lg border border-white/10 space-y-2">
+                                    <h4 className="text-sm font-medium text-white">
+                                        Database Information
+                                    </h4>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm">Type:</span>
+                                            <span className="text-sm">PostgreSQL</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm">Storage:</span>
+                                            <span className="text-sm">1GB</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm">Connections:</span>
+                                            <span className="text-sm">Up to 10 concurrent</span>
+                                        </div>
+                                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                                            <span className="text-sm font-medium">Price:</span>
+                                            <span className="text-sm">$10 per month</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <p className="text-sm text-yellow-400">
-                                You need to subscribe to unlock database features.
-                            </p>
-                            <Button
-                                onClick={handleSubscribe}
-                                variant="outline"
-                                className="w-full bg-genesoft hover:bg-genesoft/80 text-white"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <>
-                                        <span className="mr-2 loader animate-spin" />{" "}
-                                        Redirecting...
-                                    </>
-                                ) : (
-                                    `Subscribe to Database Service`
-                                )}
-                            </Button>
-                        </>
-                    )}
+                                <p className="text-sm text-yellow-400">
+                                    You need to subscribe to unlock database features.
+                                </p>
+                                <Button
+                                    onClick={handleSubscribe}
+                                    variant="outline"
+                                    className="w-full bg-genesoft hover:bg-genesoft/80 text-white"
+                                    disabled={subscribeLoading}
+                                >
+                                    {subscribeLoading ? (
+                                        <>
+                                            <span className="mr-2 loader animate-spin" />{" "}
+                                            Redirecting...
+                                        </>
+                                    ) : (
+                                        `Subscribe to Database Service`
+                                    )}
+                                </Button>
+                            </>
+                        ) 
+                    }
                 </div>
             )}
         </div>
