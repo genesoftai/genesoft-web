@@ -108,8 +108,6 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
 
         if (isSubscribed) {
             fetchDatabaseCredentials();
-        }else{
-            // setIsLoading(false);
         }
     }, [isSubscribed, projectId]);
 

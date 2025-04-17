@@ -66,6 +66,7 @@ export const DeploymentSheet = ({
     }, []);
 
     const handleSubscribe = async () => {
+        if (isSubscribed) return;
         if (!projectId) return;
         const user = await supabase.auth.getUser(); 
         if (!user.data.user) return;
