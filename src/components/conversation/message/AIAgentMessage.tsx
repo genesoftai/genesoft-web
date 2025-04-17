@@ -47,51 +47,52 @@ const StreamingText = ({
     const [htmlContent, setHtmlContent] = useState("");
     const containerRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (currentIndex < text.length) {
-            const timeoutId = setTimeout(async () => {
-                const newDisplayedText = displayedText + text[currentIndex];
-                setDisplayedText(newDisplayedText);
-                setCurrentIndex((prev) => prev + 1);
+    // useEffect(() => {
+    //     if (currentIndex < text.length) {
+    //         const timeoutId = setTimeout(async () => {
+    //             const newDisplayedText = displayedText + text[currentIndex];
+    //             setDisplayedText(newDisplayedText);
+    //             setCurrentIndex((prev) => prev + 1);
 
-                // Process with markdown every few characters for better performance
-                if (
-                    currentIndex % 5 === 0 ||
-                    currentIndex === text.length - 1
-                ) {
-                    const file = await processor.process(newDisplayedText);
-                    const processedContent = String(file);
-                    setHtmlContent(processedContent);
+    //             // Process with markdown every few characters for better performance
+    //             if (
+    //                 currentIndex % 5 === 0 ||
+    //                 currentIndex === text.length - 1
+    //             ) {
+    //                 const file = await processor.process(newDisplayedText);
+    //                 const processedContent = String(file);
+    //                 setHtmlContent(processedContent);
 
-                    // Smooth scroll during streaming
-                    if (containerRef.current) {
-                        containerRef.current.scrollIntoView({
-                            behavior: "smooth",
-                            block: "end",
-                        });
-                    }
-                }
-            }, speed);
+    //                 // Smooth scroll during streaming
+    //                 if (containerRef.current) {
+    //                     containerRef.current.scrollIntoView({
+    //                         behavior: "smooth",
+    //                         block: "end",
+    //                     });
+    //                 }
+    //             }
+    //         }, speed);
 
-            return () => clearTimeout(timeoutId);
-        } else if (onComplete) {
-            onComplete();
-        }
-    }, [text, speed, currentIndex, displayedText, onComplete]);
+    //         return () => clearTimeout(timeoutId);
+    //     } else if (onComplete) {
+    //         onComplete();
+    //     }
+    // }, [text, speed, currentIndex, displayedText, onComplete]);
 
     return (
         <div ref={containerRef}>
+            
             <div
                 className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
-                dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(htmlContent),
-                }}
-            />
+                // dangerouslySetInnerHTML={{
+                //     __html: DOMPurify.sanitize(htmlContent),
+                // }}
+            ><pre>{text}</pre></div>
             <div
                 className="text-white rounded-lg w-full block md:hidden text-xs"
-                dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(htmlContent),
-                }}
+                // dangerouslySetInnerHTML={{
+                //     __html: DOMPurify.sanitize(htmlContent),
+                // }}
             />
         </div>
     );
@@ -218,7 +219,7 @@ const AIAgentMessage = ({
                 {isLatestMessage && !streamComplete ? (
                     <StreamingText
                         text={message?.content || ""}
-                        speed={5}
+                        speed={1}
                         onComplete={handleStreamComplete}
                     />
                 ) : (

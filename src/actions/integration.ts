@@ -81,6 +81,21 @@ export const requestGithubAccess = async (projectId: string, uid: string) => {
     }
 };
 
+export const getGithubUsername = async (uid: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/supabase/github-username/${uid}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error getting GitHub username:", error);
+        return null;
+    }
+};
+
 export type ProjectEnv = {
     id: string;
     key: string;
@@ -174,5 +189,96 @@ export const deleteProjectEnv = async (projectId: string, envId: string) => {
     } catch (error) {
         console.error("Error deleting project environment variable:", error);
         throw new Error("Failed to delete project environment variable");
+    }
+};
+
+export interface SubscribeProjectRequest {
+    uid: string;
+    returnUrl: string;
+}
+
+export const subscribeProject = async (projectId: string, data: SubscribeProjectRequest) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/projects/${projectId}/subscribe/instance`;
+    try {
+        const response = await axios.post(url, data, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error subscribing to project:", error);
+        throw new Error("Failed to subscribe to project");
+    }
+};
+
+export const getSubscribeProject = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/projects/${projectId}/subscribe`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error subscribing to project:", error);
+        throw new Error("Failed to subscribe to project");
+    }
+};
+
+export const getProjectServices = async (projectId: string): Promise<{
+    id: string;
+    name: string;
+    status: string;
+    type: 'STARTING' | 'HEALTHY' | 'DEGRADED' | 'UNHEALTHY' | 'DELETING' | 'DELETED' | 'PAUSING' | 'PAUSED' | 'RESUMING';
+    createdAt: string;
+}> => {
+    //koyeb/project/:projectId/service
+    
+    const url = `${genesoftCoreApiServiceBaseUrl}/backend-infra/koyeb/project/${projectId}/service`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error getting project services:", error);
+        throw new Error("Failed to get project services");
+    }
+};
+
+export const subscribeDatabaseService = async (projectId: string, data: SubscribeProjectRequest) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/projects/${projectId}/subscribe/database`;
+    try {
+        const response = await axios.post(url, data, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error subscribing to database service:", error);
+        throw new Error("Failed to subscribe to database service");
+    }
+};
+
+export const getDatabaseCredentials = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/database/credentials`;
+    console.log({
+        url,
+    });
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error getting database credentials:", error);
+        throw new Error("Failed to get database credentials");
     }
 };

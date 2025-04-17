@@ -20,9 +20,12 @@ import {
 } from "@/components/ui/resizable";
 import BackendGenerations from "./BackendGenerations";
 import { useCollectionStore } from "@/stores/collection-store";
-import { useProjectStore } from "@/stores/project-store";
 import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
 import { getLatestIteration } from "@/actions/development";
+import ServicesIntegrationSheet from "../services/ServicesIntegrationSheet";
+import DeploymentSheet from "../services/DeploymentSheet";
+import { Toaster } from "sonner";
+import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
 
 type Props = {
     project: Project;
@@ -49,12 +52,14 @@ const BackendAiAgent = ({
     const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [isProjectInfoSheetOpen, setIsProjectInfoSheetOpen] = useState(false);
+    const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
+    const [isDeploymentSheetOpen, setIsDeploymentSheetOpen] = useState(false);
+    const [isEnvSheetOpen, setIsEnvSheetOpen] = useState(false);
 
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
     };
-    const [activeTabForCollection, setActiveTabForCollection] =
-        useState("backend");
+    const [activeTabForCollection] = useState("backend");
     const { id: collectionId } = useCollectionStore();
 
     useEffect(() => {
@@ -119,6 +124,7 @@ const BackendAiAgent = ({
 
     return (
         <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1">
+            <Toaster position="top-center" />
             <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                 <div className="flex items-center gap-4">
                     <Image
@@ -140,6 +146,21 @@ const BackendAiAgent = ({
                         onOpenChange={setIsProjectInfoSheetOpen}
                         project={project as Project}
                         onSave={handleSaveProjectInfo}
+                    />
+
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
+
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+
+                    <DeploymentSheet
+                        isOpen={isDeploymentSheetOpen}
+                        onOpenChange={setIsDeploymentSheetOpen}
                     />
 
                     {collectionId && (
