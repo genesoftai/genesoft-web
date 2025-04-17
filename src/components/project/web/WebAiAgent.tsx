@@ -24,6 +24,8 @@ import ServicesIntegrationSheet from "../services/ServicesIntegrationSheet";
 import WebProjectInfoSheet from "../services/WebProjectInfoSheet";
 import { getCollectionByWebProjectId } from "@/actions/collection";
 import { getLatestIteration } from "@/actions/development";
+import { Toaster } from 'sonner';
+import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
 
 type Props = {
     project: Project | null;
@@ -51,6 +53,7 @@ const WebAiAgent = ({
     const pathParams = useParams();
     const [loading, setLoading] = useState(false);
     const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
+    const [isEnvSheetOpen, setIsEnvSheetOpen] = useState(false);
     const [activeTabForCollection, setActiveTabForCollection] = useState("web");
     const { id: collectionId, web_project_id } = useCollectionStore();
     const [isProjectInfoSheetOpen, setIsProjectInfoSheetOpen] = useState(false);
@@ -124,6 +127,7 @@ const WebAiAgent = ({
 
     return (
         <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full">
+            <Toaster />
             <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                 <div className="flex items-center gap-4">
                     <Image
@@ -179,6 +183,11 @@ const WebAiAgent = ({
                         isOpen={isServicesSheetOpen}
                         onOpenChange={setIsServicesSheetOpen}
                     />
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+
                 </div>
 
                 <Tabs

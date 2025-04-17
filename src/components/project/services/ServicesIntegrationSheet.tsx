@@ -9,14 +9,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
-import StripeSection from "./StripeSection";
-import FirebaseSection from "./FirebaseSection";
 import GitHubSection from "./GitHubSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getStripeEnvs } from "@/actions/integration";
-import { getFirebaseEnvs } from "@/actions/integration";
 import { useProjectStore } from "@/stores/project-store";
-import { FirebaseEnv, StripeEnv } from "@/types/integration";
+import DbSection from "@/components/project/services/DbSection";
 
 interface ServicesIntegrationSheetProps {
     isOpen: boolean;
@@ -27,23 +23,13 @@ export const ServicesIntegrationSheet = ({
     isOpen,
     onOpenChange,
 }: ServicesIntegrationSheetProps) => {
-    const [stripeEnv, setStripeEnv] = useState<StripeEnv | null>(null);
-    const [firebaseEnv, setFirebaseEnv] = useState<FirebaseEnv | null>(null);
 
     const { id: projectId } = useProjectStore();
 
     useEffect(() => {
         if (projectId) {
-            setupIntegration();
         }
     }, [projectId]);
-
-    const setupIntegration = async () => {
-        const stripeEnv = await getStripeEnvs(projectId);
-        const firebaseEnv = await getFirebaseEnvs(projectId);
-        setStripeEnv(stripeEnv);
-        setFirebaseEnv(firebaseEnv);
-    };
 
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -75,15 +61,16 @@ export const ServicesIntegrationSheet = ({
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                     <div className="py-6 space-y-6">
-                        <GitHubSection projectId={projectId} />
-                        {/* <FirebaseSection
-                            projectId={projectId}
-                            firebaseEnv={firebaseEnv as FirebaseEnv}
-                        />
-                        <StripeSection
-                            projectId={projectId}
-                            stripeEnv={stripeEnv as StripeEnv}
-                        /> */}
+                        <div className={'mb-12'}>
+                            <GitHubSection projectId={projectId} />
+                        </div>
+                        <hr/>
+                        <div className={'mb-12'}>
+                            <DbSection projectId={projectId} />
+                        </div>
+                        <hr/>
+                        <div className={'mb-12'}>
+                        </div>
                     </div>
                 </ScrollArea>
             </SheetContent>
