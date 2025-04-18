@@ -13,14 +13,20 @@ import NestjsLogo from "@public/tech/nestjs.svg";
 import Image from "next/image";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import { HashLoader } from "react-spinners";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WebPreview } from "@/components/project/manage/WebPreview";
+import { BackendPreview } from "@/components/project/manage/BackendPreview";
 
-type Props = {};
+type TabValue = "generations" | "preview";
 
-const CollectionCreationPage = (props: Props) => {
+const CollectionCreationPage = () => {
     const { collectionId } = useParams();
     const [webProject, setWebProject] = useState<Project | null>(null);
     const [backendProject, setBackendProject] = useState<Project | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [activeTabWeb, setActiveTabWeb] = useState<TabValue>("generations");
+    const [activeTabBackend, setActiveTabBackend] =
+        useState<TabValue>("generations");
     const router = useRouter();
 
     useEffect(() => {
@@ -93,12 +99,33 @@ const CollectionCreationPage = (props: Props) => {
                         <p className="text-lg font-bold text-center">Web</p>
                     </div>
 
-                    <WebGenerations project={webProject} />
+                    <Tabs
+                        defaultValue="generations"
+                        value={activeTabWeb}
+                        onValueChange={(value) =>
+                            setActiveTabWeb(value as TabValue)
+                        }
+                        className="w-full"
+                    >
+                        <TabsList className="grid w-full grid-cols-2 bg-secondary-dark">
+                            <TabsTrigger value="generations">
+                                Generations
+                            </TabsTrigger>
+                            <TabsTrigger value="preview">Preview</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="generations">
+                            <WebGenerations project={webProject} />
+                        </TabsContent>
+                        <TabsContent value="preview">
+                            <WebPreview project={webProject} />
+                        </TabsContent>
+                    </Tabs>
+
                     <Button
                         onClick={() =>
                             handleGoToWorkspace(webProject?.id as string)
                         }
-                        className="w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90"
+                        className="w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90 mt-4"
                     >
                         <span>AI Agent workspace for web</span>
                         <SquareArrowRight className="w-4 h-4" />
@@ -116,12 +143,34 @@ const CollectionCreationPage = (props: Props) => {
                             Backend Service
                         </p>
                     </div>
-                    <BackendGenerations project={backendProject} />
+
+                    <Tabs
+                        defaultValue="generations"
+                        value={activeTabBackend}
+                        onValueChange={(value) =>
+                            setActiveTabBackend(value as TabValue)
+                        }
+                        className="w-full"
+                    >
+                        <TabsList className="grid w-full grid-cols-2 bg-secondary-dark">
+                            <TabsTrigger value="generations">
+                                Generations
+                            </TabsTrigger>
+                            <TabsTrigger value="preview">Preview</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="generations">
+                            <BackendGenerations project={backendProject} />
+                        </TabsContent>
+                        <TabsContent value="preview">
+                            <BackendPreview project={backendProject} />
+                        </TabsContent>
+                    </Tabs>
+
                     <Button
                         onClick={() =>
                             handleGoToWorkspace(backendProject?.id as string)
                         }
-                        className="w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90"
+                        className="w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90 mt-4"
                     >
                         <span>AI Agent workspace for backend</span>
                         <SquareArrowRight className="w-4 h-4" />

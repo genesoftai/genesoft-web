@@ -96,7 +96,11 @@ const BackendAiAgent = ({
 
         try {
             const data = await getLatestIteration(project.id);
-            if (data.status === "in_progress") {
+            if (
+                data.status === "in_progress" ||
+                data.status === "todo" ||
+                !data
+            ) {
                 setActiveTabOverview("generations");
             }
         } catch (error) {

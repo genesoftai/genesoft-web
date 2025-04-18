@@ -135,3 +135,23 @@ export const getLatestDeployment = async (projectId: string) => {
         throw new Error("Failed to get latest deployment");
     }
 };
+
+export const getIterationStepsByIterationTaskId = async (
+    iterationTaskId: string,
+) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/development/iteration-step/task/${iterationTaskId}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(
+            "Error getting iteration steps by iteration task id:",
+            error,
+        );
+        throw new Error("Failed to get iteration steps by iteration task id");
+    }
+};

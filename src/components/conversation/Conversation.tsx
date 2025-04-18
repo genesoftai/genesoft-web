@@ -512,8 +512,8 @@ const Conversation: React.FC<ConversationProps> = ({
                                         >
                                             <span className="text-xs font-medium">
                                                 {isLoadingSubmitConversation
-                                                    ? "Generating..."
-                                                    : "Generate"}
+                                                    ? "Executing..."
+                                                    : "Execute"}
                                             </span>
                                             {isLoadingSubmitConversation ? (
                                                 <Loader2 className="h-4 w-4 animate-spin ml-1" />

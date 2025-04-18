@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { BrainCircuit } from "lucide-react";
 import React from "react";
@@ -40,9 +40,11 @@ const AIAgentAnalyzing = ({ projectType }: Props) => {
                         className="text-center space-y-2 flex flex-col items-center justify-center"
                     >
                         <p className="text-subtext-in-dark-bg max-w-md">
-                            Genesoft AI Agents are analyzing your{" "}
-                            {projectType === "web" ? "web" : "backend service"}{" "}
-                            project requirements to prepare project creation
+                            Genesoft AI Agents are analyzing your requirements
+                            for{" "}
+                            {projectType === "web"
+                                ? "web development"
+                                : "backend service development"}
                         </p>
                     </motion.div>
 
