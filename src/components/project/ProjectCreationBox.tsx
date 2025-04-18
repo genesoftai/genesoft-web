@@ -5,15 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-    Upload,
-    Sparkles,
-    Loader2,
-    Palette,
-    AppWindow,
-    Server,
-} from "lucide-react";
-import { SketchPicker } from "react-color";
+import { Upload, Sparkles, Loader2, AppWindow, Server } from "lucide-react";
 import { RGBColor } from "react-color";
 import { rgbaToHex } from "@/utils/common/color";
 import { uploadFileFree } from "@/actions/file";
@@ -394,7 +386,7 @@ const ProjectCreationBox = ({
                             />
                         </motion.div>
 
-                        <div
+                        <motion.div
                             className="grid grid-cols-1 md:grid-cols-2 gap-4"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{
@@ -414,7 +406,6 @@ const ProjectCreationBox = ({
                                     <span className="text-gray-400 text-xs ml-2">
                                         (Optional)
                                     </span>
-
                                     <span className="flex  items-center gap-2">
                                         <Input
                                             type="file"
@@ -444,7 +435,7 @@ const ProjectCreationBox = ({
                                         </Label>
                                     </span>
                                 </Label>
-                                
+
                                 <div className="space-y-2">
                                     {/* <div className="flex items-center gap-2">
                                         <Input
@@ -565,7 +556,7 @@ const ProjectCreationBox = ({
                                     </motion.div>
                                 </div>
                             </div> */}
-                        </div>
+                        </motion.div>
 
                         {/* Create Button */}
                         {projectType === "web" && (
