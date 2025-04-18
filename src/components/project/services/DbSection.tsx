@@ -22,7 +22,7 @@ type DatabaseConnectionDetails = {
 
 export const DbSection = ({ projectId }: DbSectionProps) => {
 
-    const [subscribeLoading, setSubscribeLoading] = useState(true);
+    const [subscribeLoading, setSubscribeLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [dbConnectionDetails, setDbConnectionDetails] = useState<DatabaseConnectionDetails | null>(null);
@@ -36,14 +36,19 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
         const fetchSubscriptionStatus = async () => {
             try {
                 const response = await getSubscribeProject(projectId);
+                let isSubscribed = false;
                 for (const sub of response) { 
                     if (sub.tier.indexOf('db-') !== -1) {
+                        isSubscribed = true;
                         setIsSubscribed(true);
                         setSubscribe({
                             status: sub.status,
                             expiredAt: sub.expiredAt,
                         });
                     }
+                }
+                if (!isSubscribed) {
+                    setIsLoading(false);
                 }
             } catch (error) {
                 console.error("Error fetching database subscription:", error);
