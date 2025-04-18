@@ -261,3 +261,10 @@ body {
 .bg-genesoft-secondary-dark {
     background-color: #202020;
 }
+
+.sheet-genesoft {
+    max-width: 480px !important;
+    width: 100%;
+    word-wrap: break-word;
+}
+

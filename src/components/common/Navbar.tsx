@@ -232,10 +232,10 @@ export default function Navbar() {
                         <div className="relative group">
                             <Button
                                 variant="ghost"
-                                className="text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full px-4"
+                                className="text-white hover:text-white hover:bg-tertiary-dark/70 rounded-full px-4"
                             >
                                 <span className="flex items-center">
-                                    Products
+                                    <b>Products</b>
                                     <ChevronDown className="ml-1 h-4 w-4" />
                                 </span>
                             </Button>
@@ -280,43 +280,43 @@ export default function Navbar() {
                         </div>
 
                         <p
-                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
+                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
                             onClick={handleGoToDashboard}
                         >
-                            Dashboard
+                            <b>Dashboard</b>
                         </p>
 
-                        <p
-                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
+                        {/* <p
+                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
                             onClick={handleGoToCollections}
                         >
-                            Collections
-                        </p>
+                            <b>Collections</b>
+                        </p> */}
 
-                        <button
+                        {/* <button
                             onClick={handleSupportClick}
-                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
-                            Support
+                            <b>Support</b>
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                        </button>
+                        </button> */}
 
                         <button
                             onClick={() => {
                                 router.push("/subscription");
                             }}
-                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
-                            Pricing
+                            <b>Pricing</b>
                         </button>
 
                         <a
                             href="https://discord.gg/5jRywzzqDd"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
-                            Discord
+                            <b>Discord</b>
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
                         </a>
                     </div>

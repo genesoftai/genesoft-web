@@ -282,3 +282,37 @@ export const getDatabaseCredentials = async (projectId: string) => {
         throw new Error("Failed to get database credentials");
     }
 };
+
+export const reDeployProject = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/services/re-deploy`;
+    console.log(url)
+    console.log(genesoftCoreApiServiceApiKey)
+    try {
+        const response = await axios.post(url, {}, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error re-deploying project:", error);
+        throw new Error("Failed to re-deploy project");
+    }
+};
+
+export const viewLogs = async (projectId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/deployment/logs/latest`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error viewing logs:", error);
+        throw new Error("Failed to view logs");
+    }
+};
+
+
