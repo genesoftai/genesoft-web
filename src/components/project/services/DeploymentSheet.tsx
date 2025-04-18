@@ -15,6 +15,7 @@ import { ReadyStatus } from "@/types/web-application";
 import { Badge } from "@/components/ui/badge";
 import { getProjectServices, getSubscribeProject, subscribeProject, viewLogs, reDeployProject } from "@/actions/integration";
 import { createSupabaseClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 interface DeploymentSheetProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -93,6 +94,29 @@ export const DeploymentSheet = ({
         if (!projectId) return;
         const response = await reDeployProject(projectId);
         console.log("Re-deployed project:", response);
+        try {
+            // Show toast notification
+            toast.success("Redeploying your project...", {
+                description: "Your project is being redeployed. This may take a few minutes.",
+                duration: 5000,
+            });
+            
+            // log custom change service info
+            console.log("Custom change service info: deploy_status -> deploying");
+            // Update local state to show deploying status immediately
+            setServiceInfo((prevInfo: any) => ({
+                ...prevInfo,
+                deploy_status: 'deploying'
+            }));
+            
+            return response;
+        } catch (error) {
+            toast.error("Failed to redeploy project", {
+                description: "There was an error redeploying your project. Please try again.",
+                duration: 5000,
+            });
+            console.error("Error redeploying project:", error);
+        }
     }
 
     const handleViewLogs = async () => {

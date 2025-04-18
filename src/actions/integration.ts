@@ -285,8 +285,6 @@ export const getDatabaseCredentials = async (projectId: string) => {
 
 export const reDeployProject = async (projectId: string) => {
     const url = `${genesoftCoreApiServiceBaseUrl}/project/${projectId}/services/re-deploy`;
-    console.log(url)
-    console.log(genesoftCoreApiServiceApiKey)
     try {
         const response = await axios.post(url, {}, {
             headers: {
