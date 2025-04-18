@@ -8,6 +8,7 @@ export enum ReadyStatus {
     READY = "READY",
     ERROR = "ERROR",
     QUEUED = "QUEUED",
+    NONE = "NONE",
 }
 
 export enum DevelopmentStatus {

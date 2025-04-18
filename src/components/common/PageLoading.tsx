@@ -11,7 +11,7 @@ const PageLoading = ({ text = "Loading your information..." }: Props) => {
     return (
         <div className="flex flex-col justify-center items-center h-screen bg-primary-dark text-white">
             <GenesoftLoading size={50} />
-            <p className="text-base md:text-2xl">{text}</p>
+            <p className="mt-6 text-base md:text-2xl">{text}</p>
         </div>
     );
 };
