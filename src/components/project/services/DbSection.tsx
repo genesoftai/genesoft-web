@@ -2,11 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Database } from "lucide-react";
+import { Database, ClipboardCopy } from "lucide-react";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
-import GenesoftLoading from "@/components/common/GenesoftLoading";
 import { getDatabaseCredentials, getSubscribeProject, subscribeDatabaseService } from "@/actions/integration";
+import SimpleLoading from "@/components/common/SimpleLoading";
 
 type DbSectionProps = {
     projectId: string;
@@ -112,14 +112,14 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
     }, [isSubscribed, projectId]);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" style={{ wordWrap: 'break-word', width: '90%' }}>
             <div className="flex items-center space-x-2">
                 <Database className="h-5 w-5" />
                 <h3 className="text-lg font-medium text-white">
                     Database Integration
                 </h3>
             </div>
-            <p className="text-sm text-subtext-in-dark-bg">
+            <p className="text-sm text-subtext-in-dark-bg break-words">
                 Manage your project database by enabling enhanced database
                 features and analytics.
             </p>
@@ -127,7 +127,7 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                 {isSubscribed ? "Database Features Unlocked 🎉" : "Subscribe to Database Services"}
             </h4>
             {isLoading ? (
-                <GenesoftLoading size={50} />
+                <div className="flex justify-center items-center"><SimpleLoading size={36} color="#1E62D0" /></div>
             ) : (
                 <div className="pt-2 space-y-4">
                     {isSubscribed && expiredAt && (
@@ -140,59 +140,72 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                     )}
                     
                     {!isLoading && dbConnectionDetails ? (
-                        <div className="bg-primary-dark/30 p-4 rounded-lg border border-white/10 space-y-2">
-                        
+                        <div className="p-4 rounded-lg border border-white/10 space-y-2" style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
                             <h4 className="text-sm font-medium text-white">
                                 Database Connection Details
                             </h4>
                             <div className="space-y-2">
                                 <div>
-                                    <span className="text-white font-medium">
+                                    <div className="text-white font-medium">
                                         Connection URL:
-                                    </span>
+                                    </div>
                                     <p className="text-subtext-in-dark-bg text-sm">
                                         postgresql://{dbConnectionDetails?.db_user}:{dbConnectionDetails?.db_password}@{dbConnectionDetails?.host}:{dbConnectionDetails?.port}/{dbConnectionDetails?.db_name}
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-white font-medium">
+                                    <div className="text-white font-medium">
                                         Host:
-                                    </span>
+                                    </div>
                                     <p className="text-subtext-in-dark-bg text-sm">
                                         {dbConnectionDetails?.host}
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-white font-medium">
+                                    <div className="text-white font-medium">
                                         Port:
-                                    </span>
+                                    </div>
                                     <p className="text-subtext-in-dark-bg text-sm">
                                         {dbConnectionDetails?.port}
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-white font-medium">
+                                    <div className="text-white font-medium">
                                         Username:
-                                    </span>
+                                    </div>
                                     <p className="text-subtext-in-dark-bg text-sm">
                                         {dbConnectionDetails?.db_user}
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-white font-medium">
+                                    <div className="text-white font-medium">
                                         Database:
-                                    </span>
+                                    </div>
                                     <p className="text-subtext-in-dark-bg text-sm">
                                         {dbConnectionDetails?.db_name}
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-white font-medium">
+                                    <div className="text-white font-medium">
                                         Password:
-                                    </span>
-                                    <p className="text-subtext-in-dark-bg text-sm">
-                                        {"********"}
-                                    </p>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-subtext-in-dark-bg text-sm">
+                                            {"********"} <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            className="h-6 px-2 text-xs text-white/70 hover:text-white"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(dbConnectionDetails?.db_password || "");
+                                                toast.success("Password copied to clipboard");
+                                            }}
+                                        >
+                                            <div className="sr-only">Copy password</div>
+                                            <ClipboardCopy className="h-3.5 w-3.5" />
+                                        </Button>
+                                        </p>
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>

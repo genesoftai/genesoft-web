@@ -240,6 +240,7 @@ const ProjectCreationBox = ({
         >
             <div className="p-6 space-y-5 ">
                 <Select
+                    defaultValue={projectType}
                     onValueChange={(value) => {
                         setProjectType(value);
                     }}
@@ -393,7 +394,7 @@ const ProjectCreationBox = ({
                             />
                         </motion.div>
 
-                        <motion.div
+                        <div
                             className="grid grid-cols-1 md:grid-cols-2 gap-4"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{
@@ -413,9 +414,39 @@ const ProjectCreationBox = ({
                                     <span className="text-gray-400 text-xs ml-2">
                                         (Optional)
                                     </span>
+
+                                    <span className="flex  items-center gap-2">
+                                        <Input
+                                            type="file"
+                                            id="branding-image"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleLogoUpload}
+                                        />
+                                        <Label htmlFor="branding-image">
+                                            <Button
+                                                variant="outline"
+                                                className="ms-8 cursor-pointer flex items-center gap-2 border-line-in-dark-bg hover:bg-genesoft/20 hover:text-white transition-all duration-300 text-black"
+                                                onClick={() => {
+                                                    document
+                                                        .getElementById(
+                                                            "branding-image",
+                                                        )
+                                                        ?.click();
+                                                }}
+                                                disabled={isUploading}
+                                            >
+                                                <Upload className="h-4 w-4" />
+                                                {isUploading
+                                                    ? "Uploading..."
+                                                    : "Upload Logo"}
+                                            </Button>
+                                        </Label>
+                                    </span>
                                 </Label>
+                                
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
+                                    {/* <div className="flex items-center gap-2">
                                         <Input
                                             type="file"
                                             id="branding-image"
@@ -442,7 +473,7 @@ const ProjectCreationBox = ({
                                                     : "Upload Logo"}
                                             </Button>
                                         </Label>
-                                    </div>
+                                    </div> */}
 
                                     <AnimatePresence>
                                         {brandingImage && (
@@ -482,7 +513,7 @@ const ProjectCreationBox = ({
                             </div>
 
                             {/* Branding Color (Optional) */}
-                            <div className="space-y-2">
+                            {/* <div className="space-y-2">
                                 <Label
                                     htmlFor="brand-color"
                                     className="text-white flex items-center"
@@ -533,8 +564,8 @@ const ProjectCreationBox = ({
                                         </span>
                                     </motion.div>
                                 </div>
-                            </div>
-                        </motion.div>
+                            </div> */}
+                        </div>
 
                         {/* Create Button */}
                         {projectType === "web" && (

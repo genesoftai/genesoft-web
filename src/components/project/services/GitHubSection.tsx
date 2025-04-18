@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Github, Loader2 } from "lucide-react";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
-import GenesoftLoading from "@/components/common/GenesoftLoading";
+import SimpleLoading from "@/components/common/SimpleLoading";
 
 type GitHubSectionProps = {
     projectId: string;
@@ -63,7 +63,7 @@ export const GitHubSection = ({ projectId }: GitHubSectionProps) => {
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" style={{ wordWrap: 'break-word', width: '90%' }}>
             <div className="flex items-center space-x-2">
                 <Github className="h-5 w-5" />
                 <h3 className="text-lg font-medium text-white">
@@ -99,7 +99,7 @@ export const GitHubSection = ({ projectId }: GitHubSectionProps) => {
                     )}
                 </div>
             ) : (
-                <GenesoftLoading size={50} />
+                <div className="flex justify-center items-center"><SimpleLoading size={36} color="#1E62D0" /></div>
             )}
         </div>
     );

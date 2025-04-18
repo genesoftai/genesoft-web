@@ -8,13 +8,14 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { RocketIcon } from "lucide-react";
+import { FileIcon, RocketIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useProjectStore } from "@/stores/project-store";
 import { ReadyStatus } from "@/types/web-application";
 import { Badge } from "@/components/ui/badge";
-import { getProjectServices, getSubscribeProject, subscribeProject } from "@/actions/integration";
+import { getProjectServices, getSubscribeProject, subscribeProject, viewLogs, reDeployProject } from "@/actions/integration";
 import { createSupabaseClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 interface DeploymentSheetProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -28,7 +29,7 @@ export const DeploymentSheet = ({
     const [isSubscribed, setIsSubscribed] = useState(false);
     
     // Mock deployment status - replace with actual data fetching
-    const [serviceInfo, setServiceInfo] = useState({});
+    const [serviceInfo, setServiceInfo] = useState<any>(null);
     const [deploymentStatus, setDeploymentStatus] = useState('NONE');
     const isDeployed = deploymentStatus.toString() === ReadyStatus.READY.toString();
     const deploymentUrl = "https://example.genesoft.app";
@@ -89,6 +90,41 @@ export const DeploymentSheet = ({
         } 
     }
 
+    const handleReDeploy = async () => {
+        if (!projectId) return;
+        const response = await reDeployProject(projectId);
+        console.log("Re-deployed project:", response);
+        try {
+            // Show toast notification
+            toast.success("Redeploying your project...", {
+                description: "Your project is being redeployed. This may take a few minutes.",
+                duration: 5000,
+            });
+            
+            // log custom change service info
+            console.log("Custom change service info: deploy_status -> deploying");
+            // Update local state to show deploying status immediately
+            setServiceInfo((prevInfo: any) => ({
+                ...prevInfo,
+                deploy_status: 'deploying'
+            }));
+            
+            return response;
+        } catch (error) {
+            toast.error("Failed to redeploy project", {
+                description: "There was an error redeploying your project. Please try again.",
+                duration: 5000,
+            });
+            console.error("Error redeploying project:", error);
+        }
+    }
+
+    const handleViewLogs = async () => {
+        if (!projectId) return;
+        const response = await viewLogs(projectId);
+        console.log("Logs:", response);
+    }
+
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
             <SheetTrigger asChild>
@@ -106,7 +142,7 @@ export const DeploymentSheet = ({
 
             <SheetContent
                 side="right"
-                className="bg-primary-dark border-line-in-dark-bg p-6 w-[350px] text-white"
+                className="bg-primary-dark border-line-in-dark-bg p-6 text-white"
             >
                 <SheetHeader>
                     <SheetTitle className="text-white">
@@ -123,6 +159,15 @@ export const DeploymentSheet = ({
                             <div className="flex flex-col gap-2 p-4 bg-primary-dark/30 rounded-lg border border-white/10">
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm">Status:</span>
+                                    {
+                                        serviceInfo?.deploy_status === 'deploying' ?
+                                        <Badge 
+                                        className={`${
+                                          'bg-yellow-400/50' 
+                                        }`}
+                                    >
+                                        Deploying
+                                    </Badge>:
                                     <Badge 
                                         className={`${
                                             deploymentStatus === 'HEALTHY' ? 'bg-emerald-400/50' : 
@@ -133,6 +178,8 @@ export const DeploymentSheet = ({
                                     >
                                         {deploymentStatus}
                                     </Badge>
+                                    }
+                                    
                                 </div>
                                 
                                 {isDeployed && (
@@ -171,13 +218,36 @@ export const DeploymentSheet = ({
                         <div className="space-y-4">
                             <h3 className="text-sm font-medium text-white">Deployment Actions</h3>
                             <div className="flex flex-col gap-3">
-                                <Button 
-                                    onClick={handleSubscribe}
-                                    className="w-full bg-genesoft hover:bg-genesoft/80"
-                                >
-                                    <RocketIcon className="h-4 w-4 mr-2" />
-                                    {isSubscribed ? "View Deployment Logs" : "Subscribe to deploy"}
-                                </Button>
+                                {
+                                    isSubscribed && (
+                                        <Button 
+                                            onClick={handleReDeploy}
+                                            className="w-full bg-genesoft hover:bg-genesoft/80"
+                                        >
+                                            <RocketIcon className="h-4 w-4 mr-2" /> Re-deploy
+                                        </Button>
+                                )}
+
+
+                                {
+                                    !isSubscribed && (
+                                        <Button 
+                                            onClick={handleSubscribe}
+                                            className="w-full bg-genesoft hover:bg-genesoft/80"
+                                        >
+                                            <RocketIcon className="h-4 w-4 mr-2" /> Subscribe to deploy
+                                        </Button>
+                                )}
+
+                                {
+                                        isSubscribed && (
+                                    <Button 
+                                        onClick={handleViewLogs}
+                                        className="w-full bg-genesoft hover:bg-genesoft/80"
+                                    >
+                                        <FileIcon className="h-4 w-4 mr-2" />View Deployment Logs 
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>

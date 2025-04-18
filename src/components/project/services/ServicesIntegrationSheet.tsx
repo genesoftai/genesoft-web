@@ -48,7 +48,7 @@ export const ServicesIntegrationSheet = ({
 
             <SheetContent
                 side="right"
-                className="bg-primary-dark border-line-in-dark-bg p-6 w-[350px] text-white"
+                className="sheet-genesoft bg-primary-dark border-line-in-dark-bg p-6 text-white break-words"
             >
                 <SheetHeader>
                     <SheetTitle className="text-white">
