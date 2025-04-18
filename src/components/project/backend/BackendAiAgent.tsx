@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/resizable";
 import BackendGenerations from "./BackendGenerations";
 import { useCollectionStore } from "@/stores/collection-store";
-import { useProjectStore } from "@/stores/project-store";
 import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
 import { getLatestIteration } from "@/actions/development";
 
@@ -91,7 +90,11 @@ const BackendAiAgent = ({
 
         try {
             const data = await getLatestIteration(project.id);
-            if (data.status === "in_progress") {
+            if (
+                data.status === "in_progress" ||
+                data.status === "todo" ||
+                !data
+            ) {
                 setActiveTabOverview("generations");
             }
         } catch (error) {

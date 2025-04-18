@@ -33,70 +33,6 @@ type AIAgentMessageProps = {
     sender_id: string;
 };
 
-const StreamingText = ({
-    text,
-    speed = 5,
-    onComplete,
-}: {
-    text: string;
-    speed: number;
-    onComplete: () => void;
-}) => {
-    const [displayedText, setDisplayedText] = useState("");
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [htmlContent, setHtmlContent] = useState("");
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (currentIndex < text.length) {
-            const timeoutId = setTimeout(async () => {
-                const newDisplayedText = displayedText + text[currentIndex];
-                setDisplayedText(newDisplayedText);
-                setCurrentIndex((prev) => prev + 1);
-
-                // Process with markdown every few characters for better performance
-                if (
-                    currentIndex % 5 === 0 ||
-                    currentIndex === text.length - 1
-                ) {
-                    const file = await processor.process(newDisplayedText);
-                    const processedContent = String(file);
-                    setHtmlContent(processedContent);
-
-                    // Smooth scroll during streaming
-                    if (containerRef.current) {
-                        containerRef.current.scrollIntoView({
-                            behavior: "smooth",
-                            block: "end",
-                        });
-                    }
-                }
-            }, speed);
-
-            return () => clearTimeout(timeoutId);
-        } else if (onComplete) {
-            onComplete();
-        }
-    }, [text, speed, currentIndex, displayedText, onComplete]);
-
-    return (
-        <div ref={containerRef}>
-            <div
-                className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
-                dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(htmlContent),
-                }}
-            />
-            <div
-                className="text-white rounded-lg w-full block md:hidden text-xs"
-                dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(htmlContent),
-                }}
-            />
-        </div>
-    );
-};
-
 const AIAgentMessage = ({
     message,
     messagesLength,
@@ -104,9 +40,7 @@ const AIAgentMessage = ({
     sender_id,
 }: AIAgentMessageProps) => {
     const [htmlContent, setHtmlContent] = useState("");
-    const isLatestMessage = index === messagesLength - 1;
     const [senderName, setSenderName] = useState("");
-    const [streamComplete, setStreamComplete] = useState(false);
     const messageRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -126,43 +60,21 @@ const AIAgentMessage = ({
 
     // Auto scroll to bottom on new messages
     useEffect(() => {
-        if (isLatestMessage && !streamComplete && containerRef.current) {
-            containerRef.current.scrollIntoView({
-                behavior: "smooth",
-                block: "end",
-            });
-        }
-    }, [isLatestMessage, streamComplete]);
-
-    const handleStreamComplete = async () => {
-        setStreamComplete(true);
-
-        // Final processing to ensure complete content is rendered
-        if (message?.content) {
-            const file = await processor.process(message.content);
-            const processedContent = String(file);
-            setHtmlContent(processedContent);
-        }
-
-        // Final scroll after streaming completes
         if (containerRef.current) {
             containerRef.current.scrollIntoView({
                 behavior: "smooth",
                 block: "end",
             });
         }
-    };
+    }, [message]);
 
     const setupContent = async () => {
         if (!message?.content) return;
 
-        // If not the latest message, just process normally without streaming
-        if (!isLatestMessage || streamComplete) {
-            const value = `${message?.content?.trim()}`;
-            const file = await processor.process(value);
-            const processedContent = String(file);
-            setHtmlContent(processedContent);
-        }
+        const value = `${message?.content?.trim()}`;
+        const file = await processor.process(value);
+        const processedContent = String(file);
+        setHtmlContent(processedContent);
     };
 
     return (
@@ -215,31 +127,21 @@ const AIAgentMessage = ({
             </div>
 
             <div className="flex-1 min-w-0 max-w-full">
-                {isLatestMessage && !streamComplete ? (
-                    <StreamingText
-                        text={message?.content || ""}
-                        speed={5}
-                        onComplete={handleStreamComplete}
-                    />
-                ) : (
-                    <>
-                        <div
-                            ref={messageRef}
-                            className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
-                            dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(htmlContent),
-                            }}
-                        />
+                <div
+                    ref={messageRef}
+                    className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(htmlContent),
+                    }}
+                />
 
-                        <div
-                            ref={messageRef}
-                            className="text-white rounded-lg w-full block md:hidden text-xs"
-                            dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(htmlContent),
-                            }}
-                        />
-                    </>
-                )}
+                <div
+                    ref={messageRef}
+                    className="text-white rounded-lg w-full block md:hidden text-xs"
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(htmlContent),
+                    }}
+                />
             </div>
         </div>
     );

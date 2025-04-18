@@ -12,6 +12,7 @@ import { getWebApplicationInfo } from "@/actions/web-application";
 import GenesoftLoading from "@/components/common/GenesoftLoading";
 import { WebTerminal } from "../web/WebTerminal";
 import { WebEnv } from "../web/WebEnv";
+import { runTaskInCodesandbox } from "@/actions/codesandbox";
 interface WebPreviewProps {
     project: Project | null;
 }
@@ -24,6 +25,7 @@ export function WebPreview({ project }: WebPreviewProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
+    const [isRunning, setIsRunning] = useState(false);
 
     const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
 
@@ -60,6 +62,26 @@ export function WebPreview({ project }: WebPreviewProps) {
         fetchLatestData();
     };
 
+    const handleRunTask = async (task: string) => {
+        try {
+            setIsRunning(true);
+            if (project?.sandbox_id) {
+                await runTaskInCodesandbox(project?.sandbox_id || "", task);
+                handleRefresh();
+                console.log(`Task run successfully: ${task}`);
+            }
+        } catch (error) {
+            console.error("Error running task:", error);
+        } finally {
+            setIsRunning(false);
+        }
+    };
+
+    // const setupCodesandbox = async () => {
+    //     await handleRunTask("install");
+    //     await handleRunTask("dev");
+    // };
+
     console.log({
         webApplicationInfo,
         isLoading,
@@ -69,6 +91,9 @@ export function WebPreview({ project }: WebPreviewProps) {
         if (project?.id) {
             fetchLatestData();
         }
+        // if (project?.sandbox_id) {
+        //     setupCodesandbox();
+        // }
     }, [project]);
 
     if (isLoading) {
@@ -206,7 +231,8 @@ export function WebPreview({ project }: WebPreviewProps) {
                                     className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" ? "w-[360px] md:w-[380px] h-[720px]" : "w-full h-full"} rounded-b-lg`}
                                     src={
                                         webApplicationInfo?.codesandboxPreviewUrl ||
-                                        webApplicationInfo?.url
+                                        webApplicationInfo?.url ||
+                                        ""
                                     }
                                     title="Web Application Preview"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

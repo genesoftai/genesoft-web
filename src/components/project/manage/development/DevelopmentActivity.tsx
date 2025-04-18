@@ -8,6 +8,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { getTextSeparatedUnderScore } from "@/utils/common/text";
+import IterationSteps from "@/components/development/IterationSteps";
 
 type DevelopmentActivityProps = {
     pollingCount: number;
@@ -32,6 +33,10 @@ const DevelopmentActivity = ({
                 ? prev.filter((id) => id !== taskId)
                 : [...prev, taskId],
         );
+    };
+
+    const removeOpenTaskId = (taskId: string) => {
+        setOpenTaskIds((prev) => prev.filter((id) => id !== taskId));
     };
 
     return (
@@ -195,6 +200,12 @@ const DevelopmentActivity = ({
                                                                                 task.name
                                                                             }
                                                                         </span>
+                                                                        <span className="text-xs text-gray-400">
+                                                                            {task.status ===
+                                                                                "in_progress" && (
+                                                                                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                                                                            )}
+                                                                        </span>
                                                                     </div>
                                                                     {openTaskIds.includes(
                                                                         task.id,
@@ -205,7 +216,7 @@ const DevelopmentActivity = ({
                                                                     )}
                                                                 </CollapsibleTrigger>
                                                                 <CollapsibleContent className="p-3 bg-white/5 border-t border-white/10">
-                                                                    <div className="text-xs text-gray-300">
+                                                                    <div className="flex flex-col gap-2 text-xs text-gray-300">
                                                                         <p className="mb-2">
                                                                             {
                                                                                 task.description
@@ -232,6 +243,14 @@ const DevelopmentActivity = ({
                                                                                 </div>
                                                                             )}
                                                                         </div>
+                                                                        <IterationSteps
+                                                                            iterationTaskId={
+                                                                                task.id
+                                                                            }
+                                                                            removeOpenTaskId={
+                                                                                removeOpenTaskId
+                                                                            }
+                                                                        />
                                                                     </div>
                                                                 </CollapsibleContent>
                                                             </Collapsible>

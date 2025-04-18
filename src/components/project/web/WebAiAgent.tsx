@@ -57,7 +57,6 @@ const WebAiAgent = ({
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
     };
-    const [collectionForProject, setCollectionForProject] = useState(null);
 
     const setupActivePageConversation = async (projectId: string) => {
         setLoading(true);
@@ -83,7 +82,11 @@ const WebAiAgent = ({
 
         try {
             const data = await getLatestIteration(project.id);
-            if (data.status === "in_progress") {
+            if (
+                data.status === "in_progress" ||
+                data.status === "todo" ||
+                !data
+            ) {
                 setActiveTabOverview("generations");
             }
         } catch (error) {
