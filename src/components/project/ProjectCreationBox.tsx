@@ -527,6 +527,7 @@ const ProjectCreationBox = ({
                                         (Optional)
                                     </span>
                                     <div
+                                        style={{height: "36px"}}
                                         className="ms-8 flex flex-col items-center gap-1"
                                         // whileHover={{ scale: 1.05 }}
                                         // transition={{
@@ -536,9 +537,11 @@ const ProjectCreationBox = ({
                                     >
                                         <Popover>
                                             <PopoverTrigger>
-                                                <motion.div
-                                                className="w-10 h-10 rounded-lg border border-white/20"
+                                               <div>
+                                               <motion.div
+                                                className="w-10 display-in h-10 rounded-lg border border-white/20"
                                                 style={{
+                                                    height: "36px",
                                                     backgroundColor:
                                                         rgbaToHex(brandColor),
                                                 }}
@@ -550,7 +553,12 @@ const ProjectCreationBox = ({
                                                     repeat: Infinity,
                                                     repeatType: "reverse",
                                                 }}
+                                               
                                             />
+                                             <span className="text-xs text-subtext-in-dark-bg">
+                                                {rgbaToHex(brandColor)}
+                                            </span>
+                                               </div>
                                             </PopoverTrigger>
                                             <PopoverContent>
                                                 <div className="flex">
@@ -567,9 +575,7 @@ const ProjectCreationBox = ({
                                             </PopoverContent>
                                         </Popover>
                                         
-                                        <span className="text-xs text-subtext-in-dark-bg">
-                                            {rgbaToHex(brandColor)}
-                                        </span>
+                                       
                                     </div>
                                 </Label>
                                 {/* <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8">
