@@ -246,7 +246,7 @@ export default function LandingPage() {
         <div className="flex flex-col min-h-screen bg-genesoft-dark text-subtext-in-dark-bg">
             <main className="flex-grow">
                 {/* Hero Section */}
-                <section className="relative text-center px-5 md:px-10 lg:px-20 pt-0 md:pt-24 pb-24 md:pb-32 overflow-hidden">
+                <section className="relative text-center px-5 md:px-10 lg:px-20 pt-0 pb-24 md:pb-32 overflow-hidden">
                     {/* Decorative elements */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
                         <div className="absolute top-0 left-1/4 w-1/3 h-1/3 bg-genesoft/10 rounded-full blur-[120px] transform -translate-y-1/2"></div>
@@ -274,7 +274,7 @@ export default function LandingPage() {
                         </h1>
 
                         <h1 className="text-5xl md:text-5xl lg:text-8xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
-                           10x faster
+                            10x faster
                         </h1>
                         <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
                             with AI Agents
@@ -319,9 +319,9 @@ export default function LandingPage() {
                         )}
                     </div>
 
-                
 
-                  
+
+
                 </section>
 
                 {/* Keyboard-like section inspired by Raycast */}
@@ -446,12 +446,12 @@ export default function LandingPage() {
                             ))}
                         </div>
                     </div>
-                {/* </section> */}
+                    {/* </section> */}
 
-                {/* Subscription Section */}
-               
-                {/* CTA Section */}
-                {/* <section className="py-16 md:py-24 text-center bg-gradient-to-b from-tertiary-dark to-primary-dark relative overflow-hidden"> */}
+                    {/* Subscription Section */}
+
+                    {/* CTA Section */}
+                    {/* <section className="py-16 md:py-24 text-center bg-gradient-to-b from-tertiary-dark to-primary-dark relative overflow-hidden"> */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
                         <div className="absolute top-0 right-1/4 w-1/3 h-1/3 bg-genesoft/15 rounded-full blur-[120px] transform -translate-y-1/2"></div>
                         <div className="absolute bottom-0 left-1/4 w-1/3 h-1/3 bg-genesoft/15 rounded-full blur-[120px] transform translate-y-1/2"></div>
@@ -520,7 +520,7 @@ export default function LandingPage() {
                 </section>
 
                 {/* Keyboard-inspired visual decoration at the bottom */}
-                
+
             </main>
         </div>
     );

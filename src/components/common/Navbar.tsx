@@ -229,7 +229,7 @@ export default function Navbar() {
                     </div> */}
 
                     <div className="flex items-center space-x-1">
-                        <div className="relative group">
+                        <div className="relative group hidden">
                             <Button
                                 variant="ghost"
                                 className="text-white hover:text-white hover:bg-tertiary-dark/70 rounded-full px-4"
@@ -319,6 +319,17 @@ export default function Navbar() {
                             <b>Discord</b>
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
                         </a>
+
+                        <a
+                                    href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    <b>Docs</b>
+                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                                </a>
                     </div>
                 </div>
 
@@ -414,6 +425,17 @@ export default function Navbar() {
                                     onClick={() => setIsOpen(false)}
                                 >
                                     Discord
+                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                                </a>
+
+                                <a
+                                    href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Docs
                                     <ExternalLink className="ml-1 h-3.5 w-3.5" />
                                 </a>
                             </div>
