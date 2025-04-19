@@ -67,3 +67,63 @@ export const runTaskInCodesandbox = async (sandboxId: string, task: string) => {
     );
     return response.data;
 };
+
+export const restartSandbox = async (sandboxId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/codesandbox/${sandboxId}/restart`;
+    try {
+        const response = await axios.post(
+            url,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+                },
+            },
+        );
+        console.log("Sandbox restarted:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error restarting sandbox:", error);
+        throw error;
+    }
+};
+
+export const setupWebProjectOnCodesandbox = async (sandboxId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/codesandbox/${sandboxId}/setup/web`;
+    try {
+        const response = await axios.post(
+            url,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+                },
+            },
+        );
+        console.log("Web project setup on codesandbox:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error setting up web project on codesandbox:", error);
+        throw error;
+    }
+};
+
+export const setupBackendProjectOnCodesandbox = async (sandboxId: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/codesandbox/${sandboxId}/setup/backend`;
+    try {
+        const response = await axios.post(
+            url,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+                },
+            },
+        );
+        console.log("Web project setup on codesandbox:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error setting up web project on codesandbox:", error);
+        throw error;
+    }
+};

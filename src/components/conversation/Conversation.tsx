@@ -544,7 +544,7 @@ const Conversation: React.FC<ConversationProps> = ({
                             scrollHideDelay={0}
                         >
                             <div className="flex flex-col p-4 gap-4 pb-4 h-full">
-                                {webApplicationInfo?.readyStatus && (
+                                {/* {webApplicationInfo?.readyStatus && (
                                     <DeploymentStatus
                                         webApplicationInfo={
                                             webApplicationInfo as WebApplicationInfo
@@ -558,7 +558,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                             latestIteration as LatestIteration
                                         }
                                     />
-                                )}
+                                )} */}
 
                                 {messages.map((message, index) => (
                                     <div

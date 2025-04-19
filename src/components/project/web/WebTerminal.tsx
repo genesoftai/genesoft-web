@@ -56,7 +56,7 @@ export function WebTerminal({ sandboxId }: WebTerminalProps) {
     const [isRunning, setIsRunning] = useState(false);
     const [task, setTask] = useState("");
     const [isOpen, setIsOpen] = useState(false);
-
+    const [isRestarting, setIsRestarting] = useState(false);
     const handleRunTask = async (task: string) => {
         setTask(task);
         try {
@@ -69,6 +69,17 @@ export function WebTerminal({ sandboxId }: WebTerminalProps) {
             setIsOpen(false);
         }
     };
+
+    // const handleRestartSandbox = async () => {
+    //     try {
+    //         setIsRestarting(true);
+    //         await restartSandbox(sandboxId);
+    //     } catch (error) {
+    //         console.error("Error restarting sandbox:", error);
+    //     } finally {
+    //         setIsRestarting(false);
+    //     }
+    // };
 
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -100,6 +111,21 @@ export function WebTerminal({ sandboxId }: WebTerminalProps) {
                 </AlertDialogHeader>
 
                 <div className="flex flex-col gap-2">
+                    {/* <div className="flex flex-col gap-2 mb-4 md:mb-8">
+                        <Button
+                            variant="outline"
+                            className="w-full justify-start bg-secondary-dark text-white border-none flex h-fit items-center gap-2 py-4 hover:text-white hover:bg-secondary-dark/90"
+                            onClick={() => handleRestartSandbox()}
+                            disabled={isRestarting}
+                        >
+                            {isRestarting ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                            ) : (
+                                <PowerCircle className="w-4 h-4 text-amber-500" />
+                            )}
+                            <p>Restart Sandbox</p>
+                        </Button>
+                    </div> */}
                     {commands.map((command) => (
                         <Button
                             key={command.name}
