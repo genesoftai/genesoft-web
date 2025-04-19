@@ -26,6 +26,7 @@ import ServicesIntegrationSheet from "../services/ServicesIntegrationSheet";
 import DeploymentSheet from "../services/DeploymentSheet";
 import { Toaster } from "sonner";
 import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
+import { LatestIteration } from "@/types/development";
 
 type Props = {
     project: Project;
@@ -55,12 +56,35 @@ const BackendAiAgent = ({
     const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
     const [isDeploymentSheetOpen, setIsDeploymentSheetOpen] = useState(false);
     const [isEnvSheetOpen, setIsEnvSheetOpen] = useState(false);
+    const [isLoadingLatestIteration, setIsLoadingLatestIteration] =
+        useState(false);
+    const [latestIteration, setLatestIteration] =
+        useState<LatestIteration | null>(null);
+    const [isReadyShowPreview, setIsReadyShowPreview] = useState(false);
 
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
     };
     const [activeTabForCollection] = useState("backend");
     const { id: collectionId } = useCollectionStore();
+
+    const fetchLatestIteration = async () => {
+        if (!project?.id) return;
+        console.log("fetchLatestIteration for project", project.id);
+        try {
+            setIsLoadingLatestIteration(true);
+            const data = await getLatestIteration(project.id);
+            console.log("fetchLatestIteration", data);
+            if (data.status !== "done") {
+                setIsReadyShowPreview(false);
+            }
+            setLatestIteration(data);
+        } catch (error) {
+            console.error("Error fetching latest iteration:", error);
+        } finally {
+            setIsLoadingLatestIteration(false);
+        }
+    };
 
     useEffect(() => {
         const { projectId } = pathParams;
@@ -121,6 +145,21 @@ const BackendAiAgent = ({
     const handleSaveProjectInfo = async (project: Project) => {
         onSaveProjectInfo(project);
     };
+
+    // Poll for latest iteration every minute
+    useEffect(() => {
+        if (!project?.id) return;
+
+        fetchLatestIteration();
+
+        // Set up polling every 1 minute
+        const iterationPollingInterval = setInterval(() => {
+            fetchLatestIteration();
+        }, 60000);
+
+        // Clean up interval on component unmount
+        return () => clearInterval(iterationPollingInterval);
+    }, [project?.id]);
 
     if (loading) {
         return <PageLoading text="Loading page information..." />;
@@ -271,7 +310,13 @@ const BackendAiAgent = ({
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
                     >
                         <div className="flex-1">
-                            <BackendPreview project={project} />
+                            <BackendPreview
+                                project={project}
+                                setActiveTabOverview={setActiveTabOverview}
+                                isReadyShowPreview={isReadyShowPreview}
+                                setIsReadyShowPreview={setIsReadyShowPreview}
+                                latestIteration={latestIteration}
+                            />
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -300,10 +345,19 @@ const BackendAiAgent = ({
                 />
                 <ResizablePanel defaultSize={50}>
                     {activeTabOverview === "preview" && (
-                        <BackendPreview project={project} />
+                        <BackendPreview
+                            project={project}
+                            setActiveTabOverview={setActiveTabOverview}
+                            isReadyShowPreview={isReadyShowPreview}
+                            setIsReadyShowPreview={setIsReadyShowPreview}
+                            latestIteration={latestIteration}
+                        />
                     )}
                     {activeTabOverview === "generations" && (
-                        <BackendGenerations project={project} />
+                        <BackendGenerations
+                            project={project}
+                            latestIteration={latestIteration}
+                        />
                     )}
                 </ResizablePanel>
             </ResizablePanelGroup>

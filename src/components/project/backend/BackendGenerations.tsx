@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LatestIteration } from "@/types/development";
 import { Project } from "@/types/project";
-import { getLatestIteration } from "@/actions/development";
-import { HistoryIcon, Loader2 } from "lucide-react";
+import { HistoryIcon } from "lucide-react";
 import DevelopmentActivity from "../manage/development/DevelopmentActivity";
 import { DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DialogContent, DialogHeader } from "@/components/ui/dialog";
@@ -14,43 +13,15 @@ import { ConversationWithIterations } from "@/types/conversation";
 import { getConversationsWithIterationsByProjectId } from "@/actions/conversation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AIAgentAnalyzing from "../common/AIAgentAnalyzing";
-import GenesoftLoading from "@/components/common/GenesoftLoading";
 
 interface Props {
     project: Project | null;
+    latestIteration: LatestIteration | null;
 }
 
-const BackendGenerations = ({ project }: Props) => {
-    const [latestIteration, setLatestIteration] =
-        useState<LatestIteration | null>(null);
-    const [loading, setLoading] = useState(true);
+const BackendGenerations = ({ project, latestIteration }: Props) => {
     const [conversationsWithIterations, setConversationsWithIterations] =
         useState<ConversationWithIterations[]>([]);
-
-    const fetchLatestIteration = async () => {
-        if (!project?.id) return;
-
-        try {
-            const data = await getLatestIteration(project.id);
-            setLatestIteration(data);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            console.error("Error fetching latest iteration:", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchLatestIteration();
-
-        // Set up polling every 10 seconds
-        const pollingInterval = setInterval(() => {
-            fetchLatestIteration();
-        }, 10000);
-
-        // Clean up interval on component unmount
-        return () => clearInterval(pollingInterval);
-    }, [project?.id]);
 
     useEffect(() => {
         setupConversationsWithIterations();
@@ -70,17 +41,6 @@ const BackendGenerations = ({ project }: Props) => {
             );
         }
     };
-
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center h-full bg-primary-dark text-white">
-                <GenesoftLoading />
-                <p className="text-subtext-in-dark-bg">
-                    Loading generations ...
-                </p>
-            </div>
-        );
-    }
 
     console.log({
         message: "backend generations",

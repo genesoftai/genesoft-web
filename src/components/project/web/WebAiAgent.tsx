@@ -22,10 +22,10 @@ import Conversation from "@/components/conversation/Conversation";
 import WebGenerations from "./WebGenerations";
 import ServicesIntegrationSheet from "../services/ServicesIntegrationSheet";
 import WebProjectInfoSheet from "../services/WebProjectInfoSheet";
-import { getCollectionByWebProjectId } from "@/actions/collection";
 import { getLatestIteration } from "@/actions/development";
-import { Toaster } from 'sonner';
+import { Toaster } from "sonner";
 import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
+import { LatestIteration } from "@/types/development";
 
 type Props = {
     project: Project | null;
@@ -57,6 +57,30 @@ const WebAiAgent = ({
     const [activeTabForCollection, setActiveTabForCollection] = useState("web");
     const { id: collectionId, web_project_id } = useCollectionStore();
     const [isProjectInfoSheetOpen, setIsProjectInfoSheetOpen] = useState(false);
+    const [isReadyShowPreview, setIsReadyShowPreview] = useState(false);
+    const [latestIteration, setLatestIteration] =
+        useState<LatestIteration | null>(null);
+    const [isLoadingLatestIteration, setIsLoadingLatestIteration] =
+        useState(false);
+
+    const fetchLatestIteration = async () => {
+        if (!project?.id) return;
+        console.log("fetchLatestIteration for project", project.id);
+        try {
+            setIsLoadingLatestIteration(true);
+            const data = await getLatestIteration(project.id);
+            console.log("fetchLatestIteration", data);
+            if (data.status !== "done") {
+                setIsReadyShowPreview(false);
+            }
+            setLatestIteration(data);
+        } catch (error) {
+            console.error("Error fetching latest iteration:", error);
+        } finally {
+            setIsLoadingLatestIteration(false);
+        }
+    };
+
     const setupProjectGeneration = async (projectId: string) => {
         setupActivePageConversation(projectId);
     };
@@ -90,16 +114,19 @@ const WebAiAgent = ({
                 data.status === "todo" ||
                 !data
             ) {
-                setActiveTabOverview("generations");
+                setActiveTabOverview("development-tasks");
             }
         } catch (error) {
             console.error("Error fetching latest iteration:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleSubmitConversation = async () => {
+        window.location.reload();
         setActiveTab("conversation");
-        setActiveTabOverview("generations");
+        setActiveTabOverview("development-tasks");
     };
 
     const handleSendImageWithMessage = async (messages: Message[]) => {
@@ -123,10 +150,24 @@ const WebAiAgent = ({
         }
     }, [project]);
 
+    // Poll for latest iteration every minute
+    useEffect(() => {
+        if (!project?.id) return;
+
+        fetchLatestIteration();
+
+        // Set up polling every 1 minute
+        const iterationPollingInterval = setInterval(() => {
+            fetchLatestIteration();
+        }, 60000);
+
+        // Clean up interval on component unmount
+        return () => clearInterval(iterationPollingInterval);
+    }, [project?.id]);
+
     if (loading) {
         return <PageLoading text="Loading page information..." />;
     }
-    console.log(web_project_id, projectId);
 
     return (
         <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full">
@@ -175,7 +216,7 @@ const WebAiAgent = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-2 hidden md:flex">
+                <div className="hidden md:flex-row items-center gap-2 md:flex">
                     <WebProjectInfoSheet
                         isOpen={isProjectInfoSheetOpen}
                         onOpenChange={setIsProjectInfoSheetOpen}
@@ -190,7 +231,6 @@ const WebAiAgent = ({
                         isOpen={isEnvSheetOpen}
                         onOpenChange={setIsEnvSheetOpen}
                     />
-
                 </div>
 
                 <Tabs
@@ -198,22 +238,24 @@ const WebAiAgent = ({
                     onValueChange={setActiveTabOverview}
                     className="flex-1 flex flex-col max-w-xs md:max-w-sm rounded-lg"
                 >
-                    <TabsList className="grid self-center w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
+                    <TabsList className=" self-center w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg hidden md:grid">
                         <TabsTrigger
                             value="preview"
                             className="flex items-center gap-2 text-xs md:text-sm"
                             onClick={() => setActiveTabOverview("preview")}
                         >
-                            <MonitorPlay className="h-2 w-2 md:h-4 md:w-4" />
+                            <MonitorPlay className="h-3 w-3 md:h-4 md:w-4" />
                             <span>Preview</span>
                         </TabsTrigger>
                         <TabsTrigger
-                            value="generations"
+                            value="development-tasks"
                             className="flex items-center gap-2 text-xs md:text-sm"
-                            onClick={() => setActiveTabOverview("generations")}
+                            onClick={() =>
+                                setActiveTabOverview("development-tasks")
+                            }
                         >
-                            <MessageSquare className="h-2 w-2 md:h-4 md:w-4" />
-                            <span>Generations</span>
+                            <MessageSquare className="h-3 w-3 md:h-4 md:w-4" />
+                            <span>Development tasks</span>
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
@@ -265,11 +307,34 @@ const WebAiAgent = ({
 
                     <TabsContent
                         value="preview"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
+                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-red-500"
                     >
-                        <div className="flex-1">
-                            <WebPreview project={project} />
-                        </div>
+                        <ResizablePanelGroup
+                            direction="vertical"
+                            className="w-full rounded-lg p-0 gap-1 h-full border-2 border-blue-500 min-h-[400px]"
+                        >
+                            <ResizablePanel defaultSize={50}>
+                                <WebPreview
+                                    project={project}
+                                    setActiveTabOverview={setActiveTabOverview}
+                                    isReadyShowPreview={isReadyShowPreview}
+                                    setIsReadyShowPreview={
+                                        setIsReadyShowPreview
+                                    }
+                                    latestIteration={latestIteration}
+                                />
+                            </ResizablePanel>
+                            <ResizableHandle
+                                className="bg-primary-dark w-1 rounded-full"
+                                withHandle
+                            />
+                            <ResizablePanel defaultSize={50}>
+                                <WebGenerations
+                                    project={project}
+                                    latestIteration={latestIteration}
+                                />
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
                     </TabsContent>
                 </Tabs>
             </div>
@@ -298,10 +363,19 @@ const WebAiAgent = ({
                     />
                     <ResizablePanel defaultSize={50}>
                         {activeTabOverview === "preview" && (
-                            <WebPreview project={project} />
+                            <WebPreview
+                                project={project}
+                                setActiveTabOverview={setActiveTabOverview}
+                                isReadyShowPreview={isReadyShowPreview}
+                                setIsReadyShowPreview={setIsReadyShowPreview}
+                                latestIteration={latestIteration}
+                            />
                         )}
-                        {activeTabOverview === "generations" && (
-                            <WebGenerations project={project} />
+                        {activeTabOverview === "development-tasks" && (
+                            <WebGenerations
+                                project={project}
+                                latestIteration={latestIteration}
+                            />
                         )}
                     </ResizablePanel>
                 </ResizablePanelGroup>

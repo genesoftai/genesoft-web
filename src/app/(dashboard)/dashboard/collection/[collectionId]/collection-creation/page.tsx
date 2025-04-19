@@ -16,6 +16,8 @@ import { HashLoader } from "react-spinners";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WebPreview } from "@/components/project/manage/WebPreview";
 import { BackendPreview } from "@/components/project/manage/BackendPreview";
+import { getLatestIteration } from "@/actions/development";
+import { LatestIteration } from "@/types/development";
 
 type TabValue = "generations" | "preview";
 
@@ -27,6 +29,15 @@ const CollectionCreationPage = () => {
     const [activeTabWeb, setActiveTabWeb] = useState<TabValue>("generations");
     const [activeTabBackend, setActiveTabBackend] =
         useState<TabValue>("generations");
+    const [latestWebIteration, setLatestWebIteration] =
+        useState<LatestIteration | null>(null);
+    const [latestBackendIteration, setLatestBackendIteration] =
+        useState<LatestIteration | null>(null);
+    const [isReadyShowPreviewWeb, setIsReadyShowPreviewWeb] =
+        useState<boolean>(false);
+    const [isReadyShowPreviewBackend, setIsReadyShowPreviewBackend] =
+        useState<boolean>(false);
+
     const router = useRouter();
 
     useEffect(() => {
@@ -53,6 +64,53 @@ const CollectionCreationPage = () => {
             router.push(`/dashboard/project/${projectId}/ai-agent`);
         }
     };
+
+    const fetchLatestWebIteration = async (project: Project) => {
+        if (!project?.id) return;
+        console.log("fetchLatestIteration for project", project.id);
+        try {
+            const data = await getLatestIteration(project.id);
+            if (data.status !== "done") {
+                setIsReadyShowPreviewWeb(false);
+            }
+            console.log("fetchLatestWebIteration", data);
+            setLatestWebIteration(data);
+        } catch (error) {
+            console.error("Error fetching latest iteration:", error);
+        }
+    };
+
+    const fetchLatestBackendIteration = async (project: Project | null) => {
+        if (!project?.id) return;
+        console.log("fetchLatestIteration for project", project.id);
+        try {
+            const data = await getLatestIteration(project.id);
+            if (data.status !== "done") {
+                setIsReadyShowPreviewBackend(false);
+            }
+            console.log("fetchLatestBackendIteration", data);
+            setLatestBackendIteration(data);
+        } catch (error) {
+            console.error("Error fetching latest iteration:", error);
+        }
+    };
+
+    // Poll for latest iteration every minute
+    useEffect(() => {
+        if (!webProject?.id) return;
+
+        fetchLatestWebIteration(webProject);
+        fetchLatestBackendIteration(backendProject);
+
+        // Set up polling every 1 minute
+        const iterationPollingInterval = setInterval(() => {
+            fetchLatestWebIteration(webProject);
+            fetchLatestBackendIteration(backendProject);
+        }, 60000);
+
+        // Clean up interval on component unmount
+        return () => clearInterval(iterationPollingInterval);
+    }, [webProject?.id, backendProject?.id]);
 
     console.log({
         message: "collection creation page",
@@ -114,10 +172,18 @@ const CollectionCreationPage = () => {
                             <TabsTrigger value="preview">Preview</TabsTrigger>
                         </TabsList>
                         <TabsContent value="generations">
-                            <WebGenerations project={webProject} />
+                            <WebGenerations
+                                project={webProject}
+                                latestIteration={latestWebIteration}
+                            />
                         </TabsContent>
                         <TabsContent value="preview">
-                            <WebPreview project={webProject} />
+                            <WebPreview
+                                project={webProject}
+                                latestIteration={latestWebIteration}
+                                isReadyShowPreview={isReadyShowPreviewWeb}
+                                setIsReadyShowPreview={setIsReadyShowPreviewWeb}
+                            />
                         </TabsContent>
                     </Tabs>
 
@@ -159,10 +225,20 @@ const CollectionCreationPage = () => {
                             <TabsTrigger value="preview">Preview</TabsTrigger>
                         </TabsList>
                         <TabsContent value="generations">
-                            <BackendGenerations project={backendProject} />
+                            <BackendGenerations
+                                project={backendProject}
+                                latestIteration={latestBackendIteration}
+                            />
                         </TabsContent>
                         <TabsContent value="preview">
-                            <BackendPreview project={backendProject} />
+                            <BackendPreview
+                                project={backendProject}
+                                latestIteration={latestBackendIteration}
+                                isReadyShowPreview={isReadyShowPreviewBackend}
+                                setIsReadyShowPreview={
+                                    setIsReadyShowPreviewBackend
+                                }
+                            />
                         </TabsContent>
                     </Tabs>
 

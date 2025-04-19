@@ -33,12 +33,7 @@ type AIAgentMessageProps = {
     sender_id: string;
 };
 
-const AIAgentMessage = ({
-    message,
-    messagesLength,
-    index,
-    sender_id,
-}: AIAgentMessageProps) => {
+const AIAgentMessage = ({ message, sender_id }: AIAgentMessageProps) => {
     const [htmlContent, setHtmlContent] = useState("");
     const [senderName, setSenderName] = useState("");
     const messageRef = useRef<HTMLDivElement>(null);
