@@ -5,7 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Sparkles, Loader2, AppWindow, Server } from "lucide-react";
+import {
+    Upload,
+    Sparkles,
+    Loader2,
+    Palette,
+    AppWindow,
+    Server,
+} from "lucide-react";
+import { SketchPicker } from "react-color";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover"
 import { RGBColor } from "react-color";
 import { rgbaToHex } from "@/utils/common/color";
 import { uploadFileFree } from "@/actions/file";
@@ -25,7 +38,6 @@ import {
 import NextJSLogo from "@public/tech/nextjs.jpeg";
 import NestJSLogo from "@public/tech/nestjs.svg";
 import Image from "next/image";
-
 const webTemplates = ["web", "web-and-backend"];
 
 const backendTemplates = ["backend", "web-and-backend"];
@@ -504,7 +516,7 @@ const ProjectCreationBox = ({
                             </div>
 
                             {/* Branding Color (Optional) */}
-                            {/* <div className="space-y-2">
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="brand-color"
                                     className="text-white flex items-center"
@@ -514,9 +526,54 @@ const ProjectCreationBox = ({
                                     <span className="text-gray-400 text-xs ml-2">
                                         (Optional)
                                     </span>
+                                    <div
+                                        className="ms-8 flex flex-col items-center gap-1"
+                                        // whileHover={{ scale: 1.05 }}
+                                        // transition={{
+                                        //     type: "spring",
+                                        //     stiffness: 300,
+                                        // }}
+                                    >
+                                        <Popover>
+                                            <PopoverTrigger>
+                                                <motion.div
+                                                className="w-10 h-10 rounded-lg border border-white/20"
+                                                style={{
+                                                    backgroundColor:
+                                                        rgbaToHex(brandColor),
+                                                }}
+                                                animate={{
+                                                    boxShadow: `0 0 15px ${rgbaToHex(brandColor)}`,
+                                                }}
+                                                transition={{
+                                                    duration: 1,
+                                                    repeat: Infinity,
+                                                    repeatType: "reverse",
+                                                }}
+                                            />
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <div className="flex">
+                                                    <SketchPicker
+                                                        color={brandColor}
+                                                        onChange={(color) => {
+                                                            setBrandColor(color.rgb);
+                                                        }}
+                                                        className="!bg-primary-dark text-black"
+                                                        width="100%"
+                                                        disableAlpha={false}
+                                                    />
+                                                </div> 
+                                            </PopoverContent>
+                                        </Popover>
+                                        
+                                        <span className="text-xs text-subtext-in-dark-bg">
+                                            {rgbaToHex(brandColor)}
+                                        </span>
+                                    </div>
                                 </Label>
-                                <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8">
-                                    <div className="flex-grow">
+                                {/* <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8">
+                                     <div className="flex-grow">
                                         <SketchPicker
                                             color={brandColor}
                                             onChange={(color) => {
@@ -526,36 +583,9 @@ const ProjectCreationBox = ({
                                             width="100%"
                                             disableAlpha={false}
                                         />
-                                    </div>
-                                    <motion.div
-                                        className="flex flex-col items-center gap-1"
-                                        whileHover={{ scale: 1.05 }}
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 300,
-                                        }}
-                                    >
-                                        <motion.div
-                                            className="w-10 h-10 rounded-lg border border-white/20"
-                                            style={{
-                                                backgroundColor:
-                                                    rgbaToHex(brandColor),
-                                            }}
-                                            animate={{
-                                                boxShadow: `0 0 15px ${rgbaToHex(brandColor)}`,
-                                            }}
-                                            transition={{
-                                                duration: 1,
-                                                repeat: Infinity,
-                                                repeatType: "reverse",
-                                            }}
-                                        />
-                                        <span className="text-xs text-subtext-in-dark-bg">
-                                            {rgbaToHex(brandColor)}
-                                        </span>
-                                    </motion.div>
-                                </div>
-                            </div> */}
+                                    </div> 
+                                </div> */}
+                            </div>
                         </motion.div>
 
                         {/* Create Button */}
