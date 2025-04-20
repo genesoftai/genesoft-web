@@ -8,13 +8,6 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { getTextSeparatedUnderScore } from "@/utils/common/text";
-import IterationSteps from "@/components/development/IterationSteps";
-import ProjectManagerImage from "@public/ai-agent/project-manager-ai.png";
-import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
-import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
-import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
-
-import Image from "next/image";
 
 type DevelopmentActivityProps = {
     pollingCount: number;
@@ -39,19 +32,6 @@ const DevelopmentActivity = ({
                 ? prev.filter((id) => id !== taskId)
                 : [...prev, taskId],
         );
-    };
-
-    const removeOpenTaskId = (taskId: string) => {
-        setOpenTaskIds((prev) => prev.filter((id) => id !== taskId));
-    };
-
-    const getAiAgentImage = (team: string) => {
-        console.log("team", team);
-        if (team === "project_manager_agent") return ProjectManagerImage;
-        if (team === "backend_developer_agent") return BackendDeveloperImage;
-        if (team === "frontend_developer_agent") return FrontendDeveloperImage;
-        if (team === "ux_ui_designer_agent") return UxUiDesignerImage;
-        return "";
     };
 
     return (
@@ -215,12 +195,6 @@ const DevelopmentActivity = ({
                                                                                 task.name
                                                                             }
                                                                         </span>
-                                                                        <span className="text-xs text-gray-400">
-                                                                            {task.status ===
-                                                                                "in_progress" && (
-                                                                                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                                                                            )}
-                                                                        </span>
                                                                     </div>
                                                                     {openTaskIds.includes(
                                                                         task.id,
@@ -231,34 +205,21 @@ const DevelopmentActivity = ({
                                                                     )}
                                                                 </CollapsibleTrigger>
                                                                 <CollapsibleContent className="p-3 bg-white/5 border-t border-white/10">
-                                                                    <div className="flex flex-col gap-2 text-xs text-gray-300">
+                                                                    <div className="text-xs text-gray-300">
                                                                         <p className="mb-2">
                                                                             {
                                                                                 task.description
                                                                             }
                                                                         </p>
                                                                         <div className="grid grid-cols-2 gap-2 mt-2">
-                                                                            <div className="flex items-center gap-2">
-                                                                                <Image
-                                                                                    src={getAiAgentImage(
-                                                                                        task.team,
-                                                                                    )}
-                                                                                    width={
-                                                                                        30
-                                                                                    }
-                                                                                    height={
-                                                                                        30
-                                                                                    }
-                                                                                    alt={
-                                                                                        task.team
-                                                                                    }
-                                                                                    className="rounded-full"
-                                                                                />
-                                                                                <span>
-                                                                                    {getTextSeparatedUnderScore(
-                                                                                        task.team,
-                                                                                    )}
-                                                                                </span>
+                                                                            <div>
+                                                                                <span className="text-gray-400">
+                                                                                    AI
+                                                                                    Agent:
+                                                                                </span>{" "}
+                                                                                {getTextSeparatedUnderScore(
+                                                                                    task.team,
+                                                                                )}
                                                                             </div>
                                                                             {task.remark && (
                                                                                 <div className="col-span-2">
@@ -271,14 +232,6 @@ const DevelopmentActivity = ({
                                                                                 </div>
                                                                             )}
                                                                         </div>
-                                                                        <IterationSteps
-                                                                            iterationTaskId={
-                                                                                task.id
-                                                                            }
-                                                                            removeOpenTaskId={
-                                                                                removeOpenTaskId
-                                                                            }
-                                                                        />
                                                                     </div>
                                                                 </CollapsibleContent>
                                                             </Collapsible>

@@ -56,10 +56,10 @@ export async function updateUserPassword(password: string, code: string) {
 
 export async function continueWithGoogle() {
     const supabase = await createClient();
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}`,
             queryParams: {
                 access_type: "offline",
                 prompt: "consent",

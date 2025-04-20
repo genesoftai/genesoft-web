@@ -1,22 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import {
-    Menu,
-    ExternalLink,
-    ChevronDown,
-    Send,
-    Folders,
-    Users,
-    RocketIcon,
-} from "lucide-react";
+import { Menu, ExternalLink, ChevronDown, AppWindow, Send } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import GenesoftLogo from "@/components/common/GenesoftLogo";
 import { useRouter } from "next/navigation";
-import { createSupabaseClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import UserNav from "./UserNav";
 import { UserStore, useUserStore } from "@/stores/user-store";
 import { User } from "@supabase/supabase-js";
@@ -48,7 +40,7 @@ import { sendSupportEmail } from "@/actions/email";
 type UserData = { user: User } | { user: null };
 
 export default function Navbar() {
-    const supabase = createSupabaseClient();
+    const supabase = createClient();
     const [isOpen, setIsOpen] = useState(false);
     const [userEmail, setUserEmail] = useState("");
     const [userData, setUserData] = useState<UserData>();
@@ -134,30 +126,17 @@ export default function Navbar() {
 
     const handleGoToDashboard = () => {
         if (userEmail) {
-            // if (projectId) {
-            //     router.push(`/dashboard/project/${projectId}/ai-agent`);
-            // } else {
-            //     router.push(`/dashboard`);
-            // }
-            router.push(`/dashboard`);
+            if (projectId) {
+                router.push(`/dashboard/project/${projectId}/ai-agent`);
+            } else {
+                router.push(`/dashboard`);
+            }
         } else {
             posthog.capture("click_dashboard_from_navbar_but_not_logged_in");
             router.push("/signin");
         }
     };
 
-    const handleGoToCollections = () => {
-        if (userEmail) {
-            if (organizationId) {
-                router.push(`/dashboard/collection`);
-            } else {
-                router.push(`/dashboard`);
-            }
-        } else {
-            posthog.capture("click_collections_from_navbar_but_not_logged_in");
-            router.push("/signin");
-        }
-    };
     const handleSupportClick = (e: React.MouseEvent) => {
         e.preventDefault();
         setSupportDialogOpen(true);
@@ -230,49 +209,31 @@ export default function Navbar() {
                     </div> */}
 
                     <div className="flex items-center space-x-1">
-                        <div className="relative group hidden">
+                        <div className="relative group">
                             <Button
                                 variant="ghost"
-                                className="text-white hover:text-white hover:bg-tertiary-dark/70 rounded-full px-4"
+                                className="text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full px-4"
                             >
                                 <span className="flex items-center">
-                                    <b>Products</b>
+                                    Products
                                     <ChevronDown className="ml-1 h-4 w-4" />
                                 </span>
                             </Button>
                             <div className="absolute left-0 top-full pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
-                                <div className="flex flex-col gap-2 bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-2 shadow-lg min-w-[200px]">
+                                <div className="bg-tertiary-dark border border-line-in-dark-bg rounded-xl p-2 shadow-lg min-w-[200px]">
                                     <div
                                         onClick={handleGoToDashboard}
-                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer w-full"
+                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer"
                                     >
                                         <div className="w-8 h-8 rounded-full bg-genesoft/20 flex items-center justify-center mr-2">
-                                            <Users className="h-4 w-4 text-genesoft" />
+                                            <AppWindow className="h-4 w-4 text-genesoft" />
                                         </div>
                                         <div>
                                             <p className="font-medium">
                                                 AI Agent Workspace
                                             </p>
                                             <p className="text-xs text-subtext-in-dark-bg/70">
-                                                Talk with AI Agents to develop
-                                                and manage software
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        onClick={handleGoToCollections}
-                                        className="flex items-center p-2 hover:bg-secondary-dark rounded-lg text-sm text-subtext-in-dark-bg hover:text-white transition-colors cursor-pointer w-full"
-                                    >
-                                        <div className="w-8 h-8 rounded-full bg-genesoft/20 flex items-center justify-center mr-2">
-                                            <Folders className="h-4 w-4 text-genesoft" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">
-                                                Collections
-                                            </p>
-                                            <p className="text-xs text-subtext-in-dark-bg/70 w-full truncate">
-                                                Integrate web and backend
-                                                projects
+                                                for web development
                                             </p>
                                         </div>
                                     </div>
@@ -281,56 +242,40 @@ export default function Navbar() {
                         </div>
 
                         <p
-                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
                             onClick={handleGoToDashboard}
                         >
-                            <b>Dashboard</b>
+                            Dashboard
                         </p>
 
-                        {/* <p
-                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
-                            onClick={handleGoToCollections}
-                        >
-                            <b>Collections</b>
-                        </p> */}
-
-                        {/* <button
+                        <button
                             onClick={handleSupportClick}
-                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
-                            <b>Support</b>
+                            Support
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                        </button> */}
+                        </button>
+
+                     
 
                         <button
                             onClick={() => {
                                 router.push("/subscription");
                             }}
-                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
-                            <b>Pricing</b>
+                            Pricing
                         </button>
 
                         <a
                             href="https://discord.gg/5jRywzzqDd"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
-                            <b>Discord</b>
+                            Discord
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
                         </a>
-
-                        <a
-                                    href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <b>Docs</b>
-                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                                </a>
                     </div>
                 </div>
 
@@ -351,12 +296,12 @@ export default function Navbar() {
                                     router.push("/signin");
                                 }}
                                 variant="ghost"
-                                className="text-sm font-medium transition-colors bg-genesoft text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full"
+                                className="text-sm font-medium transition-colors bg-transparent text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full"
                             >
-                                <b> Sign in </b> <RocketIcon className="ml-1 h-3.5 w-3.5" />
+                                Sign in
                             </Button>
 
-                            {/* <Button
+                            <Button
                                 onClick={() => {
                                     posthog.capture("click_signup_from_navbar");
                                     router.push("/signup");
@@ -364,7 +309,7 @@ export default function Navbar() {
                                 className="text-sm font-medium transition-colors bg-genesoft hover:bg-genesoft/90 text-white rounded-full px-6"
                             >
                                 Sign Up
-                            </Button> */}
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -403,12 +348,6 @@ export default function Navbar() {
                                 >
                                     Dashboard
                                 </Link>
-                                <p
-                                    className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
-                                    onClick={handleGoToCollections}
-                                >
-                                    Collections
-                                </p>
                                 <button
                                     className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center text-left"
                                     onClick={(e) => {
@@ -426,17 +365,6 @@ export default function Navbar() {
                                     onClick={() => setIsOpen(false)}
                                 >
                                     Discord
-                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                                </a>
-
-                                <a
-                                    href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Docs
                                     <ExternalLink className="ml-1 h-3.5 w-3.5" />
                                 </a>
                             </div>
@@ -461,12 +389,12 @@ export default function Navbar() {
                                             setIsOpen(false);
                                         }}
                                         variant="ghost"
-                                        className="w-full text-sm font-medium transition-colors  bg-genesoft text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-lg justify-start"
+                                        className="w-full text-sm font-medium transition-colors bg-transparent text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-lg justify-start"
                                     >
-                                        <b> Sign in </b> <RocketIcon className="ml-1 h-3.5 w-3.5" />
+                                        Sign in
                                     </Button>
 
-                                    {/* <Button
+                                    <Button
                                         onClick={() => {
                                             posthog.capture(
                                                 "click_signup_from_navbar",
@@ -477,7 +405,7 @@ export default function Navbar() {
                                         className="w-full text-sm font-medium transition-colors bg-genesoft hover:bg-genesoft/90 text-white rounded-lg"
                                     >
                                         Sign Up
-                                    </Button> */}
+                                    </Button>
                                 </div>
                             )}
                         </nav>

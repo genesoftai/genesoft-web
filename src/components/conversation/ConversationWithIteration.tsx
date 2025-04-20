@@ -133,10 +133,10 @@ const ConversationWithIteration = ({
                                             message={message}
                                             messagesLength={messages.length}
                                             index={index}
+                                            messagesEndRef={messagesEndRef}
                                             status={
                                                 conversationWithIteration.status
                                             }
-                                            sender_id={message.sender_id || ""}
                                         />
                                     )}
                                 </div>

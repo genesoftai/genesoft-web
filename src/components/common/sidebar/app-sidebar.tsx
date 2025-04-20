@@ -3,8 +3,8 @@
 import * as React from "react";
 import {
     AppWindow,
-    Boxes,
     Building,
+    ChevronLeft,
     FlaskConical,
     LifeBuoy,
     Rocket,
@@ -21,6 +21,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { NavProject } from "./nav-project";
@@ -67,17 +68,6 @@ const data = {
                 {
                     title: "Create",
                     url: "/dashboard/create-project/info",
-                },
-            ],
-        },
-        {
-            title: "Collections",
-            url: "/dashboard/collection",
-            icon: Boxes,
-            items: [
-                {
-                    title: "Collections",
-                    url: "/dashboard/collections",
                 },
             ],
         },

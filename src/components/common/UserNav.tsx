@@ -15,7 +15,7 @@ import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 import { useProjectStore } from "@/stores/project-store";
 import { useUserStore } from "@/stores/user-store";
-import { createSupabaseClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import {
     UserIcon,
     LogOutIcon,
@@ -32,7 +32,7 @@ interface UserNavProps {
 }
 
 export default function UserNav({ email, avatarUrl, name }: UserNavProps) {
-    const supabase = createSupabaseClient();
+    const supabase = createClient();
     const router = useRouter();
     const { id: organizationId, name: organizationName } =
         useGenesoftOrganizationStore();

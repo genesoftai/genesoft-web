@@ -23,24 +23,12 @@ export type CreatePageDto = {
     reference_link_ids?: string[];
 };
 
-export type TalkToWebAiAgentsDto = {
-    project_id: string;
-    conversation_id: string;
-    message: CreateMessageDto;
-};
-
 export type TalkToProjectManagerDto = {
     project_id: string;
     conversation_id: string;
     message: CreateMessageDto;
     feature_id?: string;
     page_id?: string;
-};
-
-export type TalkToBackendDeveloperDto = {
-    project_id: string;
-    conversation_id: string;
-    message: CreateMessageDto;
 };
 
 export type CreateConversationDto = {
@@ -184,25 +172,6 @@ export async function addMessageToConversation(
     }
 }
 
-export async function talkToWebAiAgents(payload: TalkToWebAiAgentsDto) {
-    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/talk/web-ai-agents`;
-
-    try {
-        const res = await axios.post(url, payload, {
-            headers: {
-                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
-            },
-        });
-        return res.data;
-    } catch (error) {
-        console.error("Error talking to web ai agents:", error);
-        if (error instanceof AxiosError) {
-            throw new Error(error.response?.data.message);
-        }
-        throw new Error("Failed to talk to web ai agents");
-    }
-}
-
 export async function talkToProjectManager(payload: TalkToProjectManagerDto) {
     const url = `${genesoftCoreApiServiceBaseUrl}/conversation/talk/project-manager`;
 
@@ -225,33 +194,6 @@ export async function talkToProjectManager(payload: TalkToProjectManagerDto) {
             throw new Error(error.response?.data.message);
         }
         throw new Error("Failed to talk to project manager");
-    }
-}
-
-export async function talkToBackendDeveloper(
-    payload: TalkToBackendDeveloperDto,
-) {
-    const url = `${genesoftCoreApiServiceBaseUrl}/conversation/talk/backend-developer`;
-
-    console.log({
-        message: "talkToBackendDeveloper",
-        payload,
-        url,
-    });
-
-    try {
-        const res = await axios.post(url, payload, {
-            headers: {
-                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
-            },
-        });
-        return res.data;
-    } catch (error) {
-        console.error("Error talking to backend developer:", error);
-        if (error instanceof AxiosError) {
-            throw new Error(error.response?.data.message);
-        }
-        throw new Error("Failed to talk to backend developer");
     }
 }
 

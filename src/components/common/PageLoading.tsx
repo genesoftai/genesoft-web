@@ -1,5 +1,5 @@
 import React from "react";
-import GenesoftLoading from "./GenesoftLoading";
+import SimpleLoading from "@/components/common/SimpleLoading";
 
 type Props = {
     size?: number;
@@ -7,11 +7,15 @@ type Props = {
     color?: string;
 };
 
-const PageLoading = ({ text = "Loading your information..." }: Props) => {
+const PageLoading = ({
+    size = 30,
+    text = "Loading your information...",
+    color = "#2563EB",
+}: Props) => {
     return (
         <div className="flex flex-col justify-center items-center h-screen bg-primary-dark text-white">
-            <GenesoftLoading size={50} />
-            <p className="mt-6 text-base md:text-2xl">{text}</p>
+            <SimpleLoading color={color} size={size} />
+            <p className="text-base md:text-2xl">{text}</p>
         </div>
     );
 };

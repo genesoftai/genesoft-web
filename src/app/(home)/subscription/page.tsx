@@ -6,7 +6,7 @@ import posthog from "posthog-js";
 export default function SubscriptionPage() {
     posthog.capture("pageview_subscription");
     return (
-        <div className="flex flex-col min-h-screen bg-genesoft-dark text-subtext-in-dark-bg">
+        <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg">
             <main className="flex-1 container mx-auto px-4">
                 <Subscription />
             </main>

@@ -11,8 +11,6 @@ export interface CreateProjectStore {
     pages?: Page[];
     features?: Feature[];
     is_onboarding?: boolean;
-    project_type?: string;
-    backend_requirements?: string;
     updateCreateProjectStore: (project: Partial<CreateProjectStore>) => void;
     clearCreateProjectStore: () => void;
     addPage: (page: Page) => void;
@@ -33,8 +31,6 @@ const initialProjectStoreStates = {
     pages: [],
     features: [],
     is_onboarding: false,
-    project_type: "web",
-    backend_requirements: "",
 };
 
 export const useCreateProjectStore = create<CreateProjectStore>()(

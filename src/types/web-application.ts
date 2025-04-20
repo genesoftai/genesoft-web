@@ -8,7 +8,6 @@ export enum ReadyStatus {
     READY = "READY",
     ERROR = "ERROR",
     QUEUED = "QUEUED",
-    NONE = "NONE",
 }
 
 export enum DevelopmentStatus {
@@ -40,8 +39,4 @@ export interface WebApplicationInfo {
     developmentDoneAt: number;
     readyStatus: ReadyStatus;
     repositoryBuild: RepositoryBuild;
-    codesandboxUrl: string | null;
-    codesandboxId: string | null;
-    codesandboxPreviewUrl: string | null;
-    sandboxId: string | null;
 }

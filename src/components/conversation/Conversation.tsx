@@ -9,20 +9,34 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, BrainCircuit, Image as ImageIcon } from "lucide-react";
+import {
+    Send,
+    Loader2,
+    CircleCheck,
+    Image,
+    BrainCircuit,
+    HistoryIcon,
+} from "lucide-react";
 import { Message } from "@/types/message";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import {
     CreateMessageDto,
+    getConversationsWithIterationsByProjectId,
     submitConversation,
-    talkToWebAiAgents,
+    talkToProjectManager,
 } from "@/actions/conversation";
 import { useProjectStore } from "@/stores/project-store";
 import SystemMessage from "./message/SystemMessage";
 import AIAgentMessage from "./message/AIAgentMessage";
 import UserMessage from "./message/UserMessage";
 import { uploadFileFree } from "@/actions/file";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -49,16 +63,16 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ConversationWithIterations } from "@/types/conversation";
+import ConversationWithIteration from "./ConversationWithIteration";
+import { formatDateToHumanReadable } from "@/utils/common/time";
 import { LatestIteration } from "@/types/development";
 import { getWebApplicationInfo } from "@/actions/web-application";
+import DevelopmentActivity from "../project/manage/development/DevelopmentActivity";
+import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
+import DeploymentStatus from "./Deployment";
 import { toast } from "@/hooks/use-toast";
 import posthog from "posthog-js";
-import GenesoftLoading from "../common/GenesoftLoading";
-import NextJSLogo from "@public/tech/nextjs.jpeg";
-import Image from "next/image";
-import { Project } from "@/types/project";
-import { WebApplicationInfo } from "@/types/web-application";
-
 export type SprintOption = {
     id: string;
     name: string;
@@ -76,7 +90,6 @@ export interface ConversationProps {
     pageId?: string;
     isOnboarding?: boolean;
     onSendImageWithMessage?: (messages: Message[]) => Promise<void>;
-    project: Project;
 }
 
 const Conversation: React.FC<ConversationProps> = ({
@@ -85,8 +98,9 @@ const Conversation: React.FC<ConversationProps> = ({
     isLoading = false,
     onSubmitConversation,
     status,
+    featureId,
+    pageId,
     onSendImageWithMessage,
-    project,
 }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState("");
@@ -97,6 +111,9 @@ const Conversation: React.FC<ConversationProps> = ({
     const [isLoadingSubmitConversation, setIsLoadingSubmitConversation] =
         useState<boolean>(false);
     const [errorStartSprint, setErrorStartSprint] = useState<string>("");
+    const [isLoadingImageUpload, setIsLoadingImageUpload] =
+        useState<boolean>(false);
+    const [errorImageUpload, setErrorImageUpload] = useState<string>("");
     const [imageUploadUrl, setImageUploadUrl] = useState<string>("");
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [isImageMessageDialogOpen, setIsImageMessageDialogOpen] =
@@ -112,8 +129,11 @@ const Conversation: React.FC<ConversationProps> = ({
         tier: "",
         remaining: 0,
     });
+    const [conversationsWithIterations, setConversationsWithIterations] =
+        useState<ConversationWithIterations[]>([]);
     const [latestIteration, setLatestIteration] =
         useState<LatestIteration | null>(null);
+    const [pollingCount, setPollingCount] = useState(0);
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
     const [isCheckingBuildErrors, setIsCheckingBuildErrors] =
@@ -122,7 +142,11 @@ const Conversation: React.FC<ConversationProps> = ({
     const { id: organizationId } = useGenesoftOrganizationStore();
     const router = useRouter();
 
-    const { id: projectId } = useProjectStore();
+    const {
+        id: projectId,
+        name: projectName,
+        description: projectDescription,
+    } = useProjectStore();
     const {
         image: userImage,
         name: userName,
@@ -168,10 +192,12 @@ const Conversation: React.FC<ConversationProps> = ({
             setMessages([...messages, tempMessage]);
 
             setInputValue("");
-            const result = await talkToWebAiAgents({
+            const result = await talkToProjectManager({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
+                feature_id: featureId,
+                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
@@ -229,6 +255,9 @@ const Conversation: React.FC<ConversationProps> = ({
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setIsLoadingImageUpload(true);
+        setErrorImageUpload("");
+
         try {
             const timestamp = new Date().getTime();
             const fileName = `${conversationId}-${timestamp}`;
@@ -243,11 +272,7 @@ const Conversation: React.FC<ConversationProps> = ({
             );
 
             if (res.error) {
-                toast({
-                    title: "Error uploading image",
-                    description: res.error,
-                    variant: "destructive",
-                });
+                setErrorImageUpload(res.error);
                 return;
             }
 
@@ -256,12 +281,10 @@ const Conversation: React.FC<ConversationProps> = ({
             // Open the image message dialog after successful upload
             setIsImageMessageDialogOpen(true);
         } catch (err) {
-            toast({
-                title: "Error uploading image",
-                description: "Failed to upload image. Please try again.",
-                variant: "destructive",
-            });
+            setErrorImageUpload("Failed to upload image. Please try again.");
             console.error(err);
+        } finally {
+            setIsLoadingImageUpload(false);
         }
     };
 
@@ -299,10 +322,12 @@ const Conversation: React.FC<ConversationProps> = ({
             };
             setMessages([...messages, tempMessage]);
 
-            const result = await talkToWebAiAgents({
+            const result = await talkToProjectManager({
                 project_id: projectId,
                 conversation_id: conversationId,
                 message: newMessage,
+                feature_id: featureId,
+                page_id: pageId,
             });
             updatedMessages = result?.messages;
         } catch (error) {
@@ -339,6 +364,7 @@ const Conversation: React.FC<ConversationProps> = ({
 
     useEffect(() => {
         setupMonthlySprints();
+        setupConversationsWithIterations();
     }, []);
 
     const setupMonthlySprints = async () => {
@@ -351,6 +377,21 @@ const Conversation: React.FC<ConversationProps> = ({
                     "You have exceeded the maximum number of sprints for free tier. Please upgrade to a startup plan to continue.",
                 );
             }
+        }
+    };
+
+    const setupConversationsWithIterations = async () => {
+        try {
+            if (projectId) {
+                const response =
+                    await getConversationsWithIterationsByProjectId(projectId);
+                setConversationsWithIterations(response);
+            }
+        } catch (error) {
+            console.error(
+                "Error setting up conversations with iterations:",
+                error,
+            );
         }
     };
 
@@ -435,12 +476,16 @@ const Conversation: React.FC<ConversationProps> = ({
             fetchLatestData();
 
             // Set up polling every 10 seconds
-            interval = setInterval(fetchLatestData, 10000);
+            interval = setInterval(() => {
+                fetchLatestData();
+                setPollingCount((prev) => prev + 1);
+            }, 10000);
         }
 
         return () => {
             if (interval) clearInterval(interval);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectId]);
 
     const fetchLatestData = async () => {
@@ -496,25 +541,6 @@ const Conversation: React.FC<ConversationProps> = ({
                                 )}
                             </div>
 
-                            <div className="flex flex-col items-start gap-2">
-                                <div className="flex items-center gap-2">
-                                    <Image
-                                        src={NextJSLogo}
-                                        alt="Web Application"
-                                        width={20}
-                                        height={20}
-                                        className="rounded-md"
-                                    />
-                                    <span className="text-xs font-medium text-gray-400">
-                                        {"Web"}
-                                    </span>
-                                </div>
-
-                                <span className="text-sm text-white font-bold">
-                                    {project?.name}
-                                </span>
-                            </div>
-
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -535,8 +561,8 @@ const Conversation: React.FC<ConversationProps> = ({
                                         >
                                             <span className="text-xs font-medium">
                                                 {isLoadingSubmitConversation
-                                                    ? "Executing..."
-                                                    : "Execute"}
+                                                    ? "Generating..."
+                                                    : "Generate"}
                                             </span>
                                             {isLoadingSubmitConversation ? (
                                                 <Loader2 className="h-4 w-4 animate-spin ml-1" />
@@ -567,7 +593,76 @@ const Conversation: React.FC<ConversationProps> = ({
                             scrollHideDelay={0}
                         >
                             <div className="flex flex-col p-4 gap-4 pb-4 h-full">
-                                {/* {webApplicationInfo?.readyStatus && (
+                                {conversationsWithIterations.length > 0 && (
+                                    <div className="flex flex-col gap-4 w-full">
+                                        {conversationsWithIterations?.map(
+                                            (conversation) => (
+                                                <Dialog key={conversation?.id}>
+                                                    <DialogTrigger asChild>
+                                                        <Card className="flex flex-col w-full bg-[#1a1d21] border-0 rounded-lg overflow-hidden shadow-lg cursor-pointer hover:bg-[#222529] transition-colors">
+                                                            <CardHeader className="flex flex-row items-center justify-between px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838] transition-colors duration-200 shadow-sm">
+                                                                <CardTitle className="text-lg font-semibold text-white flex justify-between items-center w-full">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className="text-blue-300 font-medium text-xs md:text-sm">
+                                                                            {conversation?.name ||
+                                                                                "Untitled"}
+                                                                        </span>
+                                                                        {/* <span className="px-2.5 py-1 text-xs rounded-full bg-[#2a2d32] text-gray-300 border border-[#3a3d42] shadow-inner">
+                                                                            {conversation?.updated_at
+                                                                                ? formatDateToHumanReadable(
+                                                                                      conversation.updated_at,
+                                                                                  )
+                                                                                : ""}
+                                                                        </span> */}
+                                                                    </div>
+                                                                    <HistoryIcon className="h-5 w-5 text-blue-300" />
+                                                                </CardTitle>
+                                                            </CardHeader>
+                                                        </Card>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="w-11/12 md:w-6/12 max-w-4xl p-0 bg-[#1a1d21] border border-[#383838] text-white rounded-lg">
+                                                        <DialogHeader className="px-4 py-3 bg-gradient-to-r from-[#1e2124] to-[#222529] border-b border-[#383838]">
+                                                            <DialogTitle className="text-lg font-semibold text-white flex flex-col md:flex-row items-center gap-3 pt-8 md:pt-4">
+                                                                <span className="text-blue-300 font-medium">
+                                                                    {conversation?.name ||
+                                                                        "Untitled"}
+                                                                </span>
+                                                                <span className="px-2.5 py-1 text-xs rounded-full bg-[#2a2d32] text-gray-300 border border-[#3a3d42] shadow-inner">
+                                                                    {conversation?.updated_at
+                                                                        ? formatDateToHumanReadable(
+                                                                              conversation.updated_at,
+                                                                          )
+                                                                        : ""}
+                                                                </span>
+                                                            </DialogTitle>
+                                                        </DialogHeader>
+                                                        <div className="max-h-[80vh] overflow-hidden">
+                                                            <ConversationWithIteration
+                                                                conversationWithIteration={
+                                                                    conversation
+                                                                }
+                                                                isOpen={true}
+                                                            />
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            ),
+                                        )}
+                                    </div>
+                                )}
+
+                                {latestIteration && (
+                                    <DevelopmentActivity
+                                        pollingCount={pollingCount}
+                                        latestIteration={latestIteration}
+                                        project={{
+                                            name: projectName,
+                                            description: projectDescription,
+                                        }}
+                                    />
+                                )}
+
+                                {webApplicationInfo?.readyStatus && (
                                     <DeploymentStatus
                                         webApplicationInfo={
                                             webApplicationInfo as WebApplicationInfo
@@ -581,16 +676,12 @@ const Conversation: React.FC<ConversationProps> = ({
                                             latestIteration as LatestIteration
                                         }
                                     />
-                                )} */}
+                                )}
 
                                 {messages.map((message, index) => (
                                     <div
                                         key={message.id}
-                                        className={`group max-w-[500px] w-full overflow-hidden px-4 ${
-                                            index === messages.length - 1
-                                                ? "message-new"
-                                                : ""
-                                        }`}
+                                        className={`group max-w-full w-full overflow-hidden ${index === messages.length - 1 ? "message-new" : ""}`}
                                     >
                                         {message.sender_type === "system" ? (
                                             <SystemMessage message={message} />
@@ -601,10 +692,8 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 message={message}
                                                 messagesLength={messages.length}
                                                 index={index}
+                                                messagesEndRef={messagesEndRef}
                                                 status={status}
-                                                sender_id={
-                                                    message.sender_id || ""
-                                                }
                                             />
                                         )}
                                     </div>
@@ -614,12 +703,12 @@ const Conversation: React.FC<ConversationProps> = ({
                                     <div className="flex justify-center mb-4">
                                         <div className="bg-[#252a2e] text-gray-400 text-xs py-1 px-3 rounded-md flex items-center gap-2 animate-pulse">
                                             <Loader2 className="h-3 w-3 animate-spin" />
-                                            AI Agents are thinking...
+                                            Project Manager is thinking...
                                         </div>
                                     </div>
                                 )}
 
-                                {/* {latestIteration?.status === "done" &&
+                                {latestIteration?.status === "done" &&
                                     webApplicationInfo?.readyStatus ===
                                         ReadyStatus.ERROR &&
                                     (!webApplicationInfo?.repositoryBuild
@@ -650,7 +739,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 )}
                                             </Button>
                                         </div>
-                                    )} */}
+                                    )}
                             </div>
                             <style jsx global>{`
                                 .conversation-scrollarea pre,
@@ -690,7 +779,7 @@ const Conversation: React.FC<ConversationProps> = ({
                             <div className="flex flex-col p-4 gap-3">
                                 {messages.length === 0 && (
                                     <div className="flex flex-col items-center justify-center h-[calc(100vh-350px)]">
-                                        {/* <div className="relative w-20 h-20 mb-4">
+                                        <div className="relative w-20 h-20 mb-4">
                                             <div className="absolute inset-0 bg-genesoft/10 rounded-full animate-[spin_3s_linear_infinite]"></div>
                                             <div className="absolute inset-2 bg-genesoft/20 rounded-full animate-[spin_4s_linear_infinite_reverse]"></div>
                                             <div className="absolute inset-4 bg-genesoft/30 rounded-full animate-[spin_5s_linear_infinite]"></div>
@@ -698,8 +787,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                             <div className="absolute inset-8 bg-genesoft flex items-center justify-center rounded-full animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">
                                                 <div className="w-2 h-2 bg-white rounded-full"></div>
                                             </div>
-                                        </div> */}
-                                        <GenesoftLoading />
+                                        </div>
                                         <p className="text-gray-400 text-sm relative overflow-hidden group">
                                             <span className="inline-block animate-[fadeIn_1s_ease-in-out_forwards]">
                                                 Loading conversation ...
@@ -769,7 +857,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 ?.click();
                                         }}
                                     >
-                                        <ImageIcon className="h-4 w-4" />
+                                        <Image className="h-4 w-4" />
                                     </Button>
                                     <Textarea
                                         value={inputValue}

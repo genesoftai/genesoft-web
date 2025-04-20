@@ -57,12 +57,6 @@ const OrganizationProjects = ({ organizationId }: Props) => {
                                 description={project.description}
                                 purpose={project.purpose}
                                 target_audience={project.target_audience}
-                                project_template_type={
-                                    project.project_template_type
-                                }
-                                backend_requirements={
-                                    project.backend_requirements
-                                }
                             />
                         ))}
                     </div>

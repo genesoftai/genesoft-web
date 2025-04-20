@@ -78,23 +78,6 @@ export async function getProjectById(projectId: string) {
     }
 }
 
-export async function getProjects(projectIds: string[]) {
-    const url = `${genesoftCoreApiServiceBaseUrl}/project?ids=${projectIds.join(
-        ",",
-    )}`;
-    try {
-        const res = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
-            },
-        });
-        return res.data;
-    } catch (error) {
-        console.error("Error getting projects:", error);
-        throw new Error("Failed to get projects");
-    }
-}
-
 export async function updateProjectInfo({
     projectId,
     payload,
@@ -393,25 +376,17 @@ export const editFeature = async ({
 
 export type CreateProjectFromOnboardingDto = {
     user_id: string;
-    project_description?: string;
+    project_description: string;
     branding?: {
         logo_url?: string;
         color?: string;
     };
-    project_type: string;
-    backend_requirements?: string;
 };
 
 export async function createProjectFromOnboarding(
     payload: CreateProjectFromOnboardingDto,
 ) {
-    console.log("genesoftCoreApiServiceBaseUrl", genesoftCoreApiServiceBaseUrl);
     const url = `${genesoftCoreApiServiceBaseUrl}/project/onboarding`;
-    console.log({
-        message: "createProjectFromOnboarding",
-        payload,
-        url,
-    });
     try {
         const res = await axios.post(url, payload, {
             headers: {

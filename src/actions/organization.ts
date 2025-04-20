@@ -66,17 +66,6 @@ export async function getOrganizationProjects(organizationId: string) {
             Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
         },
     });
-    console.log(res.data);
-    return res.data;
-}
-
-export async function getOrganizationCollections(organizationId: string) {
-    const url = `${genesoftCoreApiServiceBaseUrl}/organization/${organizationId}/collections`;
-    const res = await axios.get(url, {
-        headers: {
-            Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
-        },
-    });
     return res.data;
 }
 
