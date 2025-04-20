@@ -57,6 +57,7 @@ import GenesoftLoading from "../common/GenesoftLoading";
 import NextJSLogo from "@public/tech/nextjs.jpeg";
 import Image from "next/image";
 import { Project } from "@/types/project";
+import { WebApplicationInfo } from "@/types/web-application";
 
 export type SprintOption = {
     id: string;
