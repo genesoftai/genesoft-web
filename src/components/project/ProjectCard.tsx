@@ -183,9 +183,9 @@ export function ProjectCard({
             )}
 
             <CardFooter className="flex justify-end md:justify-start mt-4">
-                <div className="text-subtext-in-dark-bg">
+                {/* <div className="text-subtext-in-dark-bg">
                     Collection: {111}
-                </div>
+                </div> */}
                 <Button
                     className="ms-auto bg-genesoft text-white rounded-lg text-xs md:text-base"
                     onClick={handleGoToAiAgentWorkspace}
