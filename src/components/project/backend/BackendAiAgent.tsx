@@ -281,29 +281,7 @@ const BackendAiAgent = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <BackendProjectInfoSheet
-                        isOpen={isProjectInfoSheetOpen}
-                        onOpenChange={setIsProjectInfoSheetOpen}
-                        project={project as Project}
-                        onSave={handleSaveProjectInfo}
-                    />
-
-                    <ServicesIntegrationSheet
-                        isOpen={isServicesSheetOpen}
-                        onOpenChange={setIsServicesSheetOpen}
-                    />
-
-                    <EnvironmentVariablesSheet
-                        isOpen={isEnvSheetOpen}
-                        onOpenChange={setIsEnvSheetOpen}
-                    />
-
-                    <DeploymentSheet
-                        isOpen={isDeploymentSheetOpen}
-                        onOpenChange={setIsDeploymentSheetOpen}
-                    />
-                </div>
+              
 
                 <Tabs
                     value={activeTabOverview}

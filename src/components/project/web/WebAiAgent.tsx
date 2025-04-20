@@ -173,7 +173,7 @@ const WebAiAgent = ({
     }
 
     return (
-        <div className="px-4 flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full bg-genesoft-dark">
+        <div className="w-full px-4 flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full bg-genesoft-dark">
             <Toaster />
             <div style={{borderBottom: "1px solid #222"}} className="ps-0 p-2 pb-4 mb-4 flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                 <div className="flex items-center gap-4">
@@ -299,7 +299,7 @@ const WebAiAgent = ({
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
-                    className="flex-1 flex flex-col h-[calc(100vh-60px)]"
+                    className="w-full flex-1 flex flex-col h-[calc(100vh-60px)]"
                 >
                     <TabsList className="grid self-center w-full sm:w-6/12 grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
                         <TabsTrigger
@@ -320,9 +320,9 @@ const WebAiAgent = ({
 
                     <TabsContent
                         value="conversation"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
+                        className="w-100 flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
                     >
-                        <div className="flex-1 min-w-0 h-auto">
+                        <div className="w-100 flex-1 min-w-0 h-auto">
                             <Conversation
                                 key={`mobile-conversation-${conversationKey}`}
                                 conversationId={conversation?.id || ""}
@@ -343,19 +343,19 @@ const WebAiAgent = ({
                         value="preview"
                         className="w-full flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
                     >
-                         <div className="mb-32">
+                         <div className="mb-32" style={{minHeight: "460px"}}>
                             <div className="p-4">
                                 <h3 className="mb-4 text-white text-lg font-bold">Preview</h3>
                             </div>
-                         <WebPreview
-                                    project={project}
-                                    setActiveTabOverview={setActiveTabOverview}
-                                    isReadyShowPreview={isReadyShowPreview}
-                                    setIsReadyShowPreview={
-                                        setIsReadyShowPreview
-                                    }
-                                    latestIteration={latestIteration}
-                                />
+                            <WebPreview
+                                        project={project}
+                                        setActiveTabOverview={setActiveTabOverview}
+                                        isReadyShowPreview={isReadyShowPreview}
+                                        setIsReadyShowPreview={
+                                            setIsReadyShowPreview
+                                        }
+                                        latestIteration={latestIteration}
+                                    />
                          </div>
                         <hr/>
                       <div className="p-4 mb-32">
