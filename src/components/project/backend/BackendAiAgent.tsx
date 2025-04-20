@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppWindow, ChevronDown, Database, MonitorPlay, Server } from "lucide-react";
+import { AppWindow, ChevronDown, MonitorPlay, Server } from "lucide-react";
 import { MessageSquare } from "lucide-react";
 import { getConversationById } from "@/actions/conversation";
 import { getActiveConversationByProjectId } from "@/actions/conversation";
@@ -170,7 +170,7 @@ const BackendAiAgent = ({
     }
 
     return (
-        <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1">
+        <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 bg-genesoft-dark">
             <Toaster position="top-center" />
             <div style={{borderBottom: "1px solid #222"}} className="ps-0 p-2 pb-4 mb-4 flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                 <div className="flex items-center gap-4">
