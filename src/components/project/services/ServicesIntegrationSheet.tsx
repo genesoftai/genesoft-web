@@ -37,7 +37,7 @@ export const ServicesIntegrationSheet = ({
                 <Button
                     variant="outline"
                     size="sm"
-                    className="bg-primary-dark border-secondary-dark hover:bg-primary-dark/80 hover:text-white"
+                    className="hidden md:flex  bg-primary-dark border-secondary-dark hover:bg-primary-dark/80 hover:text-white"
                 >
                     <LayoutGrid className="h-4 w-4" />
                     <span className="text-xs font-medium">
