@@ -295,7 +295,7 @@ const WebAiAgent = ({
             </div>
 
             {/* Mobile View (Tabs) - Only visible below md breakpoint */}
-            <div className="md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
+            <div className="w-full md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
@@ -341,7 +341,7 @@ const WebAiAgent = ({
 
                     <TabsContent
                         value="preview"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
+                        className="w-full flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
                     >
                          <div className="mb-32">
                             <div className="p-4">

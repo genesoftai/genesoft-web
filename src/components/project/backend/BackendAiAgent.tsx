@@ -169,7 +169,7 @@ const BackendAiAgent = ({
     }
 
     return (
-        <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1">
+        <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 bg-genesoft-dark">
             <Toaster position="top-center" />
             <div
                 style={{ borderBottom: "1px solid #222" }}
@@ -333,7 +333,7 @@ const BackendAiAgent = ({
             </div>
 
             {/* Mobile View (Tabs) - Only visible below md breakpoint */}
-            <div className="md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
+            <div className="w-full md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
@@ -358,7 +358,7 @@ const BackendAiAgent = ({
 
                     <TabsContent
                         value="conversation"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
+                        className="w-full flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
                     >
                         <div className="flex-1 min-w-0 h-auto">
                             <BackendConversation
