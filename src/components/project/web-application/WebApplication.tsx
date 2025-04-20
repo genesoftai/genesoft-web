@@ -1,4 +1,4 @@
-import { ExternalLink, Globe, Loader2 } from "lucide-react";
+import { Globe, Loader2 } from "lucide-react";
 import { Smartphone } from "lucide-react";
 import { Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -91,14 +91,14 @@ const WebApplication = ({
                         </Label>
                     </div>
 
-                    <a
+                    {/* <a
                         href={webApplicationInfo?.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
                     >
                         <ExternalLink className="h-4 w-4" />
-                    </a>
+                    </a> */}
                 </div>
 
                 <div className="overflow-hidden cursor-pointer">

@@ -67,7 +67,8 @@ export default function LandingPage() {
         backend_requirements: backendRequirements,
         clearCreateProjectStore,
     } = useCreateProjectStore();
-    const { updateCollectionStore } = useCollectionStore();
+    const { updateCollectionStore, clearCollectionStore } =
+        useCollectionStore();
     const [
         isCreatingProjectFromOnboarding,
         setIsCreatingProjectFromOnboarding,
@@ -166,6 +167,7 @@ export default function LandingPage() {
             } else {
                 clearCreateProjectStore();
                 if (res?.project) {
+                    clearCollectionStore();
                     projectId = res.project.id;
                     const projectInfo = await getProjectById(projectId);
                     const organizationInfo = await getOrganizationById(
@@ -318,10 +320,6 @@ export default function LandingPage() {
                             </div>
                         )}
                     </div>
-
-
-
-
                 </section>
 
                 {/* Keyboard-like section inspired by Raycast */}
@@ -520,7 +518,6 @@ export default function LandingPage() {
                 </section>
 
                 {/* Keyboard-inspired visual decoration at the bottom */}
-
             </main>
         </div>
     );

@@ -45,7 +45,8 @@ export function ProjectCard({
     const router = useRouter();
     const { updateProjectStore } = useProjectStore();
     const [projectType, setProjectType] = useState("");
-    const { updateCollectionStore } = useCollectionStore();
+    const { updateCollectionStore, clearCollectionStore } =
+        useCollectionStore();
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -68,6 +69,8 @@ export function ProjectCard({
             });
             if (collectionId) {
                 await handleSetupCollectionForWorkspace();
+            } else {
+                clearCollectionStore();
             }
         } catch (error) {
             console.error(error);
@@ -183,19 +186,17 @@ export function ProjectCard({
             )}
 
             <CardFooter className="flex justify-end md:justify-start mt-4">
-                <div className="text-subtext-in-dark-bg">
-                    Collection: {111}
-                </div>
+                <div className="text-subtext-in-dark-bg">Collection: {111}</div>
                 <Button
                     className="ms-auto bg-genesoft text-white rounded-lg text-xs md:text-base"
                     onClick={handleGoToAiAgentWorkspace}
-                    >
-                        <span className="text-xs md:text-base">
-                            {isLoading
-                                ? "Loading workspace..."
-                                : "AI Agents workspace"}
-                        </span>
-                    </Button>
+                >
+                    <span className="text-xs md:text-base">
+                        {isLoading
+                            ? "Loading workspace..."
+                            : "AI Agents workspace"}
+                    </span>
+                </Button>
             </CardFooter>
         </Card>
     );

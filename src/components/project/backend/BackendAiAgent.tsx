@@ -6,18 +6,14 @@ import React, { useEffect, useState } from "react";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppWindow, ChevronDown, Database, MonitorPlay, Server } from "lucide-react";
+import { AppWindow, ChevronDown, MonitorPlay, Server } from "lucide-react";
 import { MessageSquare } from "lucide-react";
 import { getConversationById } from "@/actions/conversation";
 import { getActiveConversationByProjectId } from "@/actions/conversation";
 import PageLoading from "@/components/common/PageLoading";
 import BackendConversation from "@/components/conversation/BackendConversation";
 import { BackendPreview } from "../manage/BackendPreview";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import BackendGenerations from "./BackendGenerations";
 import { useCollectionStore } from "@/stores/collection-store";
 import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
@@ -27,7 +23,10 @@ import DeploymentSheet from "../services/DeploymentSheet";
 import { Toaster } from "sonner";
 import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
 import { LatestIteration } from "@/types/development";
-import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -172,7 +171,10 @@ const BackendAiAgent = ({
     return (
         <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1">
             <Toaster position="top-center" />
-            <div style={{borderBottom: "1px solid #222"}} className="ps-0 p-2 pb-4 mb-4 flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
+            <div
+                style={{ borderBottom: "1px solid #222" }}
+                className="ps-0 p-2 pb-4 mb-4 flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white"
+            >
                 <div className="flex items-center gap-4">
                     <Image
                         src={GenesoftBlack}
@@ -200,16 +202,28 @@ const BackendAiAgent = ({
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setIsProjectInfoSheetOpen(true)}>
-                                   Project Info
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setIsProjectInfoSheetOpen(true)
+                                    }
+                                >
+                                    Project Info
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsServicesSheetOpen(true)}>
+                                <DropdownMenuItem
+                                    onClick={() => setIsServicesSheetOpen(true)}
+                                >
                                     Services Integration
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsEnvSheetOpen(true)}>
+                                <DropdownMenuItem
+                                    onClick={() => setIsEnvSheetOpen(true)}
+                                >
                                     Environment Variables
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsDeploymentSheetOpen(true)}>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setIsDeploymentSheetOpen(true)
+                                    }
+                                >
                                     Deployment
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -238,7 +252,6 @@ const BackendAiAgent = ({
                             isOpen={isDeploymentSheetOpen}
                             onOpenChange={setIsDeploymentSheetOpen}
                         />
-
                     </div>
                     {collectionId && (
                         <Tabs
@@ -266,6 +279,30 @@ const BackendAiAgent = ({
                             </TabsList>
                         </Tabs>
                     )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <BackendProjectInfoSheet
+                        isOpen={isProjectInfoSheetOpen}
+                        onOpenChange={setIsProjectInfoSheetOpen}
+                        project={project as Project}
+                        onSave={handleSaveProjectInfo}
+                    />
+
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
+
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+
+                    <DeploymentSheet
+                        isOpen={isDeploymentSheetOpen}
+                        onOpenChange={setIsDeploymentSheetOpen}
+                    />
                 </div>
 
                 <Tabs
@@ -323,7 +360,6 @@ const BackendAiAgent = ({
                         value="conversation"
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
                     >
-                          
                         <div className="flex-1 min-w-0 h-auto">
                             <BackendConversation
                                 key={`mobile-conversation-${conversationKey}`}
@@ -336,18 +372,20 @@ const BackendAiAgent = ({
                                 onSendImageWithMessage={
                                     handleSendImageWithMessage
                                 }
+                                project={project}
                             />
                         </div>
-                       
                     </TabsContent>
 
                     <TabsContent
                         value="preview"
                         className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
                     >
-                         <div className="mb-32">
+                        <div className="mb-32">
                             <div className="p-4">
-                                <h3 className="mb-4 text-white text-lg font-bold">Preview</h3>
+                                <h3 className="mb-4 text-white text-lg font-bold">
+                                    Preview
+                                </h3>
                             </div>
                             <BackendPreview
                                 project={project}
@@ -357,9 +395,11 @@ const BackendAiAgent = ({
                                 latestIteration={latestIteration}
                             />
                         </div>
-                        <hr/>
+                        <hr />
                         <div className="p-4 mb-32">
-                            <h3 className="mb-4 text-white text-lg font-bold">Development tasks</h3>
+                            <h3 className="mb-4 text-white text-lg font-bold">
+                                Development tasks
+                            </h3>
                             <BackendGenerations
                                 project={project}
                                 latestIteration={latestIteration}
@@ -369,7 +409,7 @@ const BackendAiAgent = ({
                 </Tabs>
             </div>
             <div className="hidden md:flex">
-            {/* Desktop View - Only visible at md breakpoint and up */}
+                {/* Desktop View - Only visible at md breakpoint and up */}
                 <ResizablePanelGroup
                     direction="horizontal"
                     className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
@@ -384,12 +424,9 @@ const BackendAiAgent = ({
                             status={conversation?.status || ""}
                             pageId={pathParams?.pageId as string}
                             onSendImageWithMessage={handleSendImageWithMessage}
+                            project={project}
                         />
                     </ResizablePanel>
-                    <ResizableHandle
-                        className="bg-primary-dark w-1 rounded-full"
-                        withHandle
-                    />
                     <ResizablePanel defaultSize={50}>
                         {activeTabOverview === "preview" && (
                             <BackendPreview
@@ -409,41 +446,6 @@ const BackendAiAgent = ({
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </div>
-            {/* <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-1">
-                <div
-                    className={`flex-1 min-w-0 ${
-                        isCollapsed ? "lg:w-full" : "lg:max-w-[60%]"
-                    } h-[calc(100vh-60px)]`}
-                >
-                    <BackendConversation
-                        key={`desktop-conversation-${conversationKey}`}
-                        conversationId={conversation?.id || ""}
-                        initialMessages={messages || []}
-                        isLoading={isLoadingSetupPageConversation}
-                        onSubmitConversation={handleSubmitConversation}
-                        status={conversation?.status || ""}
-                        pageId={pathParams?.pageId as string}
-                        onSendImageWithMessage={handleSendImageWithMessage}
-                    />
-                </div>
-
-                <Collapsible
-                    className={`transition-all duration-300 ease-in-out ${
-                        isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"
-                    } h-[calc(100vh-60px)]`}
-                    open={!isCollapsed}
-                    onOpenChange={(open) => setIsCollapsed(!open)}
-                >
-                    <CollapsibleContent
-                        className="w-full h-full data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
-                        forceMount
-                    >
-                        <div className="h-full overflow-auto">
-                            <BackendPreview project={project} />
-                        </div>
-                    </CollapsibleContent>
-                </Collapsible>
-            </div> */}
         </div>
     );
 };
