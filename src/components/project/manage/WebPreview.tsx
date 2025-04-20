@@ -238,8 +238,8 @@ export function WebPreview({
                             <div
                                 className={`relative flex justify-center w-full h-full`}
                             >
-                                {!isReadyShowPreview ? (
-                                    <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8">
+                                {isReadyShowPreview ? (
+                                    <div style={{minHeight: "420px"}} className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8">
                                         <motion.div
                                             className="flex flex-col items-center gap-6 max-w-md"
                                             initial={{ opacity: 0, y: 20 }}
