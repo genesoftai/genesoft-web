@@ -60,7 +60,7 @@ const WebGenerations = ({ project, latestIteration }: Props) => {
     return (
         <Card className="h-full bg-primary-dark text-white border-none">
             <CardHeader>
-                <CardTitle>Generation History of Project</CardTitle>
+                <CardTitle>Execution History of Project</CardTitle>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[calc(100vh-200px)]">

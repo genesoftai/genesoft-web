@@ -184,28 +184,6 @@ const BackendAiAgent = ({
                         <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
                     </div>
 
-                    <BackendProjectInfoSheet
-                        isOpen={isProjectInfoSheetOpen}
-                        onOpenChange={setIsProjectInfoSheetOpen}
-                        project={project as Project}
-                        onSave={handleSaveProjectInfo}
-                    />
-
-                    <ServicesIntegrationSheet
-                        isOpen={isServicesSheetOpen}
-                        onOpenChange={setIsServicesSheetOpen}
-                    />
-
-                    <EnvironmentVariablesSheet
-                        isOpen={isEnvSheetOpen}
-                        onOpenChange={setIsEnvSheetOpen}
-                    />
-
-                    <DeploymentSheet
-                        isOpen={isDeploymentSheetOpen}
-                        onOpenChange={setIsDeploymentSheetOpen}
-                    />
-
                     {collectionId && (
                         <Tabs
                             defaultValue="web"
@@ -232,6 +210,30 @@ const BackendAiAgent = ({
                             </TabsList>
                         </Tabs>
                     )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <BackendProjectInfoSheet
+                        isOpen={isProjectInfoSheetOpen}
+                        onOpenChange={setIsProjectInfoSheetOpen}
+                        project={project as Project}
+                        onSave={handleSaveProjectInfo}
+                    />
+
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
+
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+
+                    <DeploymentSheet
+                        isOpen={isDeploymentSheetOpen}
+                        onOpenChange={setIsDeploymentSheetOpen}
+                    />
                 </div>
 
                 <Tabs
@@ -301,6 +303,7 @@ const BackendAiAgent = ({
                                 onSendImageWithMessage={
                                     handleSendImageWithMessage
                                 }
+                                project={project}
                             />
                         </div>
                     </TabsContent>
@@ -337,6 +340,7 @@ const BackendAiAgent = ({
                         status={conversation?.status || ""}
                         pageId={pathParams?.pageId as string}
                         onSendImageWithMessage={handleSendImageWithMessage}
+                        project={project}
                     />
                 </ResizablePanel>
                 <ResizableHandle

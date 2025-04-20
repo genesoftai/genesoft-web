@@ -54,7 +54,6 @@ const WebAiAgent = ({
     const [loading, setLoading] = useState(false);
     const [isServicesSheetOpen, setIsServicesSheetOpen] = useState(false);
     const [isEnvSheetOpen, setIsEnvSheetOpen] = useState(false);
-    const [activeTabForCollection, setActiveTabForCollection] = useState("web");
     const { id: collectionId, web_project_id } = useCollectionStore();
     const [isProjectInfoSheetOpen, setIsProjectInfoSheetOpen] = useState(false);
     const [isReadyShowPreview, setIsReadyShowPreview] = useState(false);
@@ -192,7 +191,7 @@ const WebAiAgent = ({
                         <Tabs
                             defaultValue="web"
                             className="w-auto hidden md:flex"
-                            value={activeTabForCollection}
+                            value={"web"}
                         >
                             <TabsList className="bg-primary-dark border-line-in-dark-bg">
                                 <TabsTrigger
@@ -301,6 +300,7 @@ const WebAiAgent = ({
                                 onSendImageWithMessage={
                                     handleSendImageWithMessage
                                 }
+                                project={project as Project}
                             />
                         </div>
                     </TabsContent>
@@ -355,6 +355,7 @@ const WebAiAgent = ({
                             status={conversation?.status || ""}
                             pageId={pathParams?.pageId as string}
                             onSendImageWithMessage={handleSendImageWithMessage}
+                            project={project as Project}
                         />
                     </ResizablePanel>
                     <ResizableHandle

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, Image, BrainCircuit } from "lucide-react";
+import { Send, Loader2, BrainCircuit, Image as ImageIcon } from "lucide-react";
 import { Message } from "@/types/message";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import {
@@ -51,6 +51,10 @@ import {
 } from "@/components/ui/tooltip";
 
 import { LatestIteration } from "@/types/development";
+import { Project } from "@/types/project";
+import NestJSLogo from "@public/tech/nestjs.svg";
+import Image from "next/image";
+
 export type SprintOption = {
     id: string;
     name: string;
@@ -68,6 +72,7 @@ export interface ConversationProps {
     pageId?: string;
     isOnboarding?: boolean;
     onSendImageWithMessage?: (messages: Message[]) => Promise<void>;
+    project: Project;
 }
 
 const BackendConversation: React.FC<ConversationProps> = ({
@@ -77,6 +82,7 @@ const BackendConversation: React.FC<ConversationProps> = ({
     onSubmitConversation,
     status,
     onSendImageWithMessage,
+    project,
 }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState("");
@@ -417,6 +423,25 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                 )}
                             </div>
 
+                            <div className="flex flex-col items-start gap-2">
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={NestJSLogo}
+                                        alt="Backend Service"
+                                        width={20}
+                                        height={20}
+                                        className="rounded-md"
+                                    />
+                                    <span className="text-xs font-medium text-gray-400">
+                                        {"Backend Service"}
+                                    </span>
+                                </div>
+
+                                <span className="text-sm text-white font-bold">
+                                    {project?.name}
+                                </span>
+                            </div>
+
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -622,7 +647,7 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                                 ?.click();
                                         }}
                                     >
-                                        <Image className="h-4 w-4" />
+                                        <ImageIcon className="h-4 w-4" />
                                     </Button>
                                     <Textarea
                                         value={inputValue}

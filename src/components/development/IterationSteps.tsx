@@ -44,15 +44,19 @@ const IterationSteps = ({ iterationTaskId }: Props) => {
     });
 
     return (
-        <div className="relative flex flex-col gap-4">
+        <div className="relative flex flex-col items-center gap-4">
             {loading ? (
                 <div className="flex justify-center items-center h-full">
                     <p>Loading iteration steps...</p>
                     <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                 </div>
             ) : (
-                iterationSteps.map((iterationStep) => (
-                    <IterationStep key={iterationStep.id} {...iterationStep} />
+                iterationSteps.map((iterationStep, index) => (
+                    <IterationStep
+                        key={iterationStep.id}
+                        {...iterationStep}
+                        index={index}
+                    />
                 ))
             )}
         </div>

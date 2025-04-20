@@ -5,7 +5,7 @@ import BackendGenerations from "@/components/project/backend/BackendGenerations"
 import WebGenerations from "@/components/project/web/WebGenerations";
 import { Button } from "@/components/ui/button";
 import { Project } from "@/types/project";
-import { SquareArrowRight } from "lucide-react";
+import { CheckCheckIcon, SquareArrowRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import NextjsLogo from "@public/tech/nextjs.jpeg";
@@ -13,9 +13,6 @@ import NestjsLogo from "@public/tech/nestjs.svg";
 import Image from "next/image";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import { HashLoader } from "react-spinners";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WebPreview } from "@/components/project/manage/WebPreview";
-import { BackendPreview } from "@/components/project/manage/BackendPreview";
 import { getLatestIteration } from "@/actions/development";
 import { LatestIteration } from "@/types/development";
 
@@ -124,7 +121,7 @@ const CollectionCreationPage = () => {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg w-full">
+        <div className="flex flex-col min-h-screen bg-primary-dark text-subtext-in-dark-bg w-full py-4">
             <div className="flex flex-row items-center justify-center px-4">
                 <Image
                     src={GenesoftBlack}
@@ -136,16 +133,32 @@ const CollectionCreationPage = () => {
                         router.push("/");
                     }}
                 />
-                <p className="text-lg font-bold text-center text-subtext-in-dark-bg flex flex-row items-center gap-2">
-                    <span>Genesoft AI Agents is building your collection</span>
-                    <span>
-                        {/* <GridLoader color="#2563EB" size={2} margin={0} /> */}
-                        <HashLoader color="#2563EB" size={20} />
-                    </span>
-                </p>
+
+                {latestBackendIteration?.status === "done" &&
+                latestWebIteration?.status === "done" ? (
+                    <p className="text-lg font-bold text-center text-subtext-in-dark-bg flex flex-row items-center gap-2">
+                        <span className="text-base">
+                            Genesoft AI Agents completed your collection, Please
+                            go to AI Agent workspace
+                        </span>
+                        <span>
+                            <CheckCheckIcon size={20} />
+                        </span>
+                    </p>
+                ) : (
+                    <p className="text-lg font-bold text-center text-subtext-in-dark-bg flex flex-row items-center gap-2">
+                        <span>
+                            Genesoft AI Agents is building your collection
+                        </span>
+                        <span>
+                            {/* <GridLoader color="#2563EB" size={2} margin={0} /> */}
+                            <HashLoader color="#2563EB" size={20} />
+                        </span>
+                    </p>
+                )}
             </div>
-            <div className="flex flex-col md:flex-row gap-4 justify-evenly w-full">
-                <div className="flex flex-col w-full">
+            <div className="flex flex-col md:flex-row gap-10 md:gap-4 justify-evenly w-full mt-8 md:mt-4">
+                <div className="flex flex-col w-full relative">
                     <div className="flex flex-row items-center justify-center gap-2">
                         <Image
                             src={NextjsLogo}
@@ -157,47 +170,22 @@ const CollectionCreationPage = () => {
                         <p className="text-lg font-bold text-center">Web</p>
                     </div>
 
-                    <Tabs
-                        defaultValue="generations"
-                        value={activeTabWeb}
-                        onValueChange={(value) =>
-                            setActiveTabWeb(value as TabValue)
-                        }
-                        className="w-full"
-                    >
-                        <TabsList className="grid w-full grid-cols-2 bg-secondary-dark">
-                            <TabsTrigger value="generations">
-                                Generations
-                            </TabsTrigger>
-                            <TabsTrigger value="preview">Preview</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="generations">
-                            <WebGenerations
-                                project={webProject}
-                                latestIteration={latestWebIteration}
-                            />
-                        </TabsContent>
-                        <TabsContent value="preview">
-                            <WebPreview
-                                project={webProject}
-                                latestIteration={latestWebIteration}
-                                isReadyShowPreview={isReadyShowPreviewWeb}
-                                setIsReadyShowPreview={setIsReadyShowPreviewWeb}
-                            />
-                        </TabsContent>
-                    </Tabs>
+                    <WebGenerations
+                        project={webProject}
+                        latestIteration={latestWebIteration}
+                    />
 
                     <Button
                         onClick={() =>
                             handleGoToWorkspace(webProject?.id as string)
                         }
-                        className="w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90 mt-4"
+                        className="absolute bottom-0 md:bottom-20 w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90 mt-4"
                     >
                         <span>AI Agent workspace for web</span>
                         <SquareArrowRight className="w-4 h-4" />
                     </Button>
                 </div>
-                <div className="flex flex-col w-full">
+                <div className="relative flex flex-col w-full">
                     <div className="flex flex-row items-center justify-center gap-2">
                         <Image
                             src={NestjsLogo}
@@ -210,43 +198,16 @@ const CollectionCreationPage = () => {
                         </p>
                     </div>
 
-                    <Tabs
-                        defaultValue="generations"
-                        value={activeTabBackend}
-                        onValueChange={(value) =>
-                            setActiveTabBackend(value as TabValue)
-                        }
-                        className="w-full"
-                    >
-                        <TabsList className="grid w-full grid-cols-2 bg-secondary-dark">
-                            <TabsTrigger value="generations">
-                                Generations
-                            </TabsTrigger>
-                            <TabsTrigger value="preview">Preview</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="generations">
-                            <BackendGenerations
-                                project={backendProject}
-                                latestIteration={latestBackendIteration}
-                            />
-                        </TabsContent>
-                        <TabsContent value="preview">
-                            <BackendPreview
-                                project={backendProject}
-                                latestIteration={latestBackendIteration}
-                                isReadyShowPreview={isReadyShowPreviewBackend}
-                                setIsReadyShowPreview={
-                                    setIsReadyShowPreviewBackend
-                                }
-                            />
-                        </TabsContent>
-                    </Tabs>
+                    <BackendGenerations
+                        project={backendProject}
+                        latestIteration={latestBackendIteration}
+                    />
 
                     <Button
                         onClick={() =>
                             handleGoToWorkspace(backendProject?.id as string)
                         }
-                        className="w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90 mt-4"
+                        className="absolute bottom-0 md:bottom-20 w-fit self-center bg-genesoft text-white font-bold hover:bg-genesoft/90 mt-4"
                     >
                         <span>AI Agent workspace for backend</span>
                         <SquareArrowRight className="w-4 h-4" />
