@@ -115,3 +115,15 @@ export type LatestDeployment = {
     status: string;
     errorMessage: string;
 };
+
+export type IterationStep = {
+    id: string;
+    iteration_task_id: string;
+    name: string;
+    description: string;
+    status: string;
+    remark: string;
+    tool: string;
+    created_at: string;
+    updated_at: string;
+};

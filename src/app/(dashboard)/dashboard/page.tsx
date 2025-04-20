@@ -34,7 +34,7 @@ export default function Dashboard() {
     posthog.capture("pageview_dashboard");
     const { email } = useUserStore();
     const { updateGenesoftUser } = useGenesoftUserStore();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [hasOrganization, setHasOrganization] = useState(false);
     const [user, setUser] = useState<GenesoftUser | null>(null);
     const [organizationName, setOrganizationName] = useState("");
@@ -72,7 +72,9 @@ export default function Dashboard() {
             });
         }
 
-        setLoading(false);
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
     };
 
     const handleCreateOrganization = async () => {

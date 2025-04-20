@@ -2,21 +2,26 @@ import { Avatar } from "@/components/ui/avatar";
 import { Message } from "@/types/message";
 import { formatDateToHumanReadable } from "@/utils/common/time";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import GenesoftLogo from "@public/assets/genesoft-logo-black.png";
+import React, { useEffect, useState, useRef } from "react";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import rehypeFormat from "rehype-format";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
+import rehypeHighlight from "rehype-highlight";
 import DOMPurify from "dompurify";
-import { Loader2 } from "lucide-react";
+import "github-markdown-css";
+import "highlight.js/styles/atom-one-dark.css";
+import ProjectManagerImage from "@public/ai-agent/project-manager-ai.png";
+import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
+import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
 
 const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeHighlight, { detect: true, ignoreMissing: true })
     .use(rehypeFormat)
     .use(rehypeStringify);
 
@@ -24,103 +29,89 @@ type AIAgentMessageProps = {
     message: Message;
     messagesLength: number;
     index: number;
-    messagesEndRef: React.RefObject<HTMLDivElement | null>;
     status: string;
+    sender_id: string;
 };
 
-const AIAgentMessage = ({
-    message,
-    messagesLength,
-    index,
-    messagesEndRef,
-    status,
-}: AIAgentMessageProps) => {
+const AIAgentMessage = ({ message, sender_id }: AIAgentMessageProps) => {
     const [htmlContent, setHtmlContent] = useState("");
-    const [displayedContent, setDisplayedContent] = useState("");
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [processingComplete, setProcessingComplete] = useState(false);
-    const isLatestMessage = index === messagesLength - 1;
-    const shouldStream = status !== "submitted" && isLatestMessage;
+    const [senderName, setSenderName] = useState("");
+    const messageRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setupContent();
     }, [message?.content]);
 
+    useEffect(() => {
+        if (sender_id === "205d57c2-6297-4b9d-83c7-2fb230804023") {
+            setSenderName("Backend Developer");
+        } else if (sender_id === "9e83c7fe-e5d0-4bb9-b499-a53022641d64") {
+            setSenderName("Frontend Developer");
+        } else {
+            setSenderName("Project Manager");
+        }
+    }, [sender_id]);
+
     // Auto scroll to bottom on new messages
     useEffect(() => {
-        if (isLatestMessage) {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (containerRef.current) {
+            containerRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+            });
         }
-    }, [messagesEndRef, isLatestMessage, displayedContent]);
-
-    useEffect(() => {
-        if (
-            processingComplete &&
-            shouldStream &&
-            currentIndex < htmlContent.length
-        ) {
-            const timeoutId = setTimeout(() => {
-                setDisplayedContent((prev) => prev + htmlContent[currentIndex]);
-                setCurrentIndex((prev) => prev + 1);
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-            }, 10);
-
-            return () => clearTimeout(timeoutId);
-        }
-    }, [
-        processingComplete,
-        currentIndex,
-        htmlContent,
-        messagesEndRef,
-        isLatestMessage,
-        shouldStream,
-    ]);
+    }, [message]);
 
     const setupContent = async () => {
         if (!message?.content) return;
 
         const value = `${message?.content?.trim()}`;
         const file = await processor.process(value);
-        const processedContent = String(file)
-            .replace(/\n/g, "<br />")
-            .replace(/<br \/>/g, "<br style='margin: 8px 0' />");
-
+        const processedContent = String(file);
         setHtmlContent(processedContent);
-        setProcessingComplete(true);
-
-        // Only reset for streaming if it's the latest message and not submitted
-        if (shouldStream) {
-            setDisplayedContent("");
-            setCurrentIndex(0);
-        } else {
-            // For older messages or submitted status, show the full content immediately
-            setDisplayedContent(processedContent);
-        }
     };
 
     return (
-        <div className="flex items-start gap-3 group p-2 rounded-md w-full overflow-hidden">
-            <Avatar className="h-8 w-8 sm:h-9 sm:w-9 rounded-md flex-shrink-0">
-                <Image
-                    src={GenesoftLogo}
-                    alt="Genesoft Logo"
-                    width={36}
-                    height={36}
-                    className="w-full h-full object-cover hidden md:block"
-                />
-                <Image
-                    src={GenesoftLogo}
-                    alt="Genesoft Logo"
-                    width={24}
-                    height={24}
-                    className="w-full h-full object-cover block md:hidden"
-                />
-            </Avatar>
+        <div
+            ref={containerRef}
+            className="flex flex-col items-start gap-2 group p-2 rounded-md w-full"
+        >
+            <div className="flex items-center gap-2">
+                <div>
+                    <Avatar className="h-8 w-8 sm:h-9 sm:w-9 rounded-md flex-shrink-0">
+                        <Image
+                            src={
+                                senderName === "Backend Developer"
+                                    ? BackendDeveloperImage
+                                    : senderName === "Frontend Developer"
+                                      ? FrontendDeveloperImage
+                                      : ProjectManagerImage
+                            }
+                            alt="Genesoft Logo"
+                            width={36}
+                            height={36}
+                            className="w-full h-full object-cover hidden md:block"
+                        />
+                        <Image
+                            src={
+                                senderName === "Backend Developer"
+                                    ? BackendDeveloperImage
+                                    : senderName === "Frontend Developer"
+                                      ? FrontendDeveloperImage
+                                      : ProjectManagerImage
+                            }
+                            alt="Genesoft Logo"
+                            width={24}
+                            height={24}
+                            className="w-full h-full object-cover block md:hidden"
+                        />
+                    </Avatar>
+                </div>
 
-            <div className="flex-1 min-w-0 overflow-hidden">
-                <div className="flex items-baseline">
+                <div className="flex flex-col flex-wrap items-baseline">
                     <span className={`font-semibold text-sm text-genesoft`}>
-                        {message.sender?.name}
+                        {senderName}
                     </span>
                     <span className="ml-2 text-xs text-gray-500">
                         {formatDateToHumanReadable(
@@ -128,23 +119,24 @@ const AIAgentMessage = ({
                         )}
                     </span>
                 </div>
+            </div>
 
+            <div className="flex-1 min-w-0 max-w-full">
                 <div
-                    ref={isLatestMessage ? messagesEndRef : null}
-                    className={`text-white text-sm rounded-lg self-start break-words overflow-hidden max-w-full`}
+                    ref={messageRef}
+                    className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
                     dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(
-                            shouldStream ? displayedContent : htmlContent,
-                        ),
+                        __html: DOMPurify.sanitize(htmlContent),
                     }}
                 />
 
-                {shouldStream && !processingComplete && (
-                    <div className="flex items-center gap-2 text-gray-400 mt-1">
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        <span className="text-xs">Generating response...</span>
-                    </div>
-                )}
+                <div
+                    ref={messageRef}
+                    className="text-white rounded-lg w-full block md:hidden text-xs"
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(htmlContent),
+                    }}
+                />
             </div>
         </div>
     );

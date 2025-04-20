@@ -9,13 +9,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
-import StripeSection from "./StripeSection";
-import FirebaseSection from "./FirebaseSection";
+import GitHubSection from "./GitHubSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getStripeEnvs } from "@/actions/integration";
-import { getFirebaseEnvs } from "@/actions/integration";
 import { useProjectStore } from "@/stores/project-store";
-import { FirebaseEnv, StripeEnv } from "@/types/integration";
+import DbSection from "@/components/project/services/DbSection";
 
 interface ServicesIntegrationSheetProps {
     isOpen: boolean;
@@ -26,23 +23,13 @@ export const ServicesIntegrationSheet = ({
     isOpen,
     onOpenChange,
 }: ServicesIntegrationSheetProps) => {
-    const [stripeEnv, setStripeEnv] = useState<StripeEnv | null>(null);
-    const [firebaseEnv, setFirebaseEnv] = useState<FirebaseEnv | null>(null);
 
     const { id: projectId } = useProjectStore();
 
     useEffect(() => {
         if (projectId) {
-            setupIntegration();
         }
     }, [projectId]);
-
-    const setupIntegration = async () => {
-        const stripeEnv = await getStripeEnvs(projectId);
-        const firebaseEnv = await getFirebaseEnvs(projectId);
-        setStripeEnv(stripeEnv);
-        setFirebaseEnv(firebaseEnv);
-    };
 
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -50,7 +37,7 @@ export const ServicesIntegrationSheet = ({
                 <Button
                     variant="outline"
                     size="sm"
-                    className="bg-primary-dark border-secondary-dark hover:bg-primary-dark/80 hover:text-white"
+                    className="hidden md:flex  bg-primary-dark border-secondary-dark hover:bg-primary-dark/80 hover:text-white"
                 >
                     <LayoutGrid className="h-4 w-4" />
                     <span className="text-xs font-medium">
@@ -61,7 +48,7 @@ export const ServicesIntegrationSheet = ({
 
             <SheetContent
                 side="right"
-                className="bg-primary-dark border-line-in-dark-bg p-6 w-[350px] text-white"
+                className="sheet-genesoft bg-primary-dark border-line-in-dark-bg p-6 text-white break-words"
             >
                 <SheetHeader>
                     <SheetTitle className="text-white">
@@ -74,14 +61,16 @@ export const ServicesIntegrationSheet = ({
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                     <div className="py-6 space-y-6">
-                        <FirebaseSection
-                            projectId={projectId}
-                            firebaseEnv={firebaseEnv as FirebaseEnv}
-                        />
-                        <StripeSection
-                            projectId={projectId}
-                            stripeEnv={stripeEnv as StripeEnv}
-                        />
+                        <div className={'mb-12'}>
+                            <GitHubSection projectId={projectId} />
+                        </div>
+                        <hr/>
+                        <div className={'mb-12'}>
+                            <DbSection projectId={projectId} />
+                        </div>
+                        <hr/>
+                        <div className={'mb-12'}>
+                        </div>
                     </div>
                 </ScrollArea>
             </SheetContent>

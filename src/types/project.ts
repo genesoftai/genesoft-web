@@ -9,6 +9,9 @@ export interface Project {
     created_at: string;
     updated_at: string;
     branding: Branding;
+    project_template_type: string;
+    backend_requirements: string;
+    sandbox_id?: string;
 }
 
 export interface Page {
@@ -135,6 +138,7 @@ export interface UpdateProjectRequest {
     description?: string;
     purpose?: string;
     target_audience?: string;
+    backend_requirements?: string;
     branding?: {
         logo_url?: string;
         color?: string;
