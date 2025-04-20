@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, Image, BrainCircuit } from "lucide-react";
+import { Send, Loader2, BrainCircuit, Image as ImageIcon } from "lucide-react";
 import { Message } from "@/types/message";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
 import {
@@ -51,11 +51,12 @@ import {
 } from "@/components/ui/tooltip";
 import { LatestIteration } from "@/types/development";
 import { getWebApplicationInfo } from "@/actions/web-application";
-import { ReadyStatus, WebApplicationInfo } from "@/types/web-application";
-import DeploymentStatus from "./Deployment";
 import { toast } from "@/hooks/use-toast";
 import posthog from "posthog-js";
 import GenesoftLoading from "../common/GenesoftLoading";
+import NextJSLogo from "@public/tech/nextjs.jpeg";
+import Image from "next/image";
+import { Project } from "@/types/project";
 
 export type SprintOption = {
     id: string;
@@ -74,6 +75,7 @@ export interface ConversationProps {
     pageId?: string;
     isOnboarding?: boolean;
     onSendImageWithMessage?: (messages: Message[]) => Promise<void>;
+    project: Project;
 }
 
 const Conversation: React.FC<ConversationProps> = ({
@@ -83,6 +85,7 @@ const Conversation: React.FC<ConversationProps> = ({
     onSubmitConversation,
     status,
     onSendImageWithMessage,
+    project,
 }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState("");
@@ -492,6 +495,25 @@ const Conversation: React.FC<ConversationProps> = ({
                                 )}
                             </div>
 
+                            <div className="flex flex-col items-start gap-2">
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={NextJSLogo}
+                                        alt="Web Application"
+                                        width={20}
+                                        height={20}
+                                        className="rounded-md"
+                                    />
+                                    <span className="text-xs font-medium text-gray-400">
+                                        {"Web"}
+                                    </span>
+                                </div>
+
+                                <span className="text-sm text-white font-bold">
+                                    {project?.name}
+                                </span>
+                            </div>
+
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -596,7 +618,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                     </div>
                                 )}
 
-                                {latestIteration?.status === "done" &&
+                                {/* {latestIteration?.status === "done" &&
                                     webApplicationInfo?.readyStatus ===
                                         ReadyStatus.ERROR &&
                                     (!webApplicationInfo?.repositoryBuild
@@ -627,7 +649,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 )}
                                             </Button>
                                         </div>
-                                    )}
+                                    )} */}
                             </div>
                             <style jsx global>{`
                                 .conversation-scrollarea pre,
@@ -746,7 +768,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                                 ?.click();
                                         }}
                                     >
-                                        <Image className="h-4 w-4" />
+                                        <ImageIcon className="h-4 w-4" />
                                     </Button>
                                     <Textarea
                                         value={inputValue}

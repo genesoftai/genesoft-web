@@ -4,14 +4,15 @@ import { getProjectById } from "@/actions/project";
 import PageLoading from "@/components/common/PageLoading";
 import { useProjectStore } from "@/stores/project-store";
 import { Project } from "@/types/project";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import BackendAiAgent from "@/components/project/backend/BackendAiAgent";
 import { useCollectionStore } from "@/stores/collection-store";
 import WebAiAgent from "@/components/project/web/WebAiAgent";
 
 const AiAgentPage = () => {
-    const { id: projectId, updateProjectStore } = useProjectStore();
+    const { projectId } = useParams();
+    const { updateProjectStore } = useProjectStore();
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -21,7 +22,7 @@ const AiAgentPage = () => {
     const setupProject = async () => {
         setLoading(true);
         try {
-            const projectData = await getProjectById(projectId);
+            const projectData = await getProjectById(projectId as string);
             setProject(projectData);
             updateProjectStore(projectData);
         } catch (error) {

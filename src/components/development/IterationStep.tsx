@@ -38,6 +38,7 @@ type Props = {
     tool: string;
     created_at: string;
     updated_at: string;
+    index: number;
 };
 
 const processor = unified()
@@ -83,6 +84,7 @@ const IterationStep = ({
     remark,
     tool,
     created_at,
+    index,
 }: Props) => {
     const [htmlContent, setHtmlContent] = useState("");
 
@@ -99,9 +101,13 @@ const IterationStep = ({
     }, [description]);
 
     return (
-        <Card className="bg-primary-dark border-white/10 hover:shadow-md transition-shadow">
+        <Card className="bg-primary-dark border-white/10 hover:shadow-md transition-shadow w-10/12 overflow-x-scroll">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center gap-2">
+                    <span className="text-xs md:text-sm font-semibold text-white">
+                        {index + 1}.
+                    </span>
+
                     {toolsIcons[tool as keyof typeof toolsIcons] ||
                         statusIcons[status as keyof typeof statusIcons] || (
                             <Info className="w-4 h-4 text-gray-400" />
