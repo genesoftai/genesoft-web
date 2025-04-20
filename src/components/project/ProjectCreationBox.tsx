@@ -643,6 +643,8 @@ const ProjectCreationBox = ({
                     </>
                 )}
 
+                <hr/>
+
                 {backendTemplates.includes(projectType) && (
                     <>
                         {/* Project Description - Hero Style */}

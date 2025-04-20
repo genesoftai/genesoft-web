@@ -8,6 +8,7 @@ import {
     Send,
     Folders,
     Users,
+    RocketIcon,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -350,12 +351,12 @@ export default function Navbar() {
                                     router.push("/signin");
                                 }}
                                 variant="ghost"
-                                className="text-sm font-medium transition-colors bg-transparent text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full"
+                                className="text-sm font-medium transition-colors bg-genesoft text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full"
                             >
-                                Sign in
+                                <b> Sign in </b> <RocketIcon className="ml-1 h-3.5 w-3.5" />
                             </Button>
 
-                            <Button
+                            {/* <Button
                                 onClick={() => {
                                     posthog.capture("click_signup_from_navbar");
                                     router.push("/signup");
@@ -363,7 +364,7 @@ export default function Navbar() {
                                 className="text-sm font-medium transition-colors bg-genesoft hover:bg-genesoft/90 text-white rounded-full px-6"
                             >
                                 Sign Up
-                            </Button>
+                            </Button> */}
                         </div>
                     )}
                 </div>
@@ -460,12 +461,12 @@ export default function Navbar() {
                                             setIsOpen(false);
                                         }}
                                         variant="ghost"
-                                        className="w-full text-sm font-medium transition-colors bg-transparent text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-lg justify-start"
+                                        className="w-full text-sm font-medium transition-colors  bg-genesoft text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-lg justify-start"
                                     >
-                                        Sign in
+                                        <b> Sign in </b> <RocketIcon className="ml-1 h-3.5 w-3.5" />
                                     </Button>
 
-                                    <Button
+                                    {/* <Button
                                         onClick={() => {
                                             posthog.capture(
                                                 "click_signup_from_navbar",
@@ -476,7 +477,7 @@ export default function Navbar() {
                                         className="w-full text-sm font-medium transition-colors bg-genesoft hover:bg-genesoft/90 text-white rounded-lg"
                                     >
                                         Sign Up
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             )}
                         </nav>

@@ -182,17 +182,20 @@ export function ProjectCard({
                 </CardContent>
             )}
 
-            <CardFooter className="flex justify-end md:justify-start self-center md:self-end mt-4">
+            <CardFooter className="flex justify-end md:justify-start mt-4">
+                <div className="text-subtext-in-dark-bg">
+                    Collection: {111}
+                </div>
                 <Button
-                    className="bg-genesoft text-white rounded-lg text-xs md:text-base"
+                    className="ms-auto bg-genesoft text-white rounded-lg text-xs md:text-base"
                     onClick={handleGoToAiAgentWorkspace}
-                >
-                    <span className="text-xs md:text-base">
-                        {isLoading
-                            ? "Loading workspace..."
-                            : "AI Agents workspace"}
-                    </span>
-                </Button>
+                    >
+                        <span className="text-xs md:text-base">
+                            {isLoading
+                                ? "Loading workspace..."
+                                : "AI Agents workspace"}
+                        </span>
+                    </Button>
             </CardFooter>
         </Card>
     );
