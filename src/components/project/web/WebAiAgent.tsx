@@ -15,7 +15,7 @@ import { getActiveConversationByProjectId } from "@/actions/conversation";
 import PageLoading from "@/components/common/PageLoading";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppWindow, MessageSquare, MonitorPlay, Server } from "lucide-react";
+import { AppWindow, MessageSquare, MonitorPlay, Server, ChevronDown } from "lucide-react";
 import { WebPreview } from "../manage/WebPreview";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import Conversation from "@/components/conversation/Conversation";
@@ -26,6 +26,10 @@ import { getLatestIteration } from "@/actions/development";
 import { Toaster } from "sonner";
 import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
 import { LatestIteration } from "@/types/development";
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 type Props = {
     project: Project | null;
@@ -169,9 +173,9 @@ const WebAiAgent = ({
     }
 
     return (
-        <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full">
+        <div className="px-4 flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1 h-full bg-genesoft-dark">
             <Toaster />
-            <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
+            <div style={{borderBottom: "1px solid #222"}} className="ps-0 p-2 pb-4 mb-4 flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
                 <div className="flex items-center gap-4">
                     <Image
                         src={GenesoftBlack}
@@ -186,6 +190,52 @@ const WebAiAgent = ({
                     <div className="flex items-center gap-1">
                         <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
                     </div>
+
+                    <div className="relative md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="ml-2 bg-white text-primary-dark hover:bg-primary-dark hover:text-white"
+                                >
+                                    Settings <ChevronDown className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setIsProjectInfoSheetOpen(true)}>
+                                   Project Info
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsServicesSheetOpen(true)}>
+                                    Services Integration
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsEnvSheetOpen(true)}>
+                                    Environment Variables
+                                </DropdownMenuItem>
+                                {/* <DropdownMenuItem onClick={() => setIsDeploymentSheetOpen(true)}>
+                                    Deployment
+                                </DropdownMenuItem> */}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                <div className="hidden md:flex md:flex-row items-center gap-2">
+                    <WebProjectInfoSheet
+                        isOpen={isProjectInfoSheetOpen}
+                        onOpenChange={setIsProjectInfoSheetOpen}
+                        project={project as Project}
+                        onSave={handleSaveProjectInfo}
+                    />
+                    <ServicesIntegrationSheet
+                        isOpen={isServicesSheetOpen}
+                        onOpenChange={setIsServicesSheetOpen}
+                    />
+                    <EnvironmentVariablesSheet
+                        isOpen={isEnvSheetOpen}
+                        onOpenChange={setIsEnvSheetOpen}
+                    />
+                </div>
+
 
                     {collectionId && web_project_id === projectId && (
                         <Tabs
@@ -215,23 +265,7 @@ const WebAiAgent = ({
                     )}
                 </div>
 
-                <div className="hidden md:flex-row items-center gap-2 md:flex">
-                    <WebProjectInfoSheet
-                        isOpen={isProjectInfoSheetOpen}
-                        onOpenChange={setIsProjectInfoSheetOpen}
-                        project={project as Project}
-                        onSave={handleSaveProjectInfo}
-                    />
-                    <ServicesIntegrationSheet
-                        isOpen={isServicesSheetOpen}
-                        onOpenChange={setIsServicesSheetOpen}
-                    />
-                    <EnvironmentVariablesSheet
-                        isOpen={isEnvSheetOpen}
-                        onOpenChange={setIsEnvSheetOpen}
-                    />
-                </div>
-
+                
                 <Tabs
                     value={activeTabOverview}
                     onValueChange={setActiveTabOverview}
@@ -280,7 +314,7 @@ const WebAiAgent = ({
                             className="flex items-center gap-2"
                         >
                             <MonitorPlay className="h-4 w-4" />
-                            <span>Preview</span>
+                            <span>Preview WEB </span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -307,9 +341,31 @@ const WebAiAgent = ({
 
                     <TabsContent
                         value="preview"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-red-500"
+                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
                     >
-                        <ResizablePanelGroup
+                         <div className="mb-32">
+                            <div className="p-4">
+                                <h3 className="mb-4 text-white text-lg font-bold">Preview</h3>
+                            </div>
+                         <WebPreview
+                                    project={project}
+                                    setActiveTabOverview={setActiveTabOverview}
+                                    isReadyShowPreview={isReadyShowPreview}
+                                    setIsReadyShowPreview={
+                                        setIsReadyShowPreview
+                                    }
+                                    latestIteration={latestIteration}
+                                />
+                         </div>
+                        <hr/>
+                      <div className="p-4 mb-32">
+                        <h3 className="mb-4 text-white text-lg font-bold">Development tasks</h3>
+                            <WebGenerations
+                                        project={project}
+                                        latestIteration={latestIteration}
+                                    />
+                      </div>
+                        {/* <ResizablePanelGroup
                             direction="vertical"
                             className="w-full rounded-lg p-0 gap-1 h-full border-2 border-blue-500 min-h-[400px]"
                         >
@@ -334,7 +390,7 @@ const WebAiAgent = ({
                                     latestIteration={latestIteration}
                                 />
                             </ResizablePanel>
-                        </ResizablePanelGroup>
+                        </ResizablePanelGroup> */}
                     </TabsContent>
                 </Tabs>
             </div>

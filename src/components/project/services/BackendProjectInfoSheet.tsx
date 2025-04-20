@@ -85,7 +85,9 @@ export const BackendProjectInfoSheet = ({
                 <Button
                     variant="outline"
                     size="sm"
-                    className="bg-primary-dark border-secondary-dark hover:bg-white hover:text-primary-dark transition-colors"
+                    className="
+                    hidden md:flex 
+                    bg-primary-dark border-secondary-dark hover:bg-white hover:text-primary-dark transition-colors"
                 >
                     <Edit className="h-4 w-4" />
                     <span className="text-xs font-medium">Project Info</span>

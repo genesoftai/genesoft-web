@@ -6,18 +6,14 @@ import React, { useEffect, useState } from "react";
 import GenesoftBlack from "@public/assets/genesoft-logo-black.png";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AppWindow, MonitorPlay, Server } from "lucide-react";
+import { AppWindow, ChevronDown, MonitorPlay, Server } from "lucide-react";
 import { MessageSquare } from "lucide-react";
 import { getConversationById } from "@/actions/conversation";
 import { getActiveConversationByProjectId } from "@/actions/conversation";
 import PageLoading from "@/components/common/PageLoading";
 import BackendConversation from "@/components/conversation/BackendConversation";
 import { BackendPreview } from "../manage/BackendPreview";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import BackendGenerations from "./BackendGenerations";
 import { useCollectionStore } from "@/stores/collection-store";
 import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
@@ -27,6 +23,13 @@ import DeploymentSheet from "../services/DeploymentSheet";
 import { Toaster } from "sonner";
 import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
 import { LatestIteration } from "@/types/development";
+import {
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 type Props = {
     project: Project;
@@ -166,9 +169,12 @@ const BackendAiAgent = ({
     }
 
     return (
-        <div className="flex flex-col max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 gap-1">
+        <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1">
             <Toaster position="top-center" />
-            <div className="flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white">
+            <div
+                style={{ borderBottom: "1px solid #222" }}
+                className="ps-0 p-2 pb-4 mb-4 flex items-center sm:flex-row justify-between sm:items-center gap-2 text-white"
+            >
                 <div className="flex items-center gap-4">
                     <Image
                         src={GenesoftBlack}
@@ -184,6 +190,69 @@ const BackendAiAgent = ({
                         <SidebarTrigger className="-ml-1 bg-white rounded-md p-1 text-primary-dark hover:bg-primary-dark hover:text-white transition-colors" />
                     </div>
 
+                    <div className="relative md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="ml-2 bg-white text-primary-dark hover:bg-primary-dark hover:text-white"
+                                >
+                                    Settings <ChevronDown className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setIsProjectInfoSheetOpen(true)
+                                    }
+                                >
+                                    Project Info
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setIsServicesSheetOpen(true)}
+                                >
+                                    Services Integration
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setIsEnvSheetOpen(true)}
+                                >
+                                    Environment Variables
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setIsDeploymentSheetOpen(true)
+                                    }
+                                >
+                                    Deployment
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    <div className="hidden md:flex md:flex-row items-center gap-2">
+                        <BackendProjectInfoSheet
+                            isOpen={isProjectInfoSheetOpen}
+                            onOpenChange={setIsProjectInfoSheetOpen}
+                            project={project as Project}
+                            onSave={handleSaveProjectInfo}
+                        />
+
+                        <ServicesIntegrationSheet
+                            isOpen={isServicesSheetOpen}
+                            onOpenChange={setIsServicesSheetOpen}
+                        />
+
+                        <EnvironmentVariablesSheet
+                            isOpen={isEnvSheetOpen}
+                            onOpenChange={setIsEnvSheetOpen}
+                        />
+
+                        <DeploymentSheet
+                            isOpen={isDeploymentSheetOpen}
+                            onOpenChange={setIsDeploymentSheetOpen}
+                        />
+                    </div>
                     {collectionId && (
                         <Tabs
                             defaultValue="web"
@@ -239,7 +308,7 @@ const BackendAiAgent = ({
                 <Tabs
                     value={activeTabOverview}
                     onValueChange={setActiveTabOverview}
-                    className="flex-1 flex flex-col max-w-xs md:max-w-sm rounded-lg"
+                    className="hidden md:flex flex-1 flex-col max-w-xs md:max-w-sm rounded-lg"
                 >
                     <TabsList className="grid self-center w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
                         <TabsTrigger
@@ -257,7 +326,7 @@ const BackendAiAgent = ({
                             onClick={() => setActiveTabOverview("generations")}
                         >
                             <MessageSquare className="h-2 w-2 md:h-4 md:w-4" />
-                            <span>Generations</span>
+                            <span>Development Tasks</span>
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
@@ -310,9 +379,14 @@ const BackendAiAgent = ({
 
                     <TabsContent
                         value="preview"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden"
+                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
                     >
-                        <div className="flex-1">
+                        <div className="mb-32">
+                            <div className="p-4">
+                                <h3 className="mb-4 text-white text-lg font-bold">
+                                    Preview
+                                </h3>
+                            </div>
                             <BackendPreview
                                 project={project}
                                 setActiveTabOverview={setActiveTabOverview}
@@ -321,85 +395,57 @@ const BackendAiAgent = ({
                                 latestIteration={latestIteration}
                             />
                         </div>
+                        <hr />
+                        <div className="p-4 mb-32">
+                            <h3 className="mb-4 text-white text-lg font-bold">
+                                Development tasks
+                            </h3>
+                            <BackendGenerations
+                                project={project}
+                                latestIteration={latestIteration}
+                            />
+                        </div>
                     </TabsContent>
                 </Tabs>
             </div>
-
-            {/* Desktop View - Only visible at md breakpoint and up */}
-            <ResizablePanelGroup
-                direction="horizontal"
-                className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
-            >
-                <ResizablePanel defaultSize={50}>
-                    <BackendConversation
-                        key={`desktop-conversation-${conversationKey}`}
-                        conversationId={conversation?.id || ""}
-                        initialMessages={messages || []}
-                        isLoading={isLoadingSetupPageConversation}
-                        onSubmitConversation={handleSubmitConversation}
-                        status={conversation?.status || ""}
-                        pageId={pathParams?.pageId as string}
-                        onSendImageWithMessage={handleSendImageWithMessage}
-                        project={project}
-                    />
-                </ResizablePanel>
-                <ResizableHandle
-                    className="bg-primary-dark w-1 rounded-full"
-                    withHandle
-                />
-                <ResizablePanel defaultSize={50}>
-                    {activeTabOverview === "preview" && (
-                        <BackendPreview
-                            project={project}
-                            setActiveTabOverview={setActiveTabOverview}
-                            isReadyShowPreview={isReadyShowPreview}
-                            setIsReadyShowPreview={setIsReadyShowPreview}
-                            latestIteration={latestIteration}
-                        />
-                    )}
-                    {activeTabOverview === "generations" && (
-                        <BackendGenerations
-                            project={project}
-                            latestIteration={latestIteration}
-                        />
-                    )}
-                </ResizablePanel>
-            </ResizablePanelGroup>
-            {/* <div className="hidden md:flex flex-1 flex-col lg:flex-row gap-1">
-                <div
-                    className={`flex-1 min-w-0 ${
-                        isCollapsed ? "lg:w-full" : "lg:max-w-[60%]"
-                    } h-[calc(100vh-60px)]`}
+            <div className="hidden md:flex">
+                {/* Desktop View - Only visible at md breakpoint and up */}
+                <ResizablePanelGroup
+                    direction="horizontal"
+                    className="min-h-[200px] w-full rounded-lg md:min-w-[450px] p-0 gap-1 h-full"
                 >
-                    <BackendConversation
-                        key={`desktop-conversation-${conversationKey}`}
-                        conversationId={conversation?.id || ""}
-                        initialMessages={messages || []}
-                        isLoading={isLoadingSetupPageConversation}
-                        onSubmitConversation={handleSubmitConversation}
-                        status={conversation?.status || ""}
-                        pageId={pathParams?.pageId as string}
-                        onSendImageWithMessage={handleSendImageWithMessage}
-                    />
-                </div>
-
-                <Collapsible
-                    className={`transition-all duration-300 ease-in-out ${
-                        isCollapsed ? "w-0 opacity-0" : "flex-1 opacity-100"
-                    } h-[calc(100vh-60px)]`}
-                    open={!isCollapsed}
-                    onOpenChange={(open) => setIsCollapsed(!open)}
-                >
-                    <CollapsibleContent
-                        className="w-full h-full data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up"
-                        forceMount
-                    >
-                        <div className="h-full overflow-auto">
-                            <BackendPreview project={project} />
-                        </div>
-                    </CollapsibleContent>
-                </Collapsible>
-            </div> */}
+                    <ResizablePanel defaultSize={50}>
+                        <BackendConversation
+                            key={`desktop-conversation-${conversationKey}`}
+                            conversationId={conversation?.id || ""}
+                            initialMessages={messages || []}
+                            isLoading={isLoadingSetupPageConversation}
+                            onSubmitConversation={handleSubmitConversation}
+                            status={conversation?.status || ""}
+                            pageId={pathParams?.pageId as string}
+                            onSendImageWithMessage={handleSendImageWithMessage}
+                            project={project}
+                        />
+                    </ResizablePanel>
+                    <ResizablePanel defaultSize={50}>
+                        {activeTabOverview === "preview" && (
+                            <BackendPreview
+                                project={project}
+                                setActiveTabOverview={setActiveTabOverview}
+                                isReadyShowPreview={isReadyShowPreview}
+                                setIsReadyShowPreview={setIsReadyShowPreview}
+                                latestIteration={latestIteration}
+                            />
+                        )}
+                        {activeTabOverview === "generations" && (
+                            <BackendGenerations
+                                project={project}
+                                latestIteration={latestIteration}
+                            />
+                        )}
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            </div>
         </div>
     );
 };

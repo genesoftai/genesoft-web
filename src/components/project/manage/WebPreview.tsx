@@ -196,9 +196,9 @@ export function WebPreview({
                             <WebTerminal
                                 sandboxId={webApplicationInfo?.sandboxId || ""}
                             />
-                            <WebEnv
+                            {/* <WebEnv
                                 sandboxId={webApplicationInfo?.sandboxId || ""}
-                            />
+                            /> */}
 
                             <div className="hidden sm:flex items-center bg-gray-700/50 rounded-full overflow-hidden">
                                 <button

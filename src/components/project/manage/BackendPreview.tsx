@@ -154,9 +154,9 @@ export function BackendPreview({
                                 <RotateCcw className="h-4 w-4 text-white" />
                             </Button>
 
-                            <BackendServiceEnv
+                            {/* <BackendServiceEnv
                                 sandboxId={backendServiceInfo?.sandboxId || ""}
-                            />
+                            /> */}
                             <BackendServiceTerminal
                                 sandboxId={backendServiceInfo?.sandboxId || ""}
                             />

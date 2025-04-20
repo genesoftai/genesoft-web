@@ -67,7 +67,8 @@ export default function LandingPage() {
         backend_requirements: backendRequirements,
         clearCreateProjectStore,
     } = useCreateProjectStore();
-    const { updateCollectionStore } = useCollectionStore();
+    const { updateCollectionStore, clearCollectionStore } =
+        useCollectionStore();
     const [
         isCreatingProjectFromOnboarding,
         setIsCreatingProjectFromOnboarding,
@@ -166,6 +167,7 @@ export default function LandingPage() {
             } else {
                 clearCreateProjectStore();
                 if (res?.project) {
+                    clearCollectionStore();
                     projectId = res.project.id;
                     const projectInfo = await getProjectById(projectId);
                     const organizationInfo = await getOrganizationById(
@@ -318,10 +320,6 @@ export default function LandingPage() {
                             </div>
                         )}
                     </div>
-
-
-
-
                 </section>
 
                 {/* Keyboard-like section inspired by Raycast */}
@@ -388,7 +386,7 @@ export default function LandingPage() {
 
                 {/* <Showcases /> */}
                 {/* Why Genesoft Section */}
-                <section className="py-16  md:py-24 bg-tertiary-dark rounded-t-xl">
+                <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-t-xl">
                     <div className="container mx-auto px-4">
                         <h2 className="text-2xl md:text-6xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                             Why Genesoft
@@ -520,7 +518,6 @@ export default function LandingPage() {
                 </section>
 
                 {/* Keyboard-inspired visual decoration at the bottom */}
-
             </main>
         </div>
     );

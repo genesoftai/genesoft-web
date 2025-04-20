@@ -9,6 +9,12 @@ import {
 } from "@/components/ui/collapsible";
 import { getTextSeparatedUnderScore } from "@/utils/common/text";
 import IterationSteps from "@/components/development/IterationSteps";
+import ProjectManagerImage from "@public/ai-agent/project-manager-ai.png";
+import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
+import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
+import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
+
+import Image from "next/image";
 
 type DevelopmentActivityProps = {
     pollingCount: number;
@@ -37,6 +43,15 @@ const DevelopmentActivity = ({
 
     const removeOpenTaskId = (taskId: string) => {
         setOpenTaskIds((prev) => prev.filter((id) => id !== taskId));
+    };
+
+    const getAiAgentImage = (team: string) => {
+        console.log("team", team);
+        if (team === "project_manager_agent") return ProjectManagerImage;
+        if (team === "backend_developer_agent") return BackendDeveloperImage;
+        if (team === "frontend_developer_agent") return FrontendDeveloperImage;
+        if (team === "ux_ui_designer_agent") return UxUiDesignerImage;
+        return "";
     };
 
     return (
@@ -223,14 +238,27 @@ const DevelopmentActivity = ({
                                                                             }
                                                                         </p>
                                                                         <div className="grid grid-cols-2 gap-2 mt-2">
-                                                                            <div>
-                                                                                <span className="text-gray-400">
-                                                                                    AI
-                                                                                    Agent:
-                                                                                </span>{" "}
-                                                                                {getTextSeparatedUnderScore(
-                                                                                    task.team,
-                                                                                )}
+                                                                            <div className="flex items-center gap-2">
+                                                                                <Image
+                                                                                    src={getAiAgentImage(
+                                                                                        task.team,
+                                                                                    )}
+                                                                                    width={
+                                                                                        30
+                                                                                    }
+                                                                                    height={
+                                                                                        30
+                                                                                    }
+                                                                                    alt={
+                                                                                        task.team
+                                                                                    }
+                                                                                    className="rounded-full"
+                                                                                />
+                                                                                <span>
+                                                                                    {getTextSeparatedUnderScore(
+                                                                                        task.team,
+                                                                                    )}
+                                                                                </span>
                                                                             </div>
                                                                             {task.remark && (
                                                                                 <div className="col-span-2">

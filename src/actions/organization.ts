@@ -66,6 +66,7 @@ export async function getOrganizationProjects(organizationId: string) {
             Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
         },
     });
+    console.log(res.data);
     return res.data;
 }
 
