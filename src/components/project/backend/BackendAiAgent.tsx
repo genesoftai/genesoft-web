@@ -296,7 +296,7 @@ const BackendAiAgent = ({
             </div>
 
             {/* Mobile View (Tabs) - Only visible below md breakpoint */}
-            <div className="md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
+            <div className="w-full md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
@@ -321,7 +321,7 @@ const BackendAiAgent = ({
 
                     <TabsContent
                         value="conversation"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
+                        className="w-full flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full overflow-hidden"
                     >
                           
                         <div className="flex-1 min-w-0 h-auto">

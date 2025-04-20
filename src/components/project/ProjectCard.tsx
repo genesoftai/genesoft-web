@@ -145,43 +145,45 @@ export function ProjectCard({
                     </span>
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
-                    <p className="">
-                        {projectType === "backend"
-                            ? "Backend Requirements"
-                            : "Web Application Description"}
-                    </p>
-                    <p className="text-subtext-in-dark-bg text-xs md:text-sm">
-                        {projectType === "backend"
-                            ? backend_requirements
-                            : description}
-                    </p>
+                    <div className="mb-4">
+                        <p className="">
+                            {projectType === "backend"
+                                ? "Backend Requirements"
+                                : "Web Application Description"}
+                        </p>
+                        <p className="text-subtext-in-dark-bg text-xs md:text-sm">
+                            {projectType === "backend"
+                                ? backend_requirements
+                                : description}
+                        </p>
+                    </div>
+                    {
+                        purpose && purpose.length > 0 && (
+                            <div className="mb-4">
+                                <p className="">
+                                    Purpose
+                                </p>
+                                <p className="text-subtext-in-dark-bg text-xs md:text-sm">
+                                    {purpose}
+                                </p>
+                            </div>
+                        )
+                    }
+                    {
+                        target_audience && target_audience.length > 0 && (
+                            <div className="mb-4">
+                                <p className="">
+                                    Target Audience
+                                </p>
+                                <p className="text-subtext-in-dark-bg text-xs md:text-sm">
+                                    {target_audience}
+                                </p>
+                            </div>
+                        )
+                    }
                 </CardDescription>
             </CardHeader>
             <Separator className="w-full bg-secondary-dark" />
-
-            {projectType === "frontend" && (
-                <CardContent className="mt-4 md:mt-10">
-                    <div className="flex flex-col gap-y-4 w-full">
-                        <div className="flex flex-col space-y-1.5">
-                            <p className="text-white text-sm md:text-base font-bold">
-                                Purpose
-                            </p>
-                            <p className="text-subtext-in-dark-bg text-sm md:text-base">
-                                {purpose}
-                            </p>
-                        </div>
-                        <div className="flex flex-col space-y-1.5">
-                            <p className="text-white text-sm md:text-base font-bold">
-                                Target Audience
-                            </p>
-                            <p className="text-subtext-in-dark-bg text-sm md:text-base">
-                                {target_audience}
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            )}
-
             <CardFooter className="flex justify-end md:justify-start mt-4">
                 {/* <div className="text-subtext-in-dark-bg">
                     Collection: {111}
