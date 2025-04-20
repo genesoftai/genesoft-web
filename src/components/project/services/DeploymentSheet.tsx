@@ -13,7 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useProjectStore } from "@/stores/project-store";
 import { ReadyStatus } from "@/types/web-application";
 import { Badge } from "@/components/ui/badge";
-import { getProjectServices, getSubscribeProject, subscribeProject, viewLogs, reDeployProject } from "@/actions/integration";
+import { getProjectServices, getSubscribeProject, viewLogs, reDeployProject, subscribeDatabaseService } from "@/actions/integration";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 interface DeploymentSheetProps {
@@ -76,7 +76,7 @@ export const DeploymentSheet = ({
             const returnUrl = window.location.href;
             
             // Call the subscription endpoint
-            const response = await subscribeProject(projectId, {
+            const response = await subscribeDatabaseService(projectId, {
                 uid: user.data.user?.id,
                 returnUrl: returnUrl,
             });

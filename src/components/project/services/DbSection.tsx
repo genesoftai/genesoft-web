@@ -121,12 +121,11 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
             <div className="flex items-center space-x-2">
                 <Database className="h-5 w-5" />
                 <h3 className="text-lg font-medium text-white">
-                    Database Integration
+                    Infrastructure Integration
                 </h3>
             </div>
             <p className="text-sm text-subtext-in-dark-bg break-words">
-                Manage your project database by enabling enhanced database
-                features and analytics.
+                Enhanced your project by enabling  database, authentication and deployment instance.
             </p>
             <h4 className="text-sm font-medium text-white">
                 {isSubscribed ? "Database Features Unlocked 🎉" : "Subscribe to Database Services"}
@@ -221,8 +220,9 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                         !isLoading && !isSubscribed && (
                                 <>
                                 <div className="bg-primary-dark/30 p-4 rounded-lg border border-white/10 space-y-2">
-                                    <h4 className="text-sm font-medium text-white">
-                                        Database Information
+                                    <div className="mb-4">
+                                    <h4 className="text-sm font-medium text-white mb-2">
+                                        <b>Database Information</b>
                                     </h4>
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center">
@@ -231,20 +231,59 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm">Storage:</span>
-                                            <span className="text-sm">1GB</span>
+                                            <span className="text-sm">200MB</span>
                                         </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm">Connections:</span>
-                                            <span className="text-sm">Up to 10 concurrent</span>
+                                    </div>
+                                    </div>
+                                    <div className="mb-4 pt-4 border-t border-white/10">
+                                        <h4 className="text-sm font-medium text-white">
+                                           <b> Authentication</b>
+                                        </h4>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium">
+                                                Allow to use our provided Authentication method to integrate with your project.
+                                                Google, Github, Email/Password, etc.
+                                            </span>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                                    </div>
+                                    <div className="mb-4 pt-4 border-t border-white/10">
+                                        <h4 className="text-sm font-medium text-white">
+                                            <b>Deployment Instance</b>
+                                        </h4>
+                                        <div className="space-y-2 mb-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium">
+                                                Allow deploy your project to a cloud instance.
+                                            </span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm">CPU:</span>
+                                                <span className="text-sm">0.25 vCPU</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm">RAM:</span>
+                                                <span className="text-sm">512GB</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm">Disk:</span>
+                                                <span className="text-sm">512GB</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                    <div className="flex justify-between items-center pt-2">
                                             <span className="text-sm font-medium">Price:</span>
                                             <span className="text-sm">$10 per month</span>
                                         </div>
-                                    </div>
+
+                                  
                                 </div>
                                 <p className="text-sm text-yellow-400">
-                                    You need to subscribe to unlock database features.
+                                    You need to subscribe to unlock features.
                                 </p>
                                 <Button
                                     onClick={handleSubscribe}
@@ -258,7 +297,7 @@ export const DbSection = ({ projectId }: DbSectionProps) => {
                                             Redirecting...
                                         </>
                                     ) : (
-                                        `Subscribe to Database Service`
+                                        `Subscribe to Integration Service`
                                     )}
                                 </Button>
                             </>
