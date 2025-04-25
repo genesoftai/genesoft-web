@@ -11,10 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { getWebApplicationInfo } from "@/actions/web-application";
 import GenesoftLoading from "@/components/common/GenesoftLoading";
 import { WebTerminal } from "../web/WebTerminal";
-import { WebEnv } from "../web/WebEnv";
 import { setupWebProjectOnCodesandbox } from "@/actions/codesandbox";
 import { motion } from "framer-motion";
 import { LatestIteration } from "@/types/development";
+import CodeEditor from "@/components/development/CodeEditor";
 
 interface WebPreviewProps {
     project: Project | null;
@@ -114,11 +114,6 @@ export function WebPreview({
         );
     }
 
-    console.log({
-        isReadyShowPreview,
-        latestIteration,
-    });
-
     return (
         <Card
             className={`bg-primary-dark text-white border-none self-center w-full h-full`}
@@ -129,7 +124,7 @@ export function WebPreview({
                 >
                     <div className="w-full bg-gradient-to-r from-gray-900 to-gray-800 border-b border-white/10 p-2 flex flex-col md:flex-row items-center justify-between">
                         {/* Browser controls */}
-                        <div className="flex gap-1.5 items-center">
+                        <div className="flex gap-4 items-center">
                             <div className="flex items-center space-x-2 text-green-500">
                                 <Switch
                                     id="dev-mode"
@@ -147,7 +142,7 @@ export function WebPreview({
                                     htmlFor="dev-mode"
                                     className={`text-white text-xs ${mode === "dev" && "text-green-500"}`}
                                 >
-                                    {"Dev mode"}
+                                    {"Dev"}
                                 </Label>
                             </div>
 
@@ -159,6 +154,8 @@ export function WebPreview({
                             >
                                 <ExternalLink className="h-4 w-4" />
                             </a> */}
+
+                            <CodeEditor projectId={project?.id} />
                         </div>
 
                         <div className="overflow-hidden cursor-pointer">
@@ -218,10 +215,12 @@ export function WebPreview({
                     </div>
 
                     {/* Code sandbox */}
-                    {webApplicationInfo?.url ||
-                    webApplicationInfo?.codesandboxUrl ? (
+                    {webApplicationInfo?.codesandboxPreviewUrl ? (
                         mode === "dev" ? (
-                            <div
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.5 }}
                                 className={`relative flex justify-center w-full h-full pb-8`}
                             >
                                 <iframe
@@ -233,13 +232,16 @@ export function WebPreview({
                                     referrerPolicy="strict-origin-when-cross-origin"
                                     sandbox="allow-scripts allow-same-origin"
                                 ></iframe>
-                            </div>
+                            </motion.div>
                         ) : (
                             <div
                                 className={`relative flex justify-center w-full h-full`}
                             >
-                                {isReadyShowPreview ? (
-                                    <div style={{minHeight: "420px"}} className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8">
+                                {!isReadyShowPreview ? (
+                                    <div
+                                        style={{ minHeight: "420px" }}
+                                        className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8"
+                                    >
                                         <motion.div
                                             className="flex flex-col items-center gap-6 max-w-md"
                                             initial={{ opacity: 0, y: 20 }}
@@ -409,25 +411,35 @@ export function WebPreview({
                             </div>
                         )
                     ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative"
+                        >
                             <div className="absolute inset-0 bg-space-pattern animate-fade bg-cover"></div>
-                            <div className="p-6 rounded-xl bg-black/60 border border-white/5 flex flex-col items-center gap-3 shadow-lg transform transition-transform duration-500 hover:scale-105">
+                            <motion.div
+                                initial={{ scale: 0.9 }}
+                                animate={{ scale: 1 }}
+                                transition={{ duration: 0.5 }}
+                                className="p-6 rounded-xl bg-black/60 border border-white/5 flex flex-col items-center gap-3 shadow-lg transform transition-transform duration-500 hover:scale-105"
+                            >
                                 <Globe className="h-10 w-10 text-blue-300 animate-pulse" />
                                 <p className="text-white text-center text-sm sm:text-base">
-                                    {
-                                        "Loading your latest version of web application..."
-                                    }
+                                    {latestIteration?.status === "done"
+                                        ? "Setting up your web application..."
+                                        : "AI Agent Working on Your Application"}
                                 </p>
                                 <div className="text-xs text-gray-300 max-w-[250px] text-center mt-1">
-                                    {
-                                        "Please hold on while we prepare your application for viewing."
-                                    }
+                                    {latestIteration?.status === "done"
+                                        ? "Almost ready! We're preparing your web application for viewing."
+                                        : "Please hold on while we prepare your application for viewing."}
                                 </div>
                                 <div className="mt-4">
                                     <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
                                 </div>
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     )}
                 </div>
             </CardContent>

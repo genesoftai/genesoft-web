@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { BackendServiceInfo } from "@/types/backend-service";
 import { getBackendServiceInfo } from "@/actions/backend-service";
-import { BackendServiceEnv } from "../backend/BackendServiceEnv";
 import { BackendServiceTerminal } from "../backend/BackendServiceTerminal";
 import { motion } from "framer-motion";
 import { LatestIteration } from "@/types/development";
 import { setupBackendProjectOnCodesandbox } from "@/actions/codesandbox";
+import CodeEditor from "@/components/development/CodeEditor";
 
 interface BackendPreviewProps {
     project: Project | null;
@@ -125,6 +125,8 @@ export function BackendPreview({
                                     {"Dev Mode"}
                                 </Label>
                             </div>
+
+                            <CodeEditor projectId={project?.id} />
                         </div>
 
                         <div className="overflow-hidden cursor-pointer">
@@ -189,8 +191,9 @@ export function BackendPreview({
                             >
                                 {!isReadyShowPreview ? (
                                     <div
-                                    style={{minHeight: "420px"}}
-                                    className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8">
+                                        style={{ minHeight: "420px" }}
+                                        className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8"
+                                    >
                                         <motion.div
                                             className="flex flex-col items-center gap-6 max-w-md"
                                             initial={{ opacity: 0, y: 20 }}

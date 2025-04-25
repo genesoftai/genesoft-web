@@ -19,6 +19,7 @@ import { getFirstCharacterUppercase } from "@/utils/common/text";
 import { AppWindow, Server } from "lucide-react";
 import { useCollectionStore } from "@/stores/collection-store";
 import { getCollectionById } from "@/actions/collection";
+import { formatDateToHumanReadable } from "@/utils/common/time";
 
 interface ProjectCardProps {
     id: string;
@@ -29,6 +30,7 @@ interface ProjectCardProps {
     project_template_type: string;
     backend_requirements: string;
     collectionId?: string;
+    created_at: string;
 }
 
 export function ProjectCard({
@@ -40,6 +42,7 @@ export function ProjectCard({
     project_template_type,
     backend_requirements,
     collectionId,
+    created_at,
 }: ProjectCardProps) {
     const router = useRouter();
     const { updateProjectStore } = useProjectStore();
@@ -146,50 +149,46 @@ export function ProjectCard({
                         )}
                     </span>
                 </CardTitle>
-                <CardDescription className="text-sm md:text-base">
-                    <div className="mb-4">
-                        <p className="">
+                <CardDescription className="flex flex-col items-center text-sm md:text-base">
+                    <div className="gap-2 mb-4 w-full md:w-8/12">
+                        <p className="text-subtext-in-dark-bg">
                             {projectType === "backend"
                                 ? "Backend Requirements"
                                 : "Web Application Description"}
                         </p>
-                        <p className="text-subtext-in-dark-bg text-xs md:text-sm">
+                        <p className=" text-subtext-in-dark-bg text-xs md:text-sm max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white scrollbar-track-transparent p-4 rounded-lg bg-secondary-dark/50">
                             {projectType === "backend"
                                 ? backend_requirements
                                 : description}
                         </p>
                     </div>
-                    {
-                        purpose && purpose.length > 0 && (
-                            <div className="mb-4">
-                                <p className="">
-                                    Purpose
-                                </p>
-                                <p className="text-subtext-in-dark-bg text-xs md:text-sm">
-                                    {purpose}
-                                </p>
-                            </div>
-                        )
-                    }
-                    {
-                        target_audience && target_audience.length > 0 && (
-                            <div className="mb-4">
-                                <p className="">
-                                    Target Audience
-                                </p>
-                                <p className="text-subtext-in-dark-bg text-xs md:text-sm">
-                                    {target_audience}
-                                </p>
-                            </div>
-                        )
-                    }
+                    {purpose && purpose.length > 0 && (
+                        <div className="mb-4">
+                            <p className="">Purpose</p>
+                            <p className="text-subtext-in-dark-bg text-xs md:text-sm">
+                                {purpose}
+                            </p>
+                        </div>
+                    )}
+                    {target_audience && target_audience.length > 0 && (
+                        <div className="mb-4">
+                            <p className="">Target Audience</p>
+                            <p className="text-subtext-in-dark-bg text-xs md:text-sm">
+                                {target_audience}
+                            </p>
+                        </div>
+                    )}
                 </CardDescription>
             </CardHeader>
             <Separator className="w-full bg-secondary-dark" />
             <CardFooter className="flex justify-end md:justify-start mt-4">
-                {/* <div className="text-subtext-in-dark-bg">
-                    Collection: {111}
-                </div> */}
+                <div className="flex flex-row items-center gap-1 text-subtext-in-dark-bg">
+                    <p className="text-xs">Created on</p>
+                    <p className="text-xs">
+                        {formatDateToHumanReadable(created_at)}
+                    </p>
+                </div>
+
                 <Button
                     className="ms-auto bg-genesoft text-white rounded-lg text-xs md:text-base"
                     onClick={handleGoToAiAgentWorkspace}
