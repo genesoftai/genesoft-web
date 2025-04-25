@@ -7,13 +7,15 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { getTextSeparatedUnderScore } from "@/utils/common/text";
+import { getAgentFullName } from "@/utils/common/text";
 import IterationSteps from "@/components/development/IterationSteps";
 import ProjectManagerImage from "@public/ai-agent/project-manager-ai.png";
 import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
 import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
 import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
 import SoftwareArchitectImage from "@public/ai-agent/software-architect-ai.png";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import Image from "next/image";
 
@@ -181,9 +183,13 @@ const DevelopmentActivity = ({
                                                         (task) => (
                                                             <Collapsible
                                                                 key={task.id}
-                                                                open={openTaskIds.includes(
-                                                                    task.id,
-                                                                )}
+                                                                open={
+                                                                    openTaskIds.includes(
+                                                                        task.id,
+                                                                    ) ||
+                                                                    task.status ===
+                                                                        "in_progress"
+                                                                }
                                                                 onOpenChange={() =>
                                                                     toggleTask(
                                                                         task.id,
@@ -192,37 +198,65 @@ const DevelopmentActivity = ({
                                                                 className="border border-white/10 rounded-md overflow-hidden"
                                                             >
                                                                 <CollapsibleTrigger className="flex justify-between items-center w-full p-3 bg-white/5 hover:bg-white/10 transition-colors">
-                                                                    <div className="flex items-center gap-2 text-white">
-                                                                        <span
-                                                                            className={`px-2 py-1 text-xs rounded-full ${
-                                                                                task.status ===
+                                                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-2 text-white">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Image
+                                                                                src={getAiAgentImage(
+                                                                                    task.team,
+                                                                                )}
+                                                                                width={
+                                                                                    30
+                                                                                }
+                                                                                height={
+                                                                                    30
+                                                                                }
+                                                                                alt={
+                                                                                    task.team
+                                                                                }
+                                                                                className="rounded-full"
+                                                                            />
+                                                                        </div>
+
+                                                                        <div className="flex items-center gap-2">
+                                                                            <div className="flex flex-col gap-1 items-start relative">
+                                                                                <span className="absolute top-[-15px] text-xs text-subtext-in-dark-bg">
+                                                                                    {getAgentFullName(
+                                                                                        task.team,
+                                                                                    )}
+                                                                                </span>
+                                                                                <span className="text-sm font-medium ">
+                                                                                    {
+                                                                                        task.name
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+
+                                                                            <span
+                                                                                className={`px-2 py-1 text-xs rounded-full ${
+                                                                                    task.status ===
+                                                                                    "in_progress"
+                                                                                        ? "bg-blue-500/20 text-blue-300"
+                                                                                        : task.status ===
+                                                                                            "completed"
+                                                                                          ? "bg-green-500/20 text-green-300"
+                                                                                          : "bg-yellow-500/20 text-yellow-300"
+                                                                                }`}
+                                                                            >
+                                                                                {task.status ===
                                                                                 "in_progress"
-                                                                                    ? "bg-blue-500/20 text-blue-300"
+                                                                                    ? "In Progress"
                                                                                     : task.status ===
                                                                                         "completed"
-                                                                                      ? "bg-green-500/20 text-green-300"
-                                                                                      : "bg-yellow-500/20 text-yellow-300"
-                                                                            }`}
-                                                                        >
-                                                                            {task.status ===
-                                                                            "in_progress"
-                                                                                ? "In Progress"
-                                                                                : task.status ===
-                                                                                    "completed"
-                                                                                  ? "Completed"
-                                                                                  : "Pending"}
-                                                                        </span>
-                                                                        <span className="text-sm font-medium">
-                                                                            {
-                                                                                task.name
-                                                                            }
-                                                                        </span>
-                                                                        <span className="text-xs text-gray-400">
-                                                                            {task.status ===
-                                                                                "in_progress" && (
-                                                                                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                                                                            )}
-                                                                        </span>
+                                                                                      ? "Completed"
+                                                                                      : "Pending"}
+                                                                            </span>
+                                                                            <span className="text-xs text-gray-400">
+                                                                                {task.status ===
+                                                                                    "in_progress" && (
+                                                                                    <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                                                                                )}
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                     {openTaskIds.includes(
                                                                         task.id,
@@ -234,51 +268,44 @@ const DevelopmentActivity = ({
                                                                 </CollapsibleTrigger>
                                                                 <CollapsibleContent className="p-3 bg-white/5 border-t border-white/10">
                                                                     <div className="flex flex-col gap-2 text-xs text-gray-300">
-                                                                        <p className="mb-2">
-                                                                            {
-                                                                                task.description
-                                                                            }
-                                                                        </p>
-                                                                        <div className="grid grid-cols-2 gap-2 mt-2">
-                                                                            <div className="flex items-center gap-2">
-                                                                                <Image
-                                                                                    src={getAiAgentImage(
-                                                                                        task.team,
-                                                                                    )}
-                                                                                    width={
-                                                                                        30
-                                                                                    }
-                                                                                    height={
-                                                                                        30
-                                                                                    }
-                                                                                    alt={
-                                                                                        task.team
-                                                                                    }
-                                                                                    className="rounded-full"
-                                                                                />
-                                                                                <span>
-                                                                                    {getTextSeparatedUnderScore(
-                                                                                        task.team,
-                                                                                    )}
-                                                                                </span>
-                                                                            </div>
-                                                                            {task.remark && (
-                                                                                <div className="col-span-2">
-                                                                                    <span className="text-gray-400">
-                                                                                        Remark:
-                                                                                    </span>{" "}
-                                                                                    {
-                                                                                        task.remark
-                                                                                    }
-                                                                                </div>
-                                                                            )}
+                                                                        <div className="mb-2">
+                                                                            {task.description
+                                                                                .split(
+                                                                                    "\n",
+                                                                                )
+                                                                                .map(
+                                                                                    (
+                                                                                        line,
+                                                                                        index,
+                                                                                    ) => (
+                                                                                        <ReactMarkdown
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                            remarkPlugins={[
+                                                                                                remarkGfm,
+                                                                                            ]}
+                                                                                        >
+                                                                                            {
+                                                                                                line
+                                                                                            }
+                                                                                        </ReactMarkdown>
+                                                                                    ),
+                                                                                )}
                                                                         </div>
+
                                                                         <IterationSteps
+                                                                            status={
+                                                                                task.status
+                                                                            }
                                                                             iterationTaskId={
                                                                                 task.id
                                                                             }
                                                                             removeOpenTaskId={
                                                                                 removeOpenTaskId
+                                                                            }
+                                                                            agentName={
+                                                                                task.team
                                                                             }
                                                                         />
                                                                     </div>
