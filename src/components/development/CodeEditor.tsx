@@ -35,10 +35,7 @@ import {
 import { toast } from "sonner";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import {
-    buildFileTreeForEditor,
-    processRepositoryTree,
-} from "@/utils/common/codebase";
+import { processRepositoryTree } from "@/utils/common/codebase";
 import { cn } from "@/lib/utils";
 import CSS from "@public/tech/css.png";
 import JS from "@public/tech/javascript.png";

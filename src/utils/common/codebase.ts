@@ -157,7 +157,7 @@ export function convertToNestedTree(treeItems: TreeItem[]): NestedTreeItem[] {
                     }
 
                     // Now add the file to the parent
-                    const parentNode = map[parentPath];
+                    const parentNode: any = map[parentPath];
                     if (parentNode && parentNode.children) {
                         parentNode.children.push(fileNode);
                     }
