@@ -13,6 +13,7 @@ import ProjectManagerImage from "@public/ai-agent/project-manager-ai.png";
 import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
 import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
 import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
+import SoftwareArchitectImage from "@public/ai-agent/software-architect-ai.png";
 
 import Image from "next/image";
 
@@ -51,6 +52,7 @@ const DevelopmentActivity = ({
         if (team === "backend_developer_agent") return BackendDeveloperImage;
         if (team === "frontend_developer_agent") return FrontendDeveloperImage;
         if (team === "ux_ui_designer_agent") return UxUiDesignerImage;
+        if (team === "software_architect_agent") return SoftwareArchitectImage;
         return "";
     };
 

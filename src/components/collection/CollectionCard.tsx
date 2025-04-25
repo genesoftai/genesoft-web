@@ -206,6 +206,7 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                                             ""
                                         }
                                         collectionId={collection.id}
+                                        created_at={webProject.created_at}
                                     />
                                 )}
                             </div>
@@ -244,6 +245,7 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                                                 ""
                                             }
                                             collectionId={collection.id}
+                                            created_at={project.created_at}
                                         />
                                     </div>
                                 ))}

@@ -123,7 +123,7 @@ export const BackendProjectInfoSheet = ({
                     </SheetDescription>
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)] pr-4">
-                    <div className="py-6 space-y-8">
+                    <div className="flex flex-col py-6 space-y-8">
                         <div className="space-y-3">
                             <Label className="text-white font-bold">
                                 Project Name
