@@ -531,6 +531,7 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                     </div>
                                 )}
                             </div>
+                            
                             <style jsx global>{`
                                 .conversation-scrollarea pre,
                                 .conversation-scrollarea code {
@@ -538,7 +539,7 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                     word-break: break-word;
                                     overflow-wrap: break-word;
                                     max-width: 100%;
-                                    overflow-x: auto;
+                                    overflow-x: scroll;
                                 }
 
                                 .conversation-scrollarea p,
@@ -556,9 +557,8 @@ const BackendConversation: React.FC<ConversationProps> = ({
                                 }
 
                                 .conversation-scrollarea table {
-                                    display: block;
-                                    overflow-x: auto;
-                                    max-width: 100%;
+                                    width: 100%;
+                                    // max-width: 120%;
                                 }
                             `}</style>
                         </ScrollArea>
