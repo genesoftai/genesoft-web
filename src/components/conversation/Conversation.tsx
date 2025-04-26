@@ -474,7 +474,7 @@ const Conversation: React.FC<ConversationProps> = ({
                                             size={12}
                                             className="text-blue-400"
                                         />
-                                        Generations:
+                                        Executions:
                                         <span className="text-white font-semibold">
                                             {monthlySprints?.count || 0}
                                         </span>

@@ -8,6 +8,7 @@ import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
 import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
 import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
 import SoftwareArchitectImage from "@public/ai-agent/software-architect-ai.png";
+import TechnicalProjectManagerImage from "@public/ai-agent/technical-project-manager.png";
 import Image from "next/image";
 import { getAgentFullName } from "@/utils/common/text";
 
@@ -25,6 +26,8 @@ const getAiAgentImage = (team: string) => {
     if (team === "frontend_developer_agent") return FrontendDeveloperImage;
     if (team === "ux_ui_designer_agent") return UxUiDesignerImage;
     if (team === "software_architect_agent") return SoftwareArchitectImage;
+    if (team === "technical_project_manager_agent")
+        return TechnicalProjectManagerImage;
     return "";
 };
 

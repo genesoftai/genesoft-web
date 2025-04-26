@@ -54,5 +54,7 @@ export const getAgentFullName = (agentName: string) => {
     if (agentName === "frontend_developer_agent") return "Frontend Developer";
     if (agentName === "ux_ui_designer_agent") return "UX/UI Designer";
     if (agentName === "software_architect_agent") return "Software Architect";
+    if (agentName === "technical_project_manager_agent")
+        return "Technical Project Manager";
     return getTextSeparatedUnderScoreCapitalized(agentName);
 };

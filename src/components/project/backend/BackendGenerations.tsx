@@ -42,13 +42,6 @@ const BackendGenerations = ({ project, latestIteration }: Props) => {
         }
     };
 
-    console.log({
-        message: "backend generations",
-        project,
-        latestIteration,
-        conversationsWithIterations,
-    });
-
     if (
         !latestIteration ||
         !latestIteration.iteration_tasks ||
