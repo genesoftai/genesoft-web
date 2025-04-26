@@ -268,7 +268,7 @@ const DevelopmentActivity = ({
                                                                 </CollapsibleTrigger>
                                                                 <CollapsibleContent className="p-3 bg-white/5 border-t border-white/10">
                                                                     <div className="flex flex-col gap-2 text-xs text-gray-300">
-                                                                        <div className="mb-2">
+                                                                        <div className="mb-2 iteration-pre-wrap">
                                                                             {task.description
                                                                                 .split(
                                                                                     "\n",
