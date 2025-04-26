@@ -268,3 +268,14 @@ body {
     word-wrap: break-word;
 }
 
+.iteration-pre-wrap {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+
+    pre {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+    }
+}
