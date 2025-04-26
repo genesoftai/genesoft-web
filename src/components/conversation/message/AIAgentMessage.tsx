@@ -120,11 +120,11 @@ const AIAgentMessage = ({ message, sender_id }: AIAgentMessageProps) => {
                     </span>
                 </div>
             </div>
-
+           
             <div className="flex-1 min-w-0 max-w-full">
                 <div
                     ref={messageRef}
-                    className="text-white rounded-lg w-full markdown-body markdown-body-assistant hidden md:block"
+                    className="text-white rounded-lg w-full hidden md:block markdown-body markdown-body-assistant"
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(htmlContent),
                     }}
