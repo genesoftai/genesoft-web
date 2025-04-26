@@ -28,6 +28,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteCollection } from "@/actions/collection";
+import { formatDateToHumanReadable } from "@/utils/common/time";
 
 interface CollectionCardProps {
     collectionProps: Collection;
@@ -206,6 +207,7 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                                             ""
                                         }
                                         collectionId={collection.id}
+                                        created_at={webProject.created_at}
                                     />
                                 )}
                             </div>
@@ -244,6 +246,7 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                                                 ""
                                             }
                                             collectionId={collection.id}
+                                            created_at={project.created_at}
                                         />
                                     </div>
                                 ))}
@@ -257,7 +260,13 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                 </Tabs>
             </CardContent>
 
-            <CardFooter className="flex justify-end md:justify-start self-center md:self-end mt-4">
+            <CardFooter className="flex justify-between self-center w-full mt-4">
+                <p className="text-sm text-subtext-in-dark-bg">
+                    <span className="font-bold">{"Created on: "}</span>
+                    <span>
+                        {formatDateToHumanReadable(collection.created_at)}
+                    </span>
+                </p>
                 <ManageCollectionDialog
                     collection={collection}
                     onUpdateCollection={onUpdateCollection}

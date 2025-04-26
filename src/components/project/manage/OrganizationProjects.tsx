@@ -63,6 +63,7 @@ const OrganizationProjects = ({ organizationId }: Props) => {
                                 backend_requirements={
                                     project.backend_requirements
                                 }
+                                created_at={project.created_at}
                             />
                         ))}
                     </div>

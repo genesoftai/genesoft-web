@@ -39,7 +39,7 @@ const pricingTiers: PricingTier[] = [
         price: "$0",
         priceDescription: "Free forever",
         features: [
-            "5 generations per month",
+            "10 executions per month",
             "Maximum 2 team members",
             "No Infrastructure management with AI Agents: Database, Authentication, Storage, and Payments",
             "Email Support",
@@ -53,12 +53,12 @@ const pricingTiers: PricingTier[] = [
         price: "$20",
         priceDescription: "per month",
         features: [
-            "50 generations per month",
+            "50 executions per month",
             "Unlimited team members",
             "Infrastructure management with AI agents: Database, Authentication, Storage, and Payments (coming soon)",
             "Domain setup (coming soon)",
             "Email Support, Infrastructure setup support, Dedicated Support",
-            "Extra generations: $0.3 per generation",
+            "Extra executions: $0.5 per execution",
         ],
         buttonText: "Sign Up",
         highlighted: true,
@@ -96,7 +96,7 @@ const enterpriseTier = {
     description: "Customized solutions for your organization",
     features: [
         "Unlimited projects",
-        "Unlimited generations",
+        "Unlimited executions",
         "2 Environments per project",
         "Advanced LLM (Claude Sonnet 3.7, backup by o3-mini high)",
         "Email Support, Infrastructure setup support, Dedicated Support, and Code Edition Support",
@@ -348,15 +348,16 @@ export default function Subscription() {
                         Glossary
                     </h3>
                     <p className="text-subtext-in-dark-bg mb-4">
-                        <strong className="text-white">Sprint</strong> is 1
-                        round that triggers our Software development AI Agent
-                        team to develop software based on conversation between
-                        your team and Genesoft Project Manager. It has 2 types
-                        including page development and feature development.
+                        <strong className="text-white">Execution</strong> is 1
+                        round that triggers our Software development team of AI
+                        Agents to develop software based on conversation between
+                        you and AI Agents. Create project count into 1
+                        execution. Create Collection (web+backend) count into 2
+                        executions.
                     </p>
                     <p className="text-subtext-in-dark-bg">
-                        Each tier includes a set number of sprints per month.
-                        Additional sprints will be charged according to your
+                        Each tier includes a set number of executions per month.
+                        Additional executions will be charged according to your
                         plan&apos;s overage rate.
                     </p>
                 </div>

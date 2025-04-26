@@ -42,13 +42,6 @@ const BackendGenerations = ({ project, latestIteration }: Props) => {
         }
     };
 
-    console.log({
-        message: "backend generations",
-        project,
-        latestIteration,
-        conversationsWithIterations,
-    });
-
     if (
         !latestIteration ||
         !latestIteration.iteration_tasks ||
@@ -58,9 +51,9 @@ const BackendGenerations = ({ project, latestIteration }: Props) => {
     }
 
     return (
-        <Card className="h-full bg-primary-dark text-white border-none">
+        <Card className="h-full bg-primary-dark text-white border-none" style={{ minWidth: "300px" }}>
             <CardHeader>
-                <CardTitle>Execution History of Project</CardTitle>
+                <CardTitle>Execution Tasks</CardTitle>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[calc(100vh-200px)]">

@@ -13,7 +13,11 @@ import { getActiveConversationByProjectId } from "@/actions/conversation";
 import PageLoading from "@/components/common/PageLoading";
 import BackendConversation from "@/components/conversation/BackendConversation";
 import { BackendPreview } from "../manage/BackendPreview";
-import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import BackendGenerations from "./BackendGenerations";
 import { useCollectionStore } from "@/stores/collection-store";
 import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
@@ -219,13 +223,13 @@ const BackendAiAgent = ({
                                 >
                                     Environment Variables
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
+                                {/* <DropdownMenuItem
                                     onClick={() =>
                                         setIsDeploymentSheetOpen(true)
                                     }
                                 >
                                     Deployment
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -248,10 +252,10 @@ const BackendAiAgent = ({
                             onOpenChange={setIsEnvSheetOpen}
                         />
 
-                        <DeploymentSheet
+                        {/* <DeploymentSheet
                             isOpen={isDeploymentSheetOpen}
                             onOpenChange={setIsDeploymentSheetOpen}
-                        />
+                        /> */}
                     </div>
                     {collectionId && (
                         <Tabs
@@ -281,8 +285,6 @@ const BackendAiAgent = ({
                     )}
                 </div>
 
-              
-
                 <Tabs
                     value={activeTabOverview}
                     onValueChange={setActiveTabOverview}
@@ -311,7 +313,7 @@ const BackendAiAgent = ({
             </div>
 
             {/* Mobile View (Tabs) - Only visible below md breakpoint */}
-            <div className="w-full md:hidden flex-1 flex flex-col w-full items-center overflow-x-scroll">
+            <div className="w-full md:hidden flex-1 flex flex-col items-center overflow-x-scroll">
                 <Tabs
                     value={activeTab}
                     onValueChange={setActiveTab}
@@ -405,6 +407,10 @@ const BackendAiAgent = ({
                             project={project}
                         />
                     </ResizablePanel>
+                    <ResizableHandle
+                        className="bg-primary-dark w-1 rounded-full"
+                        withHandle
+                    />
                     <ResizablePanel defaultSize={50}>
                         {activeTabOverview === "preview" && (
                             <BackendPreview
