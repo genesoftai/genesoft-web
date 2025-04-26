@@ -14,6 +14,7 @@ import BackendDeveloperImage from "@public/ai-agent/backend-developer-ai.png";
 import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
 import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
 import SoftwareArchitectImage from "@public/ai-agent/software-architect-ai.png";
+import TechnicalProjectManagerImage from "@public/ai-agent/technical-project-manager.png";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -55,6 +56,8 @@ const DevelopmentActivity = ({
         if (team === "frontend_developer_agent") return FrontendDeveloperImage;
         if (team === "ux_ui_designer_agent") return UxUiDesignerImage;
         if (team === "software_architect_agent") return SoftwareArchitectImage;
+        if (team === "technical_project_manager_agent")
+            return TechnicalProjectManagerImage;
         return "";
     };
 
@@ -63,7 +66,7 @@ const DevelopmentActivity = ({
             <div className="text-sm font-medium text-gray-300 flex flex-col md:flex-row items-center gap-2 mt-8">
                 <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                    Software Development Activity for latest generation
+                    Software Development Activity for latest execution
                 </div>
                 {pollingCount > 0 && (
                     <span className="text-xs text-gray-400 animate-pulse">

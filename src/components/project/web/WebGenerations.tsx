@@ -42,13 +42,6 @@ const WebGenerations = ({ project, latestIteration }: Props) => {
         }
     };
 
-    console.log({
-        message: "web generations",
-        project,
-        latestIteration,
-        conversationsWithIterations,
-    });
-
     if (
         !latestIteration ||
         !latestIteration.iteration_tasks ||
