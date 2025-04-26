@@ -65,9 +65,9 @@ export const ServicesIntegrationSheet = ({
                             <GitHubSection projectId={projectId} />
                         </div>
                         <hr/>
-                        <div className={'mb-12'}>
+                        {/* <div className={'mb-12'}>
                             <DbSection projectId={projectId} />
-                        </div>
+                        </div> */}
                         <hr/>
                         <div className={'mb-12'}>
                         </div>

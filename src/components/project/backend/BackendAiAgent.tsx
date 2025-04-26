@@ -223,13 +223,13 @@ const BackendAiAgent = ({
                                 >
                                     Environment Variables
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
+                                {/* <DropdownMenuItem
                                     onClick={() =>
                                         setIsDeploymentSheetOpen(true)
                                     }
                                 >
                                     Deployment
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -252,10 +252,10 @@ const BackendAiAgent = ({
                             onOpenChange={setIsEnvSheetOpen}
                         />
 
-                        <DeploymentSheet
+                        {/* <DeploymentSheet
                             isOpen={isDeploymentSheetOpen}
                             onOpenChange={setIsDeploymentSheetOpen}
-                        />
+                        /> */}
                     </div>
                     {collectionId && (
                         <Tabs
