@@ -23,9 +23,16 @@ import { useCreateProjectStore } from "@/stores/create-project-store";
 import { createProjectFromOnboarding, getProjectById } from "@/actions/project";
 import { useGenesoftOrganizationStore } from "@/stores/organization-store";
 
-import Showcases from "./Showcases";
 import ProjectCreationBox from "../project/ProjectCreationBox";
 import { useCollectionStore } from "@/stores/collection-store";
+import Image from "next/image";
+import frontendTeam from "@public/image/genesoft-usage/v2/frontend-team.png";
+import backendTeam from "@public/image/genesoft-usage/v2/backend-team.png";
+import Showcase1 from "@public/image/genesoft-usage/v2/showcase-1.png";
+import ManageEnvironmentVariables from "@public/image/genesoft-usage/v2/environment-variables.png";
+import EditCode from "@public/image/genesoft-usage/v2/code-editor.png";
+import DevMode from "@public/image/genesoft-usage/v2/dev-mode.png";
+import InfrastructureManagement from "@public/image/genesoft-usage/v2/github-integration-and-infrastructure.png";
 
 const StreamingText = ({
     text,
@@ -77,8 +84,8 @@ export default function LandingPage() {
     const { updateGenesoftOrganization } = useGenesoftOrganizationStore();
 
     const heroContent = [
-        "Deliver full stack web app project",
-        "Collaborate with project manager, frontend developer, backend developer AI Agents to build web and backend services for your software project",
+        "Deliver web and backend service",
+        "Collaborate with project manager, frontend developer, backend developer, UX/UI designer, Software Architect AI Agents to deliver your next software project",
         "Build by developer for developer",
     ];
 
@@ -276,7 +283,7 @@ export default function LandingPage() {
                         </h1>
 
                         <h1 className="text-5xl md:text-5xl lg:text-8xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
-                            10x faster
+                            10x Easier
                         </h1>
                         <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
                             with AI Agents
@@ -319,6 +326,235 @@ export default function LandingPage() {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </section>
+
+                {/* Teams */}
+                <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-xl my-8">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-2xl md:text-6xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                            Your own software development team of AI Agents
+                        </h2>
+
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px]">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {"Frontend development team (web)"}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-2">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "Team of AI Agents focus on develop web application for your use case incldue User experience, User interface, and user facing web features."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={frontendTeam}
+                                        alt="Frontend development team"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={frontendTeam}
+                                        alt="Frontend development team"
+                                        width={250}
+                                        height={250}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px]">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {
+                                            "Backend development team (API service)"
+                                        }
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-2">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "Team of AI Agents focus on develop API service for your core business logic, data processing , monitoring, service integration, background jobs, and other advanced backend features."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={backendTeam}
+                                        alt="Backend development team"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={backendTeam}
+                                        alt="Backend development team"
+                                        width={250}
+                                        height={250}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </section>
+
+                {/* How it works */}
+                <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-xl my-8">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-2xl md:text-6xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                            How AI Agents workspace works
+                        </h2>
+
+                        <div className="flex flex-col items-center gap-4">
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px] w-full">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {"Conversation with AI Agents"}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col gap-2 items-center">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "Talk with AI Agents for improve your project, you can ask them to improve your project, add new features, or fix bugs. After conversation done click Execute button to allow AI Agents to work on your project based on your latest conversation."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={Showcase1}
+                                        alt="Conversation with AI Agents"
+                                        width={800}
+                                        height={800}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={Showcase1}
+                                        alt="Conversation with AI Agents"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px] w-full">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {"Manage Environment Variables"}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-2">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "Manage environment variables for your project, you can add, edit, or delete environment variables for your project."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={ManageEnvironmentVariables}
+                                        alt="Manage Environment Variables"
+                                        width={800}
+                                        height={800}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={ManageEnvironmentVariables}
+                                        alt="Manage Environment Variables"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px] w-full">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {"Edit Code"}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-2">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "Edit code for your project, you can edit code for your project based on existing files."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={EditCode}
+                                        alt="Edit Code"
+                                        width={800}
+                                        height={800}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={EditCode}
+                                        alt="Edit Code"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px] w-full">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {"Dev Mode"}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-2">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "You can see development environement that AI Agents using for software development real time. And you can also run baisc command in their development environment."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={DevMode}
+                                        alt="Dev Mode"
+                                        width={800}
+                                        height={800}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={DevMode}
+                                        alt="Dev Mode"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-genesoft-secondary-dark  border-line-in-dark-bg hover:border-genesoft/50 transition-all duration-300 group hover:translate-y-[-4px] w-full">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-lg md:text-xl text-white">
+                                        {
+                                            "Infrastructure Management (Coming Soon)"
+                                        }
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-2">
+                                    <p className="text-subtext-in-dark-bg">
+                                        {
+                                            "You can setup and manage basic infrastructure include database, authentication, and instance for your project. So you can deliver your project faster, cheaper, and more stable with Genesoft."
+                                        }
+                                    </p>
+                                    <Image
+                                        src={InfrastructureManagement}
+                                        alt="Infrastructure Management"
+                                        width={800}
+                                        height={800}
+                                        className="rounded-lg hidden md:block"
+                                    />
+                                    <Image
+                                        src={InfrastructureManagement}
+                                        alt="Infrastructure Management"
+                                        width={400}
+                                        height={400}
+                                        className="rounded-lg block md:hidden"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 </section>
 
@@ -386,7 +622,7 @@ export default function LandingPage() {
 
                 {/* <Showcases /> */}
                 {/* Why Genesoft Section */}
-                <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-t-xl">
+                <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-xl">
                     <div className="container mx-auto px-4">
                         <h2 className="text-2xl md:text-6xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                             Why Genesoft

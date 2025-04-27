@@ -18,7 +18,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-  } from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import { RGBColor } from "react-color";
 import { rgbaToHex } from "@/utils/common/color";
 import { uploadFileFree } from "@/actions/file";
@@ -80,7 +80,7 @@ const ProjectCreationBox = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeSection, setActiveSection] = useState<number>(0);
-    const [projectType, setProjectType] = useState<string>("web");
+    const [projectType, setProjectType] = useState<string>("web-and-backend");
     const [backendRequirements, setBackendRequirements] = useState<string>("");
     const { updateCreateProjectStore } = useCreateProjectStore();
     const { id: user_id } = useGenesoftUserStore();
@@ -249,7 +249,7 @@ const ProjectCreationBox = ({
                         setProjectType(value);
                     }}
                 >
-                    <SelectTrigger className="w-[100%] md:w-full h-18">
+                    <SelectTrigger className="w-[100%] md:w-full h-18 bg-primary-dark">
                         <SelectValue placeholder="Select a project type" />
                     </SelectTrigger>
                     <SelectContent className="w-[200px] md:w-full">
@@ -301,10 +301,9 @@ const ProjectCreationBox = ({
 
                                 <div className="flex flex-col items-start gap-2">
                                     <span className="font-bold">
-                                        Full Stack for Web integrated with
-                                        Backend service (Next.js and Nest.js)
+                                        Full Stack (Next.js and Nest.js)
                                     </span>
-                                    <span className="text-xs hidden md:block">
+                                    <span className="text-xs hidden md:flex">
                                         For professional web application with
                                         advanced backend services use case like
                                         e-commerce, SaaS, Specialized services,
@@ -527,7 +526,7 @@ const ProjectCreationBox = ({
                                         (Optional)
                                     </span>
                                     <div
-                                        style={{height: "36px"}}
+                                        style={{ height: "36px" }}
                                         className="ms-8 flex flex-col items-center gap-1"
                                         // whileHover={{ scale: 1.05 }}
                                         // transition={{
@@ -537,45 +536,47 @@ const ProjectCreationBox = ({
                                     >
                                         <Popover>
                                             <PopoverTrigger>
-                                               <div>
-                                               <motion.div
-                                                className="w-10 display-in h-10 rounded-lg border border-white/20"
-                                                style={{
-                                                    height: "36px",
-                                                    backgroundColor:
-                                                        rgbaToHex(brandColor),
-                                                }}
-                                                animate={{
-                                                    boxShadow: `0 0 15px ${rgbaToHex(brandColor)}`,
-                                                }}
-                                                transition={{
-                                                    duration: 1,
-                                                    repeat: Infinity,
-                                                    repeatType: "reverse",
-                                                }}
-                                               
-                                            />
-                                             <span className="text-xs text-subtext-in-dark-bg">
-                                                {rgbaToHex(brandColor)}
-                                            </span>
-                                               </div>
+                                                <div>
+                                                    <motion.div
+                                                        className="w-10 display-in h-10 rounded-lg border border-white/20"
+                                                        style={{
+                                                            height: "36px",
+                                                            backgroundColor:
+                                                                rgbaToHex(
+                                                                    brandColor,
+                                                                ),
+                                                        }}
+                                                        animate={{
+                                                            boxShadow: `0 0 15px ${rgbaToHex(brandColor)}`,
+                                                        }}
+                                                        transition={{
+                                                            duration: 1,
+                                                            repeat: Infinity,
+                                                            repeatType:
+                                                                "reverse",
+                                                        }}
+                                                    />
+                                                    <span className="text-xs text-subtext-in-dark-bg">
+                                                        {rgbaToHex(brandColor)}
+                                                    </span>
+                                                </div>
                                             </PopoverTrigger>
                                             <PopoverContent>
                                                 <div className="flex">
                                                     <SketchPicker
                                                         color={brandColor}
                                                         onChange={(color) => {
-                                                            setBrandColor(color.rgb);
+                                                            setBrandColor(
+                                                                color.rgb,
+                                                            );
                                                         }}
                                                         className="!bg-primary-dark text-black"
                                                         width="100%"
                                                         disableAlpha={false}
                                                     />
-                                                </div> 
+                                                </div>
                                             </PopoverContent>
                                         </Popover>
-                                        
-                                       
                                     </div>
                                 </Label>
                                 {/* <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8">
@@ -643,7 +644,7 @@ const ProjectCreationBox = ({
                     </>
                 )}
 
-                <hr/>
+                <hr />
 
                 {backendTemplates.includes(projectType) && (
                     <>
