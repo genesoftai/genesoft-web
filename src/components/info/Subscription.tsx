@@ -53,7 +53,7 @@ const pricingTiers: PricingTier[] = [
         price: "$20",
         priceDescription: "per month",
         features: [
-            "50 executions per month",
+            "60 executions per month",
             "Unlimited team members",
             "Infrastructure management with AI agents: Database, Authentication, Storage, and Payments (coming soon)",
             "Domain setup (coming soon)",
