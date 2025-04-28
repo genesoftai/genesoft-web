@@ -13,6 +13,7 @@ import {
     Search,
     Loader2,
     Waypoints,
+    Workflow,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
@@ -329,6 +330,34 @@ export default function LandingPage() {
                     </div>
                 </section>
 
+                <div className="w-full h-fit flex flex-col items-center justify-center">
+                    <h2 className="text-2xl md:text-6xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                        How Genesoft works
+                    </h2>
+
+                    {/* Desktop version */}
+                    <iframe
+                        className="hidden md:block w-8/12 h-[600px]"
+                        src="https://www.youtube.com/embed/JE-8u9FRYz0?si=N2rQn-C-GFNCUtjd"
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                    ></iframe>
+
+                    {/* Mobile version */}
+                    <iframe
+                        className="block md:hidden w-[90%] h-[300px]"
+                        src="https://www.youtube.com/embed/JE-8u9FRYz0?si=N2rQn-C-GFNCUtjd"
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+
                 {/* Teams */}
                 <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-xl my-8">
                     <div className="container mx-auto px-4">
@@ -404,7 +433,8 @@ export default function LandingPage() {
                 <section className="py-16 mx-4  md:py-24 bg-tertiary-dark rounded-xl my-8">
                     <div className="container mx-auto px-4">
                         <h2 className="text-2xl md:text-6xl font-bold mb-4 text-center bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                            How AI Agents workspace works
+                            How Genesoft can help you develop and deliver your
+                            next software project
                         </h2>
 
                         <div className="flex flex-col items-center gap-4">
@@ -628,34 +658,34 @@ export default function LandingPage() {
                             Why Genesoft
                         </h2>
                         <p className="text-lg text-center text-subtext-in-dark-bg/80 mb-16 max-w-3xl mx-auto">
-                            Benefits that set us apart from traditional
-                            development
+                            Different experience that set us apart from other
+                            Coding AI Agents
                         </p>
 
                         <div className="grid mb-24  grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {[
                                 {
-                                    title: "Built for Developer",
+                                    title: "Full Software Development Team of AI Agents",
                                     description:
-                                        "Technical experience of AI Agents integrated with cloud based development experience so you can setup and test web integrated with API service easily",
+                                        "The only one place where you can manage full software development team of AI Agents to develop both web application and backend service.",
                                     icon: UserCheck,
                                 },
                                 {
-                                    title: "Cost Effective",
+                                    title: "Realistic Software Development Workflow",
                                     description:
-                                        "10x cheaper than hiring in-house developer, we empower you to get 10x productivity with AI Agents",
-                                    icon: CircleDollarSign,
+                                        "Genesoft AI Agents consume times more than others Coding AI Agents for each task to do precisely software development workflow like a real software developer who read, write, run command, read server logs, fix errors, research information from the internet, and etc.",
+                                    icon: Workflow,
                                 },
                                 {
-                                    title: "Improve Anytime",
+                                    title: "Infrastructure Management in the workspace (coming soon)",
                                     description:
-                                        "Improve latest version of web application and API service anytime follow your feedback and requirements, no need to waiting for working hour, no sick leave, no holiday, and no motivation issue.",
+                                        "You can setup and manage basic infrastructure include database, authentication, and backend service instance for your project. So you can deliver your project faster, cheaper, and more stable with Genesoft in the workspace.",
                                     icon: Rocket,
                                 },
                                 {
-                                    title: "Separate but integrated",
+                                    title: "Separate projects but integrated",
                                     description:
-                                        "Genesoft help you develop web and API service separately but you can integrated them together so AI Agents can work together",
+                                        "Genesoft AI Agents separate web application and backend service but you can integrated them together so AI Agents can work together between frontend team and backend team to integrate backend service to web application.",
                                     icon: Waypoints,
                                 },
                             ].map((advantage, index) => (
@@ -695,11 +725,13 @@ export default function LandingPage() {
                         <div className="max-w-3xl mx-auto">
                             <h2 className="text-3xl text-center md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-white/70 text-transparent bg-clip-text">
                                 Ready to get your software project done 10x
-                                faster?
+                                effortlessly?
                             </h2>
                             <p className="text-lg text-subtext-in-dark-bg/90 mb-8 max-w-2xl mx-auto">
-                                Get started with your web application and API
-                                service today and see results in day, not week
+                                Get started to manage full software development
+                                team of AI Agents to get your web application
+                                integrated with backend service in days, not
+                                weeks.
                             </p>
 
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4">
@@ -714,7 +746,7 @@ export default function LandingPage() {
                                     className="w-64 md:w-auto px-8 py-6 text-xl bg-genesoft hover:bg-genesoft/90 text-white font-medium rounded-full shadow-lg shadow-genesoft/20 transition-all duration-300 hover:scale-105"
                                 >
                                     <Sparkles className="mr-2 h-5 w-5" /> Get
-                                    your project done now!
+                                    started !
                                 </Button>
 
                                 <Button
