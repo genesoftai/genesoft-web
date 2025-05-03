@@ -9,7 +9,7 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({
     size = "medium",
-    isInCludeText = true,
+    isInCludeText = false,
 }) => {
     let width, height;
 
@@ -34,10 +34,14 @@ const Logo: React.FC<LogoProps> = ({
                 alt={"Genesoft Logo"}
                 width={width}
                 height={height}
-                // className={size === 'small' ? 'flex md:hidden' : 'hidden md:flex'}
+                className={
+                    size === "small" ? "flex md:hidden" : "hidden md:flex"
+                }
             />
             {isInCludeText && (
-                <span className="text-2xl font-bold text-white">Genesoft</span>
+                <span className="text-sm sm:text-base md:text-2xl font-bold text-white">
+                    Genesoft
+                </span>
             )}
         </div>
     );
