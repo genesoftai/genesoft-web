@@ -3,22 +3,24 @@ import { Project } from "@/types/project";
 import { useState, useRef, useEffect } from "react";
 import { WebApplicationInfo } from "@/types/web-application";
 import { Button } from "@/components/ui/button";
-import { Code, Loader2, RotateCcw, Smartphone } from "lucide-react";
-import { Globe } from "lucide-react";
+import { Loader2, RotateCcw, Smartphone } from "lucide-react";
 import { Monitor } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { getWebApplicationInfo } from "@/actions/web-application";
 import GenesoftLoading from "@/components/common/GenesoftLoading";
 import { WebTerminal } from "../web/WebTerminal";
-import { setupWebProjectOnCodesandbox } from "@/actions/codesandbox";
+import {
+    killAllShells,
+    runCommandInCodesandbox,
+    runDevCommandInCodesandboxForWeb,
+} from "@/actions/codesandbox";
 import { motion } from "framer-motion";
 import { LatestIteration } from "@/types/development";
 import CodeEditor from "@/components/development/CodeEditor";
 
 interface WebPreviewProps {
     project: Project | null;
-    setActiveTabOverview?: (tab: string) => void;
     isReadyShowPreview: boolean;
     setIsReadyShowPreview: (isReadyShowPreview: boolean) => void;
     latestIteration: LatestIteration | null;
@@ -28,7 +30,6 @@ type Mode = "normal" | "dev";
 
 export function WebPreview({
     project,
-    setActiveTabOverview,
     isReadyShowPreview,
     setIsReadyShowPreview,
     latestIteration,
@@ -38,6 +39,10 @@ export function WebPreview({
     const [isLoading, setIsLoading] = useState(true);
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
+    const [isLoadingSetupSandbox, setIsLoadingSetupSandbox] = useState(true);
+    const [isRunningInstallCommand, setIsRunningInstallCommand] =
+        useState(false);
+    const [isRunningDevCommand, setIsRunningDevCommand] = useState(false);
 
     const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
 
@@ -75,20 +80,30 @@ export function WebPreview({
 
     const handleSetupWebProjectOnCodesandbox = async () => {
         if (project?.sandbox_id) {
-            await setupWebProjectOnCodesandbox(project.sandbox_id);
+            setIsLoadingSetupSandbox(true);
+            try {
+                await killAllShells(project.sandbox_id);
+                setIsRunningInstallCommand(true);
+                await runCommandInCodesandbox(
+                    project.sandbox_id,
+                    "pnpm install",
+                );
+                setIsRunningInstallCommand(false);
+                setIsRunningDevCommand(true);
+                await runDevCommandInCodesandboxForWeb(project.sandbox_id);
+                setIsRunningDevCommand(false);
+            } catch (error) {
+                console.error(
+                    "Error setting up web project on codesandbox:",
+                    error,
+                );
+                setIsRunningInstallCommand(false);
+                setIsRunningDevCommand(false);
+            } finally {
+                setIsLoadingSetupSandbox(false);
+            }
         }
     };
-
-    const handleOpenDevelopmentTaskTab = () => {
-        if (setActiveTabOverview) {
-            setActiveTabOverview("development-tasks");
-        }
-    };
-
-    console.log({
-        webApplicationInfo,
-        isLoading,
-    });
 
     useEffect(() => {
         if (project?.id) {
@@ -101,22 +116,48 @@ export function WebPreview({
             handleSetupWebProjectOnCodesandbox();
             setIsReadyShowPreview(true);
         }
-    }, [latestIteration]);
+    }, [latestIteration?.status, isReadyShowPreview]);
 
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center w-full h-full">
                 <GenesoftLoading />
                 <p className="text-white text-sm">
-                    Setup Sandbox for your web application...
+                    Loading your web application information...
                 </p>
+            </div>
+        );
+    }
+
+    if (isLoadingSetupSandbox) {
+        return (
+            <div className="flex flex-col items-center justify-center w-full h-full">
+                <GenesoftLoading />
+                <div className="flex flex-col items-center gap-2">
+                    <p className="text-white text-sm">
+                        Setup Sandbox for your web application...
+                    </p>
+                    {isRunningInstallCommand && (
+                        <p className="text-white text-sm flex items-center gap-2">
+                            <span>Installing dependencies...</span>
+                            <Loader2 className="h-4 w-4 text-genesoft animate-spin" />
+                        </p>
+                    )}
+
+                    {isRunningDevCommand && (
+                        <p className="text-white text-sm flex items-center gap-2">
+                            <span>Starting development server...</span>
+                            <Loader2 className="h-4 w-4 text-genesoft animate-spin" />
+                        </p>
+                    )}
+                </div>
             </div>
         );
     }
 
     return (
         <Card
-            className={`bg-primary-dark text-white border-none self-center w-full h-full`}
+            className={`bg-primary-dark text-white  self-center w-full h-full border-none`}
         >
             <CardContent className="flex flex-col items-center gap-6 px-0 h-full">
                 <div
@@ -145,15 +186,6 @@ export function WebPreview({
                                     {"Dev"}
                                 </Label>
                             </div>
-
-                            {/* <a
-                                href={webApplicationInfo?.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-1 rounded-full"
-                            >
-                                <ExternalLink className="h-4 w-4" />
-                            </a> */}
 
                             <CodeEditor projectId={project?.id} />
                         </div>
@@ -184,10 +216,10 @@ export function WebPreview({
                         <div className="flex items-center gap-2">
                             <Button
                                 variant="outline"
-                                className="flex items-center bg-primary-dark border-secondary-dark hover:bg-secondary-dark"
+                                className="flex items-center bg-white"
                                 onClick={handleRefresh}
                             >
-                                <RotateCcw className="h-4 w-4 text-white" />
+                                <RotateCcw className="h-4 w-4 text-black" />
                             </Button>
 
                             <WebTerminal
@@ -215,231 +247,41 @@ export function WebPreview({
                     </div>
 
                     {/* Code sandbox */}
-                    {webApplicationInfo?.codesandboxPreviewUrl ? (
-                        mode === "dev" ? (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                                className={`relative flex justify-center w-full h-full pb-8`}
-                            >
-                                <iframe
-                                    ref={iframeRef}
-                                    className={`relative shadow-xl border border-white/10 w-full h-full`}
-                                    src={`${webApplicationInfo?.codesandboxUrl}?embed=1`}
-                                    title="Web Application Preview"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    referrerPolicy="strict-origin-when-cross-origin"
-                                    sandbox="allow-scripts allow-same-origin"
-                                ></iframe>
-                            </motion.div>
-                        ) : (
-                            <div
-                                className={`relative flex justify-center w-full h-full`}
-                            >
-                                {!isReadyShowPreview ? (
-                                    <div
-                                        style={{ minHeight: "420px" }}
-                                        className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-8"
-                                    >
-                                        <motion.div
-                                            className="flex flex-col items-center gap-6 max-w-md"
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.5 }}
-                                        >
-                                            <motion.div
-                                                className="relative w-24 h-24 flex items-center justify-center"
-                                                animate={{ rotate: 360 }}
-                                                transition={{
-                                                    duration: 8,
-                                                    repeat: Infinity,
-                                                    ease: "linear",
-                                                }}
-                                            >
-                                                <motion.div
-                                                    className="absolute inset-0 rounded-full border-t-4 border-blue-500"
-                                                    animate={{ rotate: 360 }}
-                                                    transition={{
-                                                        duration: 2,
-                                                        repeat: Infinity,
-                                                        ease: "linear",
-                                                    }}
-                                                />
-                                                <motion.div
-                                                    className="absolute inset-2 rounded-full border-t-4 border-purple-500"
-                                                    animate={{ rotate: -360 }}
-                                                    transition={{
-                                                        duration: 3,
-                                                        repeat: Infinity,
-                                                        ease: "linear",
-                                                    }}
-                                                />
-                                                <motion.div
-                                                    className="absolute inset-4 rounded-full border-t-4 border-cyan-500"
-                                                    animate={{ rotate: 360 }}
-                                                    transition={{
-                                                        duration: 4,
-                                                        repeat: Infinity,
-                                                        ease: "linear",
-                                                    }}
-                                                />
-
-                                                <Code className="h-10 w-10" />
-                                            </motion.div>
-
-                                            <motion.h3
-                                                className="text-xl font-semibold text-white text-center"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{
-                                                    delay: 0.3,
-                                                    duration: 0.5,
-                                                }}
-                                            >
-                                                AI Agent Working on Your
-                                                Application
-                                            </motion.h3>
-
-                                            <p className="text-gray-300">
-                                                Web preview will show after
-                                                executing all development tasks.
-                                            </p>
-
-                                            <motion.div
-                                                className="space-y-4 text-center"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{
-                                                    delay: 0.5,
-                                                    duration: 0.5,
-                                                }}
-                                            >
-                                                <div className="flex justify-center gap-2 mt-2">
-                                                    <motion.div
-                                                        className="h-2 w-2 rounded-full bg-blue-500"
-                                                        animate={{
-                                                            scale: [1, 1.5, 1],
-                                                            opacity: [
-                                                                0.7, 1, 0.7,
-                                                            ],
-                                                        }}
-                                                        transition={{
-                                                            duration: 1.5,
-                                                            repeat: Infinity,
-                                                            delay: 0,
-                                                        }}
-                                                    />
-                                                    <motion.div
-                                                        className="h-2 w-2 rounded-full bg-purple-500"
-                                                        animate={{
-                                                            scale: [1, 1.5, 1],
-                                                            opacity: [
-                                                                0.7, 1, 0.7,
-                                                            ],
-                                                        }}
-                                                        transition={{
-                                                            duration: 1.5,
-                                                            repeat: Infinity,
-                                                            delay: 0.5,
-                                                        }}
-                                                    />
-                                                    <motion.div
-                                                        className="h-2 w-2 rounded-full bg-cyan-500"
-                                                        animate={{
-                                                            scale: [1, 1.5, 1],
-                                                            opacity: [
-                                                                0.7, 1, 0.7,
-                                                            ],
-                                                        }}
-                                                        transition={{
-                                                            duration: 1.5,
-                                                            repeat: Infinity,
-                                                            delay: 1,
-                                                        }}
-                                                    />
-                                                </div>
-
-                                                <motion.div
-                                                    className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 mt-4"
-                                                    initial={{
-                                                        opacity: 0,
-                                                        y: 10,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        y: 0,
-                                                    }}
-                                                    transition={{
-                                                        delay: 0.8,
-                                                        duration: 0.5,
-                                                    }}
-                                                >
-                                                    <p className="text-sm text-gray-400">
-                                                        Please check the
-                                                        <span
-                                                            onClick={
-                                                                handleOpenDevelopmentTaskTab
-                                                            }
-                                                            className="mx-2 text-blue-400 underline cursor-pointer"
-                                                        >
-                                                            Development tasks
-                                                            tab
-                                                        </span>
-                                                        for more details on what
-                                                        is happening.
-                                                    </p>
-                                                </motion.div>
-                                            </motion.div>
-                                        </motion.div>
-                                    </div>
-                                ) : (
-                                    <iframe
-                                        ref={iframeRef}
-                                        className={`relative shadow-xl border border-white/10 ${viewMode === "mobile" ? "w-[360px] md:w-[380px] h-[720px]" : "w-full h-full"} rounded-b-lg`}
-                                        src={
-                                            webApplicationInfo?.codesandboxPreviewUrl ||
-                                            webApplicationInfo?.url ||
-                                            ""
-                                        }
-                                        title="Web Application Preview"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        referrerPolicy="strict-origin-when-cross-origin"
-                                        sandbox="allow-scripts allow-same-origin"
-                                    ></iframe>
-                                )}
-                            </div>
-                        )
-                    ) : (
+                    {mode === "dev" ? (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5 }}
-                            className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-blue-900 to-purple-800 rounded-b-lg border border-white/10 overflow-hidden relative"
+                            className={`relative flex justify-center w-full h-full pb-8`}
                         >
-                            <div className="absolute inset-0 bg-space-pattern animate-fade bg-cover"></div>
-                            <motion.div
-                                initial={{ scale: 0.9 }}
-                                animate={{ scale: 1 }}
-                                transition={{ duration: 0.5 }}
-                                className="p-6 rounded-xl bg-black/60 border border-white/5 flex flex-col items-center gap-3 shadow-lg transform transition-transform duration-500 hover:scale-105"
-                            >
-                                <Globe className="h-10 w-10 text-blue-300 animate-pulse" />
-                                <p className="text-white text-center text-sm sm:text-base">
-                                    {latestIteration?.status === "done"
-                                        ? "Setting up your web application..."
-                                        : "AI Agent Working on Your Application"}
-                                </p>
-                                <div className="text-xs text-gray-300 max-w-[250px] text-center mt-1">
-                                    {latestIteration?.status === "done"
-                                        ? "Almost ready! We're preparing your web application for viewing."
-                                        : "Please hold on while we prepare your application for viewing."}
-                                </div>
-                                <div className="mt-4">
-                                    <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
-                                </div>
-                            </motion.div>
+                            <iframe
+                                ref={iframeRef}
+                                className={`relative shadow-xl w-full h-full`}
+                                src={`${webApplicationInfo?.codesandboxUrl}?embed=1`}
+                                title="Web Application Preview"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                sandbox="allow-scripts allow-same-origin"
+                            ></iframe>
                         </motion.div>
+                    ) : (
+                        <div
+                            className={`relative flex justify-center w-full h-[90vh]`}
+                        >
+                            <iframe
+                                ref={iframeRef}
+                                className={`relative shadow-xl ${viewMode === "mobile" ? "w-[360px] h-[720px] md:w-[420px] md:h-[840px]" : "w-full h-full"} rounded-b-lg`}
+                                src={
+                                    webApplicationInfo?.codesandboxPreviewUrl ||
+                                    webApplicationInfo?.url ||
+                                    ""
+                                }
+                                title="Web Application Preview"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                sandbox="allow-scripts allow-same-origin"
+                            ></iframe>
+                        </div>
                     )}
                 </div>
             </CardContent>

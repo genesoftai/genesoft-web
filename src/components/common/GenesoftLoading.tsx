@@ -1,5 +1,5 @@
 import React from "react";
-import GenesoftLogo from "@public/assets/genesoft-logo-black.png";
+import GenesoftNewLogo from "@public/assets/genesoft-new-logo.png";
 import Image from "next/image";
 import { BarLoader } from "react-spinners";
 
@@ -12,7 +12,7 @@ const GenesoftLoading: React.FC<SimpleLoadingProps> = ({ size = 50 }) => {
     return (
         <div className="flex flex-col items-center gap-2">
             <Image
-                src={GenesoftLogo}
+                src={GenesoftNewLogo}
                 alt="Genesoft Logo"
                 width={size}
                 height={size}

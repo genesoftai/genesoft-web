@@ -133,7 +133,7 @@ export default function Footer() {
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-16">
                     <div className="mb-8 md:mb-0 flex flex-col">
-                        <GenesoftLogo />
+                        <GenesoftLogo size="extra-small" />
                         <p className="text-subtext-in-dark-bg mt-4">
                             Empowering software developer to get 10x
                             productivity with Advanced AI Agent technology

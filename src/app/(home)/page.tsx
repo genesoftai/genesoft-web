@@ -10,7 +10,7 @@ export default function Home() {
 
     return (
         <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen gap-16 bg-genesoft-dark text-subtext-in-dark-bg w-full">
-            <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+            <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start my-[-100px] md:my-0">
                 <LandingPage />
             </main>
             <footer className="row-start-4 flex gap-6 flex-wrap items-center justify-center bg-genesoft-dark w-full">
