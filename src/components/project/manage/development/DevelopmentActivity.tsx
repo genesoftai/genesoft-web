@@ -15,10 +15,10 @@ import FrontendDeveloperImage from "@public/ai-agent/frontend-developer-ai.png";
 import UxUiDesignerImage from "@public/ai-agent/ux-ui-deisgner.png";
 import SoftwareArchitectImage from "@public/ai-agent/software-architect-ai.png";
 import TechnicalProjectManagerImage from "@public/ai-agent/technical-project-manager.png";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import "github-markdown-css";
 
 import Image from "next/image";
+import TaskDescription from "@/components/development/TaskDescription";
 
 type DevelopmentActivityProps = {
     pollingCount: number;
@@ -50,7 +50,6 @@ const DevelopmentActivity = ({
     };
 
     const getAiAgentImage = (team: string) => {
-        console.log("team", team);
         if (team === "project_manager_agent") return ProjectManagerImage;
         if (team === "backend_developer_agent") return BackendDeveloperImage;
         if (team === "frontend_developer_agent") return FrontendDeveloperImage;
@@ -129,9 +128,9 @@ const DevelopmentActivity = ({
                                 </div>
                             </CollapsibleTrigger>
 
-                            <CollapsibleContent className="p-4">
+                            <CollapsibleContent className="p-1 md:p-4">
                                 {/* Activity Content */}
-                                <div className="p-4">
+                                <div className="p-1 md:p-4">
                                     <div className="mb-3">
                                         <h4 className="text-sm font-medium mb-2 text-white">
                                             Development Details
@@ -201,7 +200,7 @@ const DevelopmentActivity = ({
                                                                 className="border border-white/10 rounded-md overflow-hidden"
                                                             >
                                                                 <CollapsibleTrigger className="flex justify-between items-center w-full p-3 bg-white/5 hover:bg-white/10 transition-colors">
-                                                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-2 text-white">
+                                                                    <div className="flex items-start md:items-center gap-2 text-white">
                                                                         <div className="flex items-center gap-2">
                                                                             <Image
                                                                                 src={getAiAgentImage(
@@ -220,7 +219,7 @@ const DevelopmentActivity = ({
                                                                             />
                                                                         </div>
 
-                                                                        <div className="flex items-center gap-2">
+                                                                        <div className="flex  items-center gap-2">
                                                                             <div className="flex flex-col gap-1 items-start relative">
                                                                                 <span className="absolute top-[-15px] text-xs text-subtext-in-dark-bg">
                                                                                     {getAgentFullName(
@@ -271,31 +270,11 @@ const DevelopmentActivity = ({
                                                                 </CollapsibleTrigger>
                                                                 <CollapsibleContent className="p-3 bg-white/5 border-t border-white/10">
                                                                     <div className="flex flex-col gap-2 text-xs text-gray-300">
-                                                                        <div className="mb-2 iteration-pre-wrap">
-                                                                            {task.description
-                                                                                .split(
-                                                                                    "\n",
-                                                                                )
-                                                                                .map(
-                                                                                    (
-                                                                                        line,
-                                                                                        index,
-                                                                                    ) => (
-                                                                                        <ReactMarkdown
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                            remarkPlugins={[
-                                                                                                remarkGfm,
-                                                                                            ]}
-                                                                                        >
-                                                                                            {
-                                                                                                line
-                                                                                            }
-                                                                                        </ReactMarkdown>
-                                                                                    ),
-                                                                                )}
-                                                                        </div>
+                                                                        <TaskDescription
+                                                                            description={
+                                                                                task.description
+                                                                            }
+                                                                        />
 
                                                                         <IterationSteps
                                                                             status={

@@ -13,6 +13,7 @@ export interface CreateProjectStore {
     is_onboarding?: boolean;
     project_type?: string;
     backend_requirements?: string;
+    onboarding_conversation_id?: string;
     updateCreateProjectStore: (project: Partial<CreateProjectStore>) => void;
     clearCreateProjectStore: () => void;
     addPage: (page: Page) => void;
@@ -35,6 +36,7 @@ const initialProjectStoreStates = {
     is_onboarding: false,
     project_type: "web",
     backend_requirements: "",
+    onboarding_conversation_id: "",
 };
 
 export const useCreateProjectStore = create<CreateProjectStore>()(

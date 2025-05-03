@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, EyeIcon, EyeOffIcon } from "lucide-react";
+import { ArrowLeft, EyeIcon, EyeOffIcon, Loader } from "lucide-react";
 import { signup } from "@/app/(auth)/signup/actions";
-import SimpleLoading from "@/components/common/SimpleLoading";
 import { useRouter } from "next/navigation";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import posthog from "posthog-js";
@@ -48,7 +47,7 @@ export default function Signup() {
             await signup(formData);
             alert("Sign Up successful, check your email for confirmation");
             setLoading(false);
-            router.push("/dashboard");
+            router.push("/");
         } catch (error) {
             console.error(error);
             setLoading(false);
@@ -238,7 +237,11 @@ export default function Signup() {
                             type="submit"
                             className="w-full bg-primary text-white bg-genesoft hover:bg-genesoft/90"
                         >
-                            {loading ? <SimpleLoading /> : "Signup"}
+                            {loading ? (
+                                <Loader className="w-4 h-4 animate-spin text-white" />
+                            ) : (
+                                "Signup"
+                            )}
                         </Button>
                     </form>
 

@@ -18,12 +18,10 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import BackendGenerations from "./BackendGenerations";
 import { useCollectionStore } from "@/stores/collection-store";
 import BackendProjectInfoSheet from "../services/BackendProjectInfoSheet";
 import { getLatestIteration } from "@/actions/development";
 import ServicesIntegrationSheet from "../services/ServicesIntegrationSheet";
-import DeploymentSheet from "../services/DeploymentSheet";
 import { Toaster } from "sonner";
 import EnvironmentVariablesSheet from "@/components/project/services/EnvironmentVariablesSheet";
 import { LatestIteration } from "@/types/development";
@@ -77,7 +75,6 @@ const BackendAiAgent = ({
 
     const fetchLatestIteration = async () => {
         if (!project?.id) return;
-        console.log("fetchLatestIteration for project", project.id);
         try {
             setIsLoadingLatestIteration(true);
             const data = await getLatestIteration(project.id);
@@ -98,12 +95,6 @@ const BackendAiAgent = ({
         setupProjectGeneration(projectId as string);
     }, [pathParams]);
 
-    useEffect(() => {
-        if (project) {
-            checkLatestIteration();
-        }
-    }, [project]);
-
     const setupActivePageConversation = async (projectId: string) => {
         setLoading(true);
         setIsLoadingSetupPageConversation(true);
@@ -122,22 +113,6 @@ const BackendAiAgent = ({
             setLoading(false);
         }
     };
-    const checkLatestIteration = async () => {
-        if (!project?.id) return;
-
-        try {
-            const data = await getLatestIteration(project.id);
-            if (
-                data.status === "in_progress" ||
-                data.status === "todo" ||
-                !data
-            ) {
-                setActiveTabOverview("generations");
-            }
-        } catch (error) {
-            console.error("Error fetching latest iteration:", error);
-        }
-    };
 
     const handleSubmitConversation = async () => {
         window.location.reload();
@@ -151,6 +126,10 @@ const BackendAiAgent = ({
 
     const handleSaveProjectInfo = async (project: Project) => {
         onSaveProjectInfo(project);
+    };
+
+    const refreshPreview = () => {
+        setIsReadyShowPreview(false);
     };
 
     // Poll for latest iteration every minute
@@ -173,7 +152,7 @@ const BackendAiAgent = ({
     }
 
     return (
-        <div className="px-4 flex flex-col mb-8 max-h-screen p-2 md:p-4 lg:px-2 lg:py-2 flex-1 bg-genesoft-dark">
+        <div className="px-4 flex flex-col mb-8 h-full p-2 md:p-4 lg:px-2 lg:py-2 flex-1 bg-genesoft-dark">
             <Toaster position="top-center" />
             <div
                 style={{ borderBottom: "1px solid #222" }}
@@ -250,6 +229,7 @@ const BackendAiAgent = ({
                         <EnvironmentVariablesSheet
                             isOpen={isEnvSheetOpen}
                             onOpenChange={setIsEnvSheetOpen}
+                            onSetEnv={refreshPreview}
                         />
 
                         {/* <DeploymentSheet
@@ -284,32 +264,6 @@ const BackendAiAgent = ({
                         </Tabs>
                     )}
                 </div>
-
-                <Tabs
-                    value={activeTabOverview}
-                    onValueChange={setActiveTabOverview}
-                    className="hidden md:flex flex-1 flex-col max-w-xs md:max-w-sm rounded-lg"
-                >
-                    <TabsList className="grid self-center w-full grid-cols-2 mb-2 bg-primary-dark text-subtext-in-dark-bg">
-                        <TabsTrigger
-                            value="preview"
-                            className="flex items-center gap-2 text-xs md:text-sm"
-                            onClick={() => setActiveTabOverview("preview")}
-                        >
-                            <MonitorPlay className="h-2 w-2 md:h-4 md:w-4" />
-
-                            <span>Preview</span>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="generations"
-                            className="flex items-center gap-2 text-xs md:text-sm"
-                            onClick={() => setActiveTabOverview("generations")}
-                        >
-                            <MessageSquare className="h-2 w-2 md:h-4 md:w-4" />
-                            <span>Development Tasks</span>
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
             </div>
 
             {/* Mobile View (Tabs) - Only visible below md breakpoint */}
@@ -359,32 +313,14 @@ const BackendAiAgent = ({
 
                     <TabsContent
                         value="preview"
-                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full border-2 border-gray-500"
+                        className="flex-1 flex flex-col data-[state=active]:flex data-[state=inactive]:hidden h-full"
                     >
-                        <div className="mb-32">
-                            <div className="p-4">
-                                <h3 className="mb-4 text-white text-lg font-bold">
-                                    Preview
-                                </h3>
-                            </div>
-                            <BackendPreview
-                                project={project}
-                                setActiveTabOverview={setActiveTabOverview}
-                                isReadyShowPreview={isReadyShowPreview}
-                                setIsReadyShowPreview={setIsReadyShowPreview}
-                                latestIteration={latestIteration}
-                            />
-                        </div>
-                        <hr />
-                        <div className="p-4 mb-32">
-                            <h3 className="mb-4 text-white text-lg font-bold">
-                                Development tasks
-                            </h3>
-                            <BackendGenerations
-                                project={project}
-                                latestIteration={latestIteration}
-                            />
-                        </div>
+                        <BackendPreview
+                            project={project}
+                            isReadyShowPreview={isReadyShowPreview}
+                            setIsReadyShowPreview={setIsReadyShowPreview}
+                            latestIteration={latestIteration}
+                        />
                     </TabsContent>
                 </Tabs>
             </div>
@@ -412,21 +348,12 @@ const BackendAiAgent = ({
                         withHandle
                     />
                     <ResizablePanel defaultSize={50}>
-                        {activeTabOverview === "preview" && (
-                            <BackendPreview
-                                project={project}
-                                setActiveTabOverview={setActiveTabOverview}
-                                isReadyShowPreview={isReadyShowPreview}
-                                setIsReadyShowPreview={setIsReadyShowPreview}
-                                latestIteration={latestIteration}
-                            />
-                        )}
-                        {activeTabOverview === "generations" && (
-                            <BackendGenerations
-                                project={project}
-                                latestIteration={latestIteration}
-                            />
-                        )}
+                        <BackendPreview
+                            project={project}
+                            isReadyShowPreview={isReadyShowPreview}
+                            setIsReadyShowPreview={setIsReadyShowPreview}
+                            latestIteration={latestIteration}
+                        />
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </div>

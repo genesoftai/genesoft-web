@@ -181,7 +181,7 @@ export function ProjectCard({
                 </CardDescription>
             </CardHeader>
             <Separator className="w-full bg-secondary-dark" />
-            <CardFooter className="flex justify-end md:justify-start mt-4">
+            <CardFooter className="flex flex-col md:flex-row justify-end md:justify-start mt-4">
                 <div className="flex flex-row items-center gap-1 text-subtext-in-dark-bg">
                     <p className="text-xs">Created on</p>
                     <p className="text-xs">
@@ -194,9 +194,7 @@ export function ProjectCard({
                     onClick={handleGoToAiAgentWorkspace}
                 >
                     <span className="text-xs md:text-base">
-                        {isLoading
-                            ? "Loading workspace..."
-                            : "AI Agents workspace"}
+                        {isLoading ? "Loading workspace..." : "Go to workspace"}
                     </span>
                 </Button>
             </CardFooter>

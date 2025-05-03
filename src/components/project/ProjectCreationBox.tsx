@@ -1,46 +1,49 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
-    Upload,
     Sparkles,
     Loader2,
-    Palette,
-    AppWindow,
+    MessageSquare,
     Server,
+    AppWindow,
+    Send,
+    ImageIcon,
 } from "lucide-react";
-import { SketchPicker } from "react-color";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { RGBColor } from "react-color";
 import { rgbaToHex } from "@/utils/common/color";
-import { uploadFileFree } from "@/actions/file";
-import posthog from "posthog-js";
+import { RGBColor } from "react-color";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCreateProjectStore } from "@/stores/create-project-store";
 import { useGenesoftUserStore } from "@/stores/genesoft-user-store";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import Image from "next/image";
 import NextJSLogo from "@public/tech/nextjs.jpeg";
 import NestJSLogo from "@public/tech/nestjs.svg";
-import Image from "next/image";
-const webTemplates = ["web", "web-and-backend"];
-
-const backendTemplates = ["backend", "web-and-backend"];
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { uploadFileFree } from "@/actions/file";
+import { toast } from "sonner";
+import { useOnboardingConversationStore } from "@/stores/onboarding-conversation-store";
+import {
+    CreateMessageDto,
+    createOnboardingConversation,
+    getOnboardingConversationById,
+    talkWithAiAgents,
+} from "@/actions/onboarding_conversation";
+import { Message } from "@/types/message";
+import AIAgentMessage from "../conversation/message/AIAgentMessage";
+import SystemMessage from "../conversation/message/SystemMessage";
+import OnboardingUserMessage from "../conversation/message/OnboardingUserMessage";
+import {
+    AlertDialog,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ProjectCreationBoxProps {
     onComplete: (projectData: {
@@ -49,6 +52,7 @@ interface ProjectCreationBoxProps {
         color?: string;
         project_type: string;
         backend_requirements?: string;
+        onboarding_conversation_id?: string;
     }) => void;
     initialValues?: {
         description?: string;
@@ -58,167 +62,282 @@ interface ProjectCreationBoxProps {
     };
 }
 
-const ProjectCreationBox = ({
-    onComplete,
-    initialValues = {},
-}: ProjectCreationBoxProps) => {
-    const [projectDescription, setProjectDescription] = useState(
-        initialValues.description || "",
-    );
-    const [brandingImage, setBrandingImage] = useState<string>(
-        initialValues.logo || "",
-    );
-    const [brandColor, setBrandColor] = useState<RGBColor>({
-        r: 75,
-        g: 107,
-        b: 251,
-        a: 1,
-    }); // Default genesoft-like color
-
-    // Loading states
-    const [isUploading, setIsUploading] = useState(false);
+const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
+    const [projectType, setProjectType] = useState<string>("web-and-backend");
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [inputMessage, setInputMessage] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [activeSection, setActiveSection] = useState<number>(0);
-    const [projectType, setProjectType] = useState<string>("web-and-backend");
-    const [backendRequirements, setBackendRequirements] = useState<string>("");
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const brandColor: RGBColor = { r: 75, g: 107, b: 251, a: 1 }; // Default genesoft-like color
+    const [checkWeb, setCheckWeb] = useState(true);
+    const [checkBackend, setCheckBackend] = useState(true);
+    const [isLoadingSendMessage, setIsLoadingSendMessage] = useState(false);
+    const [imageUploadUrl, setImageUploadUrl] = useState<string>("");
+    const [fileId, setFileId] = useState<string>("");
+    const [isImageMessageDialogOpen, setIsImageMessageDialogOpen] =
+        useState<boolean>(false);
+    const [isSendingImageWithMessage, setIsSendingImageWithMessage] =
+        useState<boolean>(false);
+
+    const [imageMessage, setImageMessage] = useState<string>("");
+
     const { updateCreateProjectStore } = useCreateProjectStore();
     const { id: user_id } = useGenesoftUserStore();
-    // Animation effect for section transitions
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (activeSection < 3) {
-                setActiveSection((prev) => prev + 1);
-            }
-        }, 300);
+    const {
+        id: onboarding_conversation_id,
+        updateOnboardingConversationStore,
+    } = useOnboardingConversationStore();
 
-        return () => clearTimeout(timer);
-    }, [activeSection]);
-
-    // File upload handler
-    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setIsUploading(true);
-        setError(null);
+    const handleSendMessage = async () => {
+        setIsLoadingSendMessage(true);
+        console.log("inputMessage", inputMessage);
+        if (!inputMessage.trim()) {
+            toast.error("Please enter a message");
+            setIsLoadingSendMessage(false);
+            return;
+        }
 
         try {
-            const timestamp = new Date().getTime();
-            const fileName = `New Project branding - ${timestamp}`;
-            const description = `Brand image for project New Project`;
+            const newMessage: CreateMessageDto = {
+                content: inputMessage,
+                sender_type: "user",
+                message_type: "text",
+            };
 
-            const res = await uploadFileFree(
-                "project_creation",
-                fileName,
-                description,
-                "branding_logo",
-                file,
-            );
+            const tempMessage: Message = {
+                id: "temp-message-id",
+                content: inputMessage,
+                sender_type: "user",
+                message_type: "text",
+                sender_id: user_id,
+                created_at: new Date(),
+                updated_at: new Date(),
+                conversation_id: onboarding_conversation_id,
+                sender: {
+                    name: "User",
+                    image: "https://github.com/shadcn.png",
+                    email: "user@genesoft.com",
+                },
+            };
+            setInputMessage("");
+            setMessages((prev) => [...prev, tempMessage]);
 
-            if (res.error) {
-                posthog.capture("project_creation_logo_upload_failed", {
-                    error: res.error,
-                });
-                setError(res.error);
-                return;
-            }
-
-            setBrandingImage(res.url);
-        } catch (err) {
-            posthog.capture("project_creation_logo_upload_error", {
-                error: String(err),
+            const res = await talkWithAiAgents({
+                conversation_id: onboarding_conversation_id,
+                message: newMessage,
             });
-            setError("Failed to upload image. Please try again.");
+
+            console.log("res", res);
+
+            setMessages(res.messages);
+            setInputMessage("");
+        } catch (err) {
             console.error(err);
         } finally {
-            setIsUploading(false);
+            setIsLoadingSendMessage(false);
         }
     };
 
-    // Form submission
     const handleSubmit = async () => {
-        if (projectType === "web" && !projectDescription.trim()) {
-            setError("Project description is required");
-            return;
-        }
-
-        if (
-            projectType === "web-and-backend" &&
-            (!projectDescription.trim() || !backendRequirements.trim())
-        ) {
+        if (messages.length === 0) {
             setError(
-                "Project description and backend requirements are required",
+                "Please have at least one conversation before creating your project",
             );
-            return;
-        }
-
-        if (projectType === "backend" && !backendRequirements.trim()) {
-            setError("Backend requirements are required");
             return;
         }
 
         setIsSubmitting(true);
         setError(null);
 
-        if (projectType === "web") {
-            updateCreateProjectStore({
-                description: projectDescription,
-                branding: {
-                    logo_url: brandingImage,
-                    color: rgbaToHex(brandColor),
-                    theme: "",
-                    perception: "",
-                },
-                is_onboarding: user_id ? false : true,
-                project_type: projectType,
-            });
-        } else if (projectType === "backend") {
-            updateCreateProjectStore({
-                backend_requirements: backendRequirements,
-                is_onboarding: user_id ? false : true,
-                project_type: projectType,
-            });
-        } else if (projectType === "web-and-backend") {
-            updateCreateProjectStore({
-                description: projectDescription,
-                branding: {
-                    logo_url: brandingImage,
-                    color: rgbaToHex(brandColor),
-                    theme: "",
-                    perception: "",
-                },
-                backend_requirements: backendRequirements,
-                is_onboarding: user_id ? false : true,
-                project_type: projectType,
-            });
+        let template = "";
+        if (checkBackend && checkWeb) {
+            template = "web-and-backend";
+        } else if (checkBackend && !checkWeb) {
+            template = "backend";
+        } else if (checkWeb && !checkBackend) {
+            template = "web";
         }
 
+        // Extract project description from chat
+        const formattedMessages = messages
+            .map((message) => {
+                return `[${message.sender?.name}] ${message.content}`;
+            })
+            .join("\n");
+
         try {
-            posthog.capture("project_creation_submission", {
-                has_logo: !!brandingImage,
-                has_color: true,
+            updateCreateProjectStore({
+                description: formattedMessages,
+                branding: {
+                    logo_url: "",
+                    color: rgbaToHex(brandColor),
+                    theme: "",
+                    perception: "",
+                },
+                is_onboarding: user_id ? false : true,
+                project_type: template,
+                backend_requirements:
+                    template === "backend" || template === "web-and-backend"
+                        ? formattedMessages
+                        : undefined,
+                onboarding_conversation_id: onboarding_conversation_id,
             });
-            console.log({
-                message: "create project from onboarding ProjectCreationBox",
-            });
+
             onComplete({
-                description: projectDescription,
-                logo: brandingImage,
+                description: formattedMessages,
                 color: rgbaToHex(brandColor),
-                project_type: projectType,
-                backend_requirements: backendRequirements,
+                project_type: template,
+                backend_requirements:
+                    template === "backend" || template === "web-and-backend"
+                        ? formattedMessages
+                        : undefined,
+                onboarding_conversation_id: onboarding_conversation_id,
             });
         } catch (err) {
-            posthog.capture("project_creation_submission_failed", {
-                error: String(err),
-            });
             setError("Failed to create project. Please try again.");
             console.error(err);
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    const handleImageUpload = async (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const timestamp = new Date().getTime();
+            const fileName = `${"onboarding-conversation"}-${timestamp}`;
+            const description = `Image for conversation ${"onboarding-conversation"}`;
+
+            const res = await uploadFileFree(
+                "conversation",
+                fileName,
+                description,
+                "image",
+                file,
+            );
+
+            if (res.error) {
+                toast.error("Failed to upload image. Please try again.", {
+                    description: res.error,
+                    duration: 5000,
+                    position: "top-center",
+                });
+                return;
+            }
+
+            setImageUploadUrl(res.url);
+            setFileId(res.id);
+            // Open the image message dialog after successful upload
+            setIsImageMessageDialogOpen(true);
+        } catch (err) {
+            toast.error("Failed to upload image. Please try again.");
+            console.error(err);
+        }
+    };
+
+    // Handle sending image with message
+    const handleSendImageWithMessage = async () => {
+        console.log({
+            imageUploadUrl,
+            imageMessage,
+            fileId,
+        });
+        if (!imageUploadUrl) return;
+
+        if (!imageMessage.trim()) {
+            toast.error("Please enter a message");
+            setIsSendingImageWithMessage(false);
+            return;
+        }
+
+        const newMessage: CreateMessageDto = {
+            content: imageMessage,
+            sender_type: "user",
+            message_type: "image",
+            sender_id: user_id,
+            file_ids: [fileId],
+        };
+
+        setIsSendingImageWithMessage(true);
+        let updatedMessages: Message[] = [];
+        try {
+            const tempMessage: Message = {
+                id: "temp-message-id",
+                content: imageMessage,
+                sender_type: "user",
+                message_type: "image",
+                file_ids: [fileId],
+                created_at: new Date(),
+                updated_at: new Date(),
+                conversation_id: onboarding_conversation_id,
+                image_url: imageUploadUrl,
+                sender: {
+                    name: "User",
+                    image: "https://github.com/shadcn.png",
+                    email: "user@genesoft.com",
+                },
+            };
+            setMessages([...messages, tempMessage]);
+
+            const result = await talkWithAiAgents({
+                conversation_id: onboarding_conversation_id,
+                message: newMessage,
+            });
+            updatedMessages = result?.messages;
+        } catch (error) {
+            console.error("Error sending message:", error);
+        } finally {
+            setIsSendingImageWithMessage(false);
+            setIsImageMessageDialogOpen(false);
+            setImageMessage("");
+            setImageUploadUrl("");
+            setMessages(updatedMessages);
+        }
+    };
+
+    const setupOnboardingConversation = async () => {
+        const res = await createOnboardingConversation();
+        updateOnboardingConversationStore({
+            id: res.id,
+        });
+    };
+
+    const setupOnboardingConversationMessages = async () => {
+        try {
+            const res = await getOnboardingConversationById(
+                onboarding_conversation_id,
+            );
+            setMessages(res.messages);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // Handle cancel image message
+    const handleCancelImageMessage = () => {
+        setImageMessage("");
+        setImageUploadUrl("");
+        setIsImageMessageDialogOpen(false);
+    };
+
+    useEffect(() => {
+        if (onboarding_conversation_id) {
+            setupOnboardingConversationMessages();
+        } else {
+            setupOnboardingConversation();
+        }
+    }, [onboarding_conversation_id]);
+
+    console.log({
+        message: "onboarding_conversation_id",
+        onboarding_conversation_id,
+        messages,
+    });
 
     return (
         <motion.div
@@ -240,506 +359,295 @@ const ProjectCreationBox = ({
                     repeatType: "reverse",
                 },
             }}
-            className="w-full max-w-3xl mx-auto bg-tertiary-dark rounded-xl border border-line-in-dark-bg shadow-lg overflow-hidden backdrop-blur-sm"
+            className="w-full backdrop-blur-md rounded-xl shadow-lg overflow-hidden flex flex-col relative"
         >
-            <div className="p-6 space-y-5 ">
-                <Select
-                    defaultValue={projectType}
-                    onValueChange={(value) => {
-                        setProjectType(value);
-                    }}
-                >
-                    <SelectTrigger className="w-[100%] md:w-full h-18 bg-primary-dark">
-                        <SelectValue placeholder="Select a project type" />
-                    </SelectTrigger>
-                    <SelectContent className="w-[200px] md:w-full">
-                        <SelectGroup>
-                            <SelectLabel className="text-gray-500">
-                                Project Type
-                            </SelectLabel>
-                            <SelectItem
-                                value="web"
-                                className="flex items-center gap-2"
+            <div className="flex flex-col h-full relative z-10">
+                <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
+                    <p className="text-sm md:text-xl text-white/80 mb-4 text-start">
+                        Project Setup
+                    </p>
+                    <div
+                        className="flex flex-col md:flex-row gap-2 md:gap-8 mb-4"
+                        id="project-type-toggle"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="web"
+                                className="border-genesoft text-genesoft h-6 w-6"
+                                checked={checkWeb}
+                                onCheckedChange={(checked) =>
+                                    setCheckWeb(checked === true)
+                                }
+                            />
+                            <Label
+                                htmlFor="web"
+                                className={`text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 p-1 md:p-2 rounded-md`}
                             >
-                                <Image
-                                    src={NextJSLogo}
-                                    alt="Next.js"
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full"
-                                />
-                                <div className="flex flex-col items-start gap-2">
-                                    <span className="font-bold">
-                                        Web (Next.js)
-                                    </span>
-                                    <span className="text-xs hidden md:block">
-                                        For static websites like portfolio,
-                                        blog, landing pages, and etc
-                                    </span>
-                                </div>
-                            </SelectItem>
-                            <SelectItem
-                                value="web-and-backend"
-                                className="flex items-center gap-2"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Image
-                                        src={NextJSLogo}
-                                        alt="Next.js"
-                                        width={20}
-                                        height={20}
-                                        className="rounded-full"
-                                    />
-                                    <Image
-                                        src={NestJSLogo}
-                                        alt="Nest.js"
-                                        width={20}
-                                        height={20}
-                                        className="rounded-full"
-                                    />
-                                </div>
+                                <AppWindow className="h-4 w-4" />
+                                <span>Web (NextJS)</span>
+                            </Label>
+                            <Image
+                                src={NextJSLogo}
+                                alt="Next.js"
+                                width={20}
+                                height={20}
+                                className="rounded-full"
+                            />
+                        </div>
 
-                                <div className="flex flex-col items-start gap-2">
-                                    <span className="font-bold">
-                                        Full Stack (Next.js and Nest.js)
-                                    </span>
-                                    <span className="text-xs hidden md:flex">
-                                        For professional web application with
-                                        advanced backend services use case like
-                                        e-commerce, SaaS, Specialized services,
-                                        and complex data processing systems
-                                    </span>
-                                </div>
-                            </SelectItem>
-                            <SelectItem
-                                value="backend"
-                                className="flex items-center gap-2"
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="backend"
+                                className="border-genesoft  text-genesoft h-6 w-6"
+                                checked={checkBackend}
+                                onCheckedChange={(checked) =>
+                                    setCheckBackend(checked === true)
+                                }
+                            />
+                            <Label
+                                htmlFor="backend"
+                                className={`text-xs md:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 p-1 md:p-2 rounded-md`}
                             >
-                                <Image
-                                    src={NestJSLogo}
-                                    alt="Nest.js"
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full"
-                                />
-                                <div className="flex flex-col items-start gap-2">
-                                    <span className="font-bold">
-                                        Backend service (Nest.js)
-                                    </span>
-                                    <span className="text-xs hidden md:block">
-                                        For specialized services or
-                                        microservices architecture like API
-                                        services, developer services, and
-                                        complex data processing systems
-                                    </span>
-                                </div>
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+                                <Server className="h-4 w-4" />
+
+                                <span>Backend (NestJS)</span>
+                            </Label>
+                            <Image
+                                src={NestJSLogo}
+                                alt="Nest.js"
+                                width={20}
+                                height={20}
+                                className="rounded-full"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <AnimatePresence>
                     {error && (
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="bg-red-500/10 border border-red-500/30 rounded-md p-3 text-red-400 text-sm"
+                            className="bg-red-500/10 border border-red-500/30 rounded-md p-3 text-red-400 text-sm mb-4"
                         >
                             {error}
                         </motion.div>
                     )}
                 </AnimatePresence>
-
-                {webTemplates.includes(projectType) && (
-                    <>
-                        {/* Project Description - Hero Style */}
-                        <motion.div
-                            className="flex flex-col space-y-2"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{
-                                opacity: activeSection >= 1 ? 1 : 0,
-                                x: activeSection >= 1 ? 0 : -20,
-                            }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                        >
-                            {projectType === "web-and-backend" && (
-                                <Label
-                                    htmlFor="project-description"
-                                    className="text-white flex items-center text-xl font-bold self-start gap-2"
+                {/* Chat messages */}
+                <div className="self-center flex-1 overflow-y-auto bg-primary-dark/30 backdrop-blur-sm rounded-md p-1 md:p-4 mb-4 max-w-[420px] max-h-[580px] min-h-[500px] w-full md:max-w-[1024px] md:max-h-[600px] md:min-h-[600px] border-[1px] border-tertiary-dark mx-2 md:mx-4">
+                    {messages?.length === 0 ? (
+                        <div className="flex items-center justify-center h-full text-gray-400 text-center">
+                            <div>
+                                <MessageSquare className="h-12 w-12 mx-auto mb-3 text-genesoft/50" />
+                                <p className="text-xs md:text-base">
+                                    Start a conversation with your own software
+                                    development team by describe your project
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-4 overflow-y-scroll items-center">
+                            {messages?.map((message, index) => (
+                                <div
+                                    key={message.id}
+                                    className={`flex flex-col group w-full overflow-hidden px-1 md:px-4 text-start`}
                                 >
-                                    <AppWindow className="w-4 h-4 mr-2 text-genesoft" />
-                                    <p className="text-xl  font-bold text-genesoft">
-                                        Web Frontend requirements (Next.js)
-                                    </p>
-                                    <Image
-                                        src={NextJSLogo}
-                                        alt="Next.js"
-                                        width={20}
-                                        height={20}
-                                        className="rounded-full"
-                                    />
-                                </Label>
-                            )}
-                            <Label
-                                htmlFor="project-description"
-                                className="text-white flex items-center text-lg font-bold"
-                            >
-                                What idea do you want to build
-                            </Label>
-                            <Textarea
-                                id="project-description"
-                                placeholder="ex. E-commerce website for a small business, SaaS for remote teams, Platform for creating and selling NFTs, and etc."
-                                value={projectDescription}
-                                onChange={(e) =>
-                                    setProjectDescription(e.target.value)
-                                }
-                                className="bg-primary-dark border-line-in-dark-bg text-white min-h-[150px] focus:ring-2 focus:ring-genesoft/50 transition-all duration-300"
-                            />
-                        </motion.div>
-
-                        <motion.div
-                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{
-                                opacity: activeSection >= 2 ? 1 : 0,
-                                y: activeSection >= 2 ? 0 : 20,
-                            }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                        >
-                            {/* Project Logo (Optional) */}
-                            <div className="space-y-2">
-                                <Label
-                                    htmlFor="branding-image"
-                                    className="text-white flex items-center"
-                                >
-                                    <Upload className="h-4 w-4 mr-2 text-genesoft" />
-                                    Project Logo{" "}
-                                    <span className="text-gray-400 text-xs ml-2">
-                                        (Optional)
-                                    </span>
-                                    <span className="flex  items-center gap-2">
-                                        <Input
-                                            type="file"
-                                            id="branding-image"
-                                            className="hidden"
-                                            accept="image/*"
-                                            onChange={handleLogoUpload}
+                                    {message.sender_type === "system" ? (
+                                        <SystemMessage message={message} />
+                                    ) : message.sender_type === "user" ? (
+                                        <OnboardingUserMessage
+                                            message={message}
                                         />
-                                        <Label htmlFor="branding-image">
-                                            <Button
-                                                variant="outline"
-                                                className="ms-8 cursor-pointer flex items-center gap-2 border-line-in-dark-bg hover:bg-genesoft/20 hover:text-white transition-all duration-300 text-black"
-                                                onClick={() => {
-                                                    document
-                                                        .getElementById(
-                                                            "branding-image",
-                                                        )
-                                                        ?.click();
-                                                }}
-                                                disabled={isUploading}
-                                            >
-                                                <Upload className="h-4 w-4" />
-                                                {isUploading
-                                                    ? "Uploading..."
-                                                    : "Upload Logo"}
-                                            </Button>
-                                        </Label>
-                                    </span>
-                                </Label>
-
-                                <div className="space-y-2">
-                                    {/* <div className="flex items-center gap-2">
-                                        <Input
-                                            type="file"
-                                            id="branding-image"
-                                            className="hidden"
-                                            accept="image/*"
-                                            onChange={handleLogoUpload}
+                                    ) : (
+                                        <AIAgentMessage
+                                            message={message}
+                                            messagesLength={messages?.length}
+                                            index={index}
+                                            status={status}
+                                            sender_id={message.sender_id || ""}
                                         />
-                                        <Label htmlFor="branding-image">
-                                            <Button
-                                                variant="outline"
-                                                className="cursor-pointer flex items-center gap-2 border-line-in-dark-bg hover:bg-genesoft/20 hover:text-white transition-all duration-300 text-black"
-                                                onClick={() => {
-                                                    document
-                                                        .getElementById(
-                                                            "branding-image",
-                                                        )
-                                                        ?.click();
-                                                }}
-                                                disabled={isUploading}
-                                            >
-                                                <Upload className="h-4 w-4" />
-                                                {isUploading
-                                                    ? "Uploading..."
-                                                    : "Upload Logo"}
-                                            </Button>
-                                        </Label>
-                                    </div> */}
-
-                                    <AnimatePresence>
-                                        {brandingImage && (
-                                            <motion.div
-                                                initial={{
-                                                    opacity: 0,
-                                                    scale: 0.9,
-                                                }}
-                                                animate={{
-                                                    opacity: 1,
-                                                    scale: 1,
-                                                }}
-                                                exit={{
-                                                    opacity: 0,
-                                                    scale: 0.9,
-                                                }}
-                                                className="relative w-full h-24 border border-line-in-dark-bg rounded-lg overflow-hidden bg-primary-dark group"
-                                            >
-                                                <motion.img
-                                                    src={brandingImage}
-                                                    alt="Brand logo"
-                                                    className="w-full h-full object-contain transition-all duration-300 group-hover:scale-105"
-                                                    initial={{
-                                                        filter: "blur(10px)",
-                                                    }}
-                                                    animate={{
-                                                        filter: "blur(0px)",
-                                                    }}
-                                                    transition={{
-                                                        duration: 0.5,
-                                                    }}
-                                                />
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                    )}
                                 </div>
-                            </div>
-
-                            {/* Branding Color (Optional) */}
-                            <div className="space-y-2">
-                                <Label
-                                    htmlFor="brand-color"
-                                    className="text-white flex items-center"
-                                >
-                                    <Palette className="h-4 w-4 mr-2 text-genesoft" />
-                                    Brand Color{" "}
-                                    <span className="text-gray-400 text-xs ml-2">
-                                        (Optional)
-                                    </span>
-                                    <div
-                                        style={{ height: "36px" }}
-                                        className="ms-8 flex flex-col items-center gap-1"
-                                        // whileHover={{ scale: 1.05 }}
-                                        // transition={{
-                                        //     type: "spring",
-                                        //     stiffness: 300,
-                                        // }}
-                                    >
-                                        <Popover>
-                                            <PopoverTrigger>
-                                                <div>
-                                                    <motion.div
-                                                        className="w-10 display-in h-10 rounded-lg border border-white/20"
-                                                        style={{
-                                                            height: "36px",
-                                                            backgroundColor:
-                                                                rgbaToHex(
-                                                                    brandColor,
-                                                                ),
-                                                        }}
-                                                        animate={{
-                                                            boxShadow: `0 0 15px ${rgbaToHex(brandColor)}`,
-                                                        }}
-                                                        transition={{
-                                                            duration: 1,
-                                                            repeat: Infinity,
-                                                            repeatType:
-                                                                "reverse",
-                                                        }}
-                                                    />
-                                                    <span className="text-xs text-subtext-in-dark-bg">
-                                                        {rgbaToHex(brandColor)}
-                                                    </span>
-                                                </div>
-                                            </PopoverTrigger>
-                                            <PopoverContent>
-                                                <div className="flex">
-                                                    <SketchPicker
-                                                        color={brandColor}
-                                                        onChange={(color) => {
-                                                            setBrandColor(
-                                                                color.rgb,
-                                                            );
-                                                        }}
-                                                        className="!bg-primary-dark text-black"
-                                                        width="100%"
-                                                        disableAlpha={false}
-                                                    />
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                    </div>
-                                </Label>
-                                {/* <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8">
-                                     <div className="flex-grow">
-                                        <SketchPicker
-                                            color={brandColor}
-                                            onChange={(color) => {
-                                                setBrandColor(color.rgb);
-                                            }}
-                                            className="!bg-primary-dark text-black"
-                                            width="100%"
-                                            disableAlpha={false}
-                                        />
-                                    </div> 
-                                </div> */}
-                            </div>
-                        </motion.div>
-
-                        {/* Create Button */}
-                        {projectType === "web" && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{
-                                    opacity: activeSection >= 3 ? 1 : 0,
-                                    y: activeSection >= 3 ? 0 : 20,
-                                }}
-                                transition={{ duration: 0.5, delay: 0.3 }}
-                                className="flex justify-center mt-2"
-                            >
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+                    )}
+                </div>
+                {/* Message input and team member selector */}
+                <div className="flex flex-col gap-4 mx-2 md:mx-4">
+                    <div className="flex flex-col w-full gap-2 h-fit">
+                        <div className="relative flex flex-col w-full bg-[#2b2d31] rounded-md p-1 h-fit">
+                            {isLoadingSendMessage ? (
+                                <div className="flex items-center justify-center h-full text-gray-400 text-center gap-2">
+                                    <Loader2 className="h-8 w-8 animate-spin text-genesoft" />
+                                    <p className="text-xs md:text-base">
+                                        AI Agents are thinking...
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 w-full">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="image-upload"
+                                        className="hidden"
+                                        onChange={handleImageUpload}
+                                    />
                                     <Button
-                                        onClick={handleSubmit}
-                                        disabled={
-                                            isSubmitting ||
-                                            !projectDescription.trim()
-                                        }
-                                        className="px-8 bg-genesoft hover:bg-genesoft/90 text-white font-medium py-5 rounded-lg shadow-lg shadow-genesoft/20 transition-all duration-300"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-gray-400 hover:text-gray-300 relative md:absolute left-2 md:bottom-[-50px] z-10 h-2 w-2 md:h-10 md:w-20 bg-tertiary-dark hover:bg-tertiary-dark/80"
+                                        onClick={() => {
+                                            document
+                                                .getElementById("image-upload")
+                                                ?.click();
+                                        }}
                                     >
-                                        {isSubmitting
-                                            ? "Creating ..."
-                                            : "Create Project"}
-                                        {isSubmitting ? (
-                                            <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                                        <ImageIcon className="h-2 w-2 md:h-10 md:w-10 text-white hover:text-gray-300" />
+                                        <span className="text-white hidden md:block">
+                                            Image
+                                        </span>
+                                    </Button>
+                                    <Textarea
+                                        value={inputMessage}
+                                        onChange={(e) =>
+                                            setInputMessage(e.target.value)
+                                        }
+                                        placeholder="Send a message to your own software development team..."
+                                        className="text-xs md:text-base min-h-20 md:min-h-40 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white conversation-textarea w-full"
+                                        onKeyDown={(e) => {
+                                            if (
+                                                e.key === "Enter" &&
+                                                !e.shiftKey
+                                            ) {
+                                                e.preventDefault();
+                                                handleSendMessage();
+                                            }
+                                        }}
+                                    />
+
+                                    <Button
+                                        onClick={handleSendMessage}
+                                        disabled={
+                                            inputMessage.trim() === "" ||
+                                            isLoadingSendMessage
+                                        }
+                                        className={`rounded-md w-8 h-8 flex md:hidden ${inputMessage.trim() === "" ? "bg-[#4b4b4b] text-gray-400" : "bg-[#1e62d0] hover:bg-[#1a56b8] text-white"}`}
+                                    >
+                                        {isLoadingSendMessage ? (
+                                            <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-t-transparent border-white rounded-full animate-spin conversation-loading"></div>
                                         ) : (
-                                            <motion.div
-                                                animate={{
-                                                    rotate: [0, 15, -15, 0],
-                                                }}
-                                                transition={{
-                                                    duration: 1.5,
-                                                    repeat: Infinity,
-                                                    repeatType: "loop",
-                                                }}
-                                            >
-                                                <Sparkles className="w-4 h-4 ml-2" />
-                                            </motion.div>
+                                            <Send size={8} />
                                         )}
                                     </Button>
-                                </motion.div>
-                            </motion.div>
-                        )}
-                    </>
-                )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                <hr />
+                    {/* Image Message Dialog */}
+                    <AlertDialog
+                        open={isImageMessageDialogOpen}
+                        onOpenChange={setIsImageMessageDialogOpen}
+                    >
+                        <AlertDialogContent className="bg-primary-dark border-line-in-dark-bg text-white max-w-[90%] md:max-w-[620px] rounded-lg flex flex-col">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Add a message to your image
+                                </AlertDialogTitle>
+                                <AlertDialogDescription className="text-subtext-in-dark-bg">
+                                    Your image has been uploaded. Would you like
+                                    to add a message to go with it?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
 
-                {backendTemplates.includes(projectType) && (
-                    <>
-                        {/* Project Description - Hero Style */}
-                        <motion.div
-                            className="flex flex-col space-y-3" // Increased spacing slightly
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{
-                                opacity: activeSection >= 1 ? 1 : 0,
-                                x: activeSection >= 1 ? 0 : -20,
-                            }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                        >
-                            <Label
-                                htmlFor="backend-requirements"
-                                className="text-white flex items-center text-xl font-bold self-start gap-2" // Use text-xl for prominence
-                            >
-                                <Server className="w-5 h-5 mr-2 text-genesoft" />{" "}
-                                <p className="text-xl font-bold text-genesoft">
-                                    Backend Service Requirements (Nest.js)
-                                </p>
-                                <Image
-                                    src={NestJSLogo}
-                                    alt="Nest.js"
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full"
-                                />
-                            </Label>
-                            <Label
-                                htmlFor="project-description"
-                                className="text-white flex items-center text-lg font-bold"
-                            >
-                                Describe the core features, APIs, data models,
-                                authentication, and integrations.
-                            </Label>
+                            {imageUploadUrl && (
+                                <div className="w-full mb-2 px-2 flex items-center justify-center gap-2 z-10 relative self-center">
+                                    <img
+                                        src={imageUploadUrl}
+                                        alt="Upload preview"
+                                        className="max-h-60 max-w-full object-contain rounded-md hover:opacity-90 transition-opacity block"
+                                    />
+                                </div>
+                            )}
 
-                            <Textarea
-                                id="backend-requirements" // Updated id
-                                placeholder="e.g., User authentication (JWT), REST API for products (CRUD), Order processing logic, Integration with Stripe for payments..." // Updated placeholder
-                                value={backendRequirements} // Assuming this state holds backend requirements for this project type
-                                onChange={(e) =>
-                                    setBackendRequirements(e.target.value)
-                                }
-                                className="bg-primary-dark border-line-in-dark-bg text-white min-h-[150px] focus:ring-2 focus:ring-genesoft/50 transition-all duration-300"
-                                rows={6} // Suggest a reasonable number of rows
-                            />
-                        </motion.div>
-
-                        {/* Create Button */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{
-                                opacity: activeSection >= 3 ? 1 : 0,
-                                y: activeSection >= 3 ? 0 : 20,
-                            }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                            className="flex justify-center mt-2"
-                        >
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                <Button
-                                    onClick={handleSubmit}
-                                    disabled={
-                                        isSubmitting ||
-                                        !backendRequirements.trim()
+                            <div className="my-4">
+                                <Textarea
+                                    value={imageMessage}
+                                    onChange={(e) =>
+                                        setImageMessage(e.target.value)
                                     }
-                                    className="px-8 bg-genesoft hover:bg-genesoft/90 text-white font-medium py-5 rounded-lg shadow-lg shadow-genesoft/20 transition-all duration-300"
+                                    placeholder="Type your message here..."
+                                    className="min-h-[100px] border-tertiary-dark bg-neutral-700 text-white placeholder:text-neutral-400"
+                                    disabled={isSendingImageWithMessage}
+                                />
+                            </div>
+
+                            <AlertDialogFooter>
+                                <AlertDialogCancel
+                                    className="bg-secondary-dark text-white border-line-in-dark-bg hover:bg-secondary-dark/80 hover:text-white"
+                                    onClick={handleCancelImageMessage}
+                                    disabled={isSendingImageWithMessage}
                                 >
-                                    {isSubmitting
-                                        ? "Creating ..."
-                                        : "Create Project"}
-                                    {isSubmitting ? (
-                                        <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                                    ) : (
-                                        <motion.div
-                                            animate={{
-                                                rotate: [0, 15, -15, 0],
-                                            }}
-                                            transition={{
-                                                duration: 1.5,
-                                                repeat: Infinity,
-                                                repeatType: "loop",
-                                            }}
-                                        >
-                                            <Sparkles className="w-4 h-4 ml-2" />
-                                        </motion.div>
+                                    Cancel
+                                </AlertDialogCancel>
+                                <Button
+                                    onClick={handleSendImageWithMessage}
+                                    className="bg-genesoft text-white hover:bg-genesoft/80 flex items-center gap-2"
+                                    disabled={isSendingImageWithMessage}
+                                >
+                                    {isSendingImageWithMessage
+                                        ? "AI Agent thinking..."
+                                        : "Send"}
+                                    {isSendingImageWithMessage && (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
                                     )}
                                 </Button>
-                            </motion.div>
-                        </motion.div>
-                    </>
-                )}
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex justify-center mt-2"
+                    >
+                        <div className="flex flex-col items-center gap-2  p-2 md:p-4">
+                            <p className="text-xs md:text-base text-white/80">
+                                {
+                                    "Once you think team are understanding requirements correctly, click create to start building your project"
+                                }
+                            </p>
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={
+                                    isSubmitting || messages?.length === 0
+                                }
+                                className="w-fit px-4 md:px-8 bg-genesoft hover:bg-genesoft/90 text-white font-medium py-2 md:py-6 rounded-lg shadow-lg shadow-genesoft/20 transition-all duration-300 text-xs md:text-base"
+                            >
+                                {isSubmitting ? "Creating ..." : "Create"}
+                                {isSubmitting ? (
+                                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                                ) : (
+                                    <motion.div
+                                        animate={{
+                                            rotate: [0, 15, -15, 0],
+                                        }}
+                                        transition={{
+                                            duration: 1.5,
+                                            repeat: Infinity,
+                                            repeatType: "loop",
+                                        }}
+                                    >
+                                        <Sparkles className="w-4 h-4 ml-2" />
+                                    </motion.div>
+                                )}
+                            </Button>
+                        </div>
+                    </motion.div>
+                </div>
             </div>
         </motion.div>
     );

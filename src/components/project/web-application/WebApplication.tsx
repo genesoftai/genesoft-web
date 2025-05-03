@@ -87,7 +87,7 @@ const WebApplication = ({
                             htmlFor="dev-mode"
                             className={`text-white text-xs ${mode === "dev" && "text-green-500"}`}
                         >
-                            {"Dev mode"}
+                            {"Dev"}
                         </Label>
                     </div>
 

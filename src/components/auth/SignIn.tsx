@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInWithEmail, resetPassword } from "@/app/(auth)/signin/actions";
-import { ArrowLeft, EyeIcon, EyeOffIcon } from "lucide-react";
+import { ArrowLeft, EyeIcon, EyeOffIcon, Loader } from "lucide-react";
 import { validateEmail } from "@/utils/auth/email";
 import { useRouter } from "next/navigation";
-import SimpleLoading from "@/components/common/SimpleLoading";
 import { createSupabaseClient } from "@/utils/supabase/client";
 import GenesoftLogo from "@/components/common/GenesoftLogo";
 import posthog from "posthog-js";
@@ -51,9 +50,9 @@ export default function SignIn() {
     const supabase = createSupabaseClient();
 
     const heroContent = [
-        "AI Agent workspace for small business and startup team",
-        "Help you get on-demand web application anytime with 10x cheaper cost by collaborate with your team and AI Agent",
-        "Built for non-technical product owner and startup founder who need to make idea come true but don't have a lot of funding and technical background and limited budget",
+        "AI Agents workspace for software development",
+        "Help you get on-demand full stack web application and backend service anytime with 10x cheaper cost by collaborate with software development team of AI Agents",
+        "Built for software developer and technical startup founder who need to reduce workload and delegate tasks to AI Agents instead.",
     ];
 
     const nextStage = () => {
@@ -74,7 +73,7 @@ export default function SignIn() {
             });
 
             if (data) {
-                router.push("/dashboard");
+                router.push("/");
             }
             setLoading(false);
         } catch (error) {
@@ -170,7 +169,7 @@ export default function SignIn() {
                 {/* <p className="text-6xl font-medium text-genesoft hidden lg:block">
           Genesoft
         </p> */}
-                <GenesoftLogo size="big" />
+                <GenesoftLogo size="big" isInCludeText={true} />
 
                 <section className="flex flex-col space-y-4 py-12 text-center px-4">
                     <h1 className="text-2xl font-bold tracking-tight text-genesoft">
@@ -275,7 +274,11 @@ export default function SignIn() {
                             type="submit"
                             className="w-full bg-primary text-white bg-genesoft hover:bg-genesoft/90 cursor-pointer"
                         >
-                            {loading ? <SimpleLoading /> : "Sign in"}
+                            {loading ? (
+                                <Loader className="w-4 h-4 animate-spin text-white" />
+                            ) : (
+                                "Sign in"
+                            )}
                         </Button>
                     </form>
 
