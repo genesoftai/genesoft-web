@@ -39,7 +39,7 @@ export function WebPreview({
     const [isLoading, setIsLoading] = useState(true);
     const [webApplicationInfo, setWebApplicationInfo] =
         useState<WebApplicationInfo | null>(null);
-    const [isLoadingSetupSandbox, setIsLoadingSetupSandbox] = useState(true);
+    const [isLoadingSetupSandbox, setIsLoadingSetupSandbox] = useState(false);
     const [isRunningInstallCommand, setIsRunningInstallCommand] =
         useState(false);
     const [isRunningDevCommand, setIsRunningDevCommand] = useState(false);

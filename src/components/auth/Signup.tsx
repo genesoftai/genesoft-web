@@ -47,7 +47,7 @@ export default function Signup() {
             await signup(formData);
             alert("Sign Up successful, check your email for confirmation");
             setLoading(false);
-            router.push("/dashboard");
+            router.push("/");
         } catch (error) {
             console.error(error);
             setLoading(false);

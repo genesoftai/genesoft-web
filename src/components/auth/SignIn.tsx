@@ -73,7 +73,7 @@ export default function SignIn() {
             });
 
             if (data) {
-                router.push("/dashboard");
+                router.push("/");
             }
             setLoading(false);
         } catch (error) {
