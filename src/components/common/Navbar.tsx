@@ -211,7 +211,7 @@ export default function Navbar() {
         >
             <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6 lg:px-8">
                 <Link href="/" className="flex items-center">
-                    <GenesoftLogo size="extra-small" />
+                    <GenesoftLogo size="extra-small" isInCludeText={true} />
                 </Link>
 
                 <div className="hidden md:flex items-center">
