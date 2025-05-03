@@ -212,7 +212,7 @@ const IterationStep = ({
     }, [description]);
 
     return (
-        <Card className="bg-primary-dark border-white/10 hover:shadow-md transition-shadow w-10/12 overflow-x-scroll">
+        <Card className="my-4 bg-primary-dark border-white/10 hover:shadow-md transition-shadow w-full overflow-x-scroll">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center gap-2">
                     <span className="text-xs md:text-sm font-semibold text-white">

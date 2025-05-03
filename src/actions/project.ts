@@ -400,6 +400,7 @@ export type CreateProjectFromOnboardingDto = {
     };
     project_type: string;
     backend_requirements?: string;
+    onboarding_conversation_id?: string;
 };
 
 export async function createProjectFromOnboarding(

@@ -11,6 +11,7 @@ import SoftwareArchitectImage from "@public/ai-agent/software-architect-ai.png";
 import TechnicalProjectManagerImage from "@public/ai-agent/technical-project-manager.png";
 import Image from "next/image";
 import { getAgentFullName } from "@/utils/common/text";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 type Props = {
     iterationTaskId: string;
@@ -20,7 +21,6 @@ type Props = {
 };
 
 const getAiAgentImage = (team: string) => {
-    console.log("team", team);
     if (team === "project_manager_agent") return ProjectManagerImage;
     if (team === "backend_developer_agent") return BackendDeveloperImage;
     if (team === "frontend_developer_agent") return FrontendDeveloperImage;
@@ -73,27 +73,23 @@ const IterationSteps = ({ iterationTaskId, status, agentName }: Props) => {
         }
     }, [iterationTaskId, status]);
 
-    console.log({
-        message: "IterationSteps: iteration steps by iteration task id",
-        iterationTaskId,
-        iterationSteps,
-    });
-
     return (
-        <div className="relative flex flex-col items-center gap-4">
+        <div className="relative flex flex-col items-center gap-4 border-t-2 border-gray-700 pt-4">
             {loading ? (
                 <div className="flex justify-center items-center h-full">
                     <p>Loading iteration steps...</p>
                     <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                 </div>
             ) : (
-                iterationSteps.map((iterationStep, index) => (
-                    <IterationStep
-                        key={iterationStep.id}
-                        {...iterationStep}
-                        index={index}
-                    />
-                ))
+                <ScrollArea className="w-full max-h-[300px] md:max-h-[500px] overflow-y-scroll overflow-x-scroll">
+                    {iterationSteps.map((iterationStep, index) => (
+                        <IterationStep
+                            key={iterationStep.id}
+                            {...iterationStep}
+                            index={index}
+                        />
+                    ))}
+                </ScrollArea>
             )}
 
             {status === "in_progress" && (

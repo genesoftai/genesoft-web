@@ -51,9 +51,12 @@ const BackendGenerations = ({ project, latestIteration }: Props) => {
     }
 
     return (
-        <Card className="h-full bg-primary-dark text-white border-none" style={{ minWidth: "300px" }}>
+        <Card
+            className="h-full bg-primary-dark text-white border-none"
+            style={{ minWidth: "300px" }}
+        >
             <CardHeader>
-                <CardTitle>Execution Tasks</CardTitle>
+                <CardTitle>Development History</CardTitle>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[calc(100vh-200px)]">

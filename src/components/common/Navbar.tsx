@@ -205,13 +205,13 @@ export default function Navbar() {
 
     return (
         <nav
-            className={`border-b border-line-in-dark-bg w-full sticky top-0 z-50 bg-primary-dark/90 backdrop-blur-md transition-all duration-300 ${
+            className={`border-b border-line-in-dark-bg w-full sticky top-0 z-50 bg-genesoft-dark border-none backdrop-blur-md transition-all duration-300 ${
                 scrolled ? "shadow-md py-2" : "py-4"
             }`}
         >
             <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6 lg:px-8">
                 <Link href="/" className="flex items-center">
-                    <GenesoftLogo />
+                    <GenesoftLogo size="extra-small" />
                 </Link>
 
                 <div className="hidden md:flex items-center">
@@ -287,20 +287,20 @@ export default function Navbar() {
                             <b>Dashboard</b>
                         </p>
 
-                        {/* <p
+                        <p
                             className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
                             onClick={handleGoToCollections}
                         >
                             <b>Collections</b>
-                        </p> */}
+                        </p>
 
-                        {/* <button
+                        <button
                             onClick={handleSupportClick}
                             className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
                         >
                             <b>Support</b>
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                        </button> */}
+                        </button>
 
                         <button
                             onClick={() => {
@@ -312,25 +312,15 @@ export default function Navbar() {
                         </button>
 
                         <a
-                            href="https://discord.gg/5jRywzzqDd"
+                            href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                            onClick={() => setIsOpen(false)}
                         >
-                            <b>Discord</b>
+                            <b>Docs</b>
                             <ExternalLink className="ml-1 h-3.5 w-3.5" />
                         </a>
-
-                        <a
-                                    href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <b>Docs</b>
-                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                                </a>
                     </div>
                 </div>
 
@@ -353,7 +343,8 @@ export default function Navbar() {
                                 variant="ghost"
                                 className="text-sm font-medium transition-colors bg-genesoft text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-full"
                             >
-                                <b> Sign in </b> <RocketIcon className="ml-1 h-3.5 w-3.5" />
+                                <b> Sign in </b>{" "}
+                                <RocketIcon className="ml-1 h-3.5 w-3.5" />
                             </Button>
 
                             {/* <Button
@@ -382,10 +373,10 @@ export default function Navbar() {
                     </SheetTrigger>
                     <SheetContent
                         side="right"
-                        className="bg-primary-dark border-line-in-dark-bg p-0"
+                        className="bg-primary-dark border-line-in-dark-bg p-0 text-subtext-in-dark-bg"
                     >
                         <div className="p-6 border-b border-line-in-dark-bg">
-                            <GenesoftLogo />
+                            <GenesoftLogo size="extra-small" />
                         </div>
                         <nav className="flex flex-col p-4">
                             <div className="flex flex-col space-y-1 mb-6">
@@ -401,14 +392,25 @@ export default function Navbar() {
                                     className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    Dashboard
+                                    Projects
                                 </Link>
+
                                 <p
                                     className="text-subtext-in-dark-bg hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 cursor-pointer"
                                     onClick={handleGoToCollections}
                                 >
                                     Collections
                                 </p>
+
+                                <button
+                                    onClick={() => {
+                                        router.push("/subscription");
+                                    }}
+                                    className="text-white hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
+                                >
+                                    <b>Pricing</b>
+                                </button>
+
                                 <button
                                     className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center text-left"
                                     onClick={(e) => {
@@ -418,16 +420,6 @@ export default function Navbar() {
                                 >
                                     Support
                                 </button>
-                                <a
-                                    href="https://discord.gg/5jRywzzqDd"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-subtext-in-dark-bg hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-tertiary-dark/70 flex items-center"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Discord
-                                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                                </a>
 
                                 <a
                                     href="https://main.d118lfbwrrrngb.amplifyapp.com/docs/overview"
@@ -463,7 +455,8 @@ export default function Navbar() {
                                         variant="ghost"
                                         className="w-full text-sm font-medium transition-colors  bg-genesoft text-subtext-in-dark-bg hover:text-white hover:bg-tertiary-dark/70 rounded-lg justify-start"
                                     >
-                                        <b> Sign in </b> <RocketIcon className="ml-1 h-3.5 w-3.5" />
+                                        <b>Sign in</b>
+                                        <RocketIcon className="ml-1 h-3.5 w-3.5" />
                                     </Button>
 
                                     {/* <Button
