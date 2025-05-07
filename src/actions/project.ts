@@ -401,6 +401,7 @@ export type CreateProjectFromOnboardingDto = {
     project_type: string;
     backend_requirements?: string;
     onboarding_conversation_id?: string;
+    figma_file_key?: string;
 };
 
 export async function createProjectFromOnboarding(
