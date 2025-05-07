@@ -10,6 +10,8 @@ import {
     AppWindow,
     Send,
     ImageIcon,
+    X,
+    AlertCircleIcon,
 } from "lucide-react";
 import { rgbaToHex } from "@/utils/common/color";
 import { RGBColor } from "react-color";
@@ -43,8 +45,12 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
+    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
+import { Input } from "../ui/input";
+import FigmaLogo from "@public/brand/figma.svg";
+import { getFigmaFile } from "@/actions/figma";
+import { extractFigmaChildren, get_figma_file_key } from "@/utils/figma/file";
 interface ProjectCreationBoxProps {
     onComplete: (projectData: {
         description: string;
@@ -53,6 +59,7 @@ interface ProjectCreationBoxProps {
         project_type: string;
         backend_requirements?: string;
         onboarding_conversation_id?: string;
+        figma_file_key?: string;
     }) => void;
     initialValues?: {
         description?: string;
@@ -63,7 +70,6 @@ interface ProjectCreationBoxProps {
 }
 
 const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
-    const [projectType, setProjectType] = useState<string>("web-and-backend");
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,7 +77,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const brandColor: RGBColor = { r: 75, g: 107, b: 251, a: 1 }; // Default genesoft-like color
     const [checkWeb, setCheckWeb] = useState(true);
-    const [checkBackend, setCheckBackend] = useState(true);
+    const [checkBackend, setCheckBackend] = useState(false);
     const [isLoadingSendMessage, setIsLoadingSendMessage] = useState(false);
     const [imageUploadUrl, setImageUploadUrl] = useState<string>("");
     const [fileId, setFileId] = useState<string>("");
@@ -79,8 +85,11 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         useState<boolean>(false);
     const [isSendingImageWithMessage, setIsSendingImageWithMessage] =
         useState<boolean>(false);
+    const [figmaUrls, setFigmaUrls] = useState<string[]>([]);
+    const [currentFigmaUrl, setCurrentFigmaUrl] = useState<string>("");
 
     const [imageMessage, setImageMessage] = useState<string>("");
+    const [figmaFileChildern, setFigmaFileChildren] = useState<any[]>([]);
 
     const { updateCreateProjectStore } = useCreateProjectStore();
     const { id: user_id } = useGenesoftUserStore();
@@ -184,6 +193,16 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                 onboarding_conversation_id: onboarding_conversation_id,
             });
 
+            let figmaFileKey: string = "";
+            if (figmaUrls.length > 0) {
+                figmaFileKey = String(get_figma_file_key(figmaUrls[0]));
+            }
+
+            console.log({
+                message: "figma file key",
+                figmaFileKey,
+            });
+
             onComplete({
                 description: formattedMessages,
                 color: rgbaToHex(brandColor),
@@ -193,6 +212,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                         ? formattedMessages
                         : undefined,
                 onboarding_conversation_id: onboarding_conversation_id,
+                figma_file_key: figmaFileKey,
             });
         } catch (err) {
             setError("Failed to create project. Please try again.");
@@ -325,6 +345,31 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         setIsImageMessageDialogOpen(false);
     };
 
+    // Add Figma URL to the list
+    const handleAddFigmaUrl = async () => {
+        if (figmaUrls?.length > 0) {
+            toast.error("You can only add one Figma URL at a time");
+            return;
+        }
+        if (currentFigmaUrl.trim() && !figmaUrls.includes(currentFigmaUrl)) {
+            setFigmaUrls([...figmaUrls, currentFigmaUrl]);
+            setCurrentFigmaUrl("");
+            toast.success("Figma URL added successfully");
+            const figmaFile = await getFigmaFile(currentFigmaUrl);
+            const figmaFileNodes = figmaFile.document.children;
+            const extractedFigmaFileNodes =
+                extractFigmaChildren(figmaFileNodes);
+            setFigmaFileChildren(extractedFigmaFileNodes);
+        } else if (figmaUrls.includes(currentFigmaUrl)) {
+            toast.error("This Figma URL is already added");
+        }
+    };
+
+    // Remove Figma URL from the list
+    const handleRemoveFigmaUrl = (urlToRemove: string) => {
+        setFigmaUrls(figmaUrls.filter((url) => url !== urlToRemove));
+    };
+
     useEffect(() => {
         if (onboarding_conversation_id) {
             setupOnboardingConversationMessages();
@@ -337,6 +382,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         message: "onboarding_conversation_id",
         onboarding_conversation_id,
         messages,
+        figmaFileChildern,
     });
 
     return (
@@ -362,6 +408,148 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             className="w-full backdrop-blur-md rounded-xl shadow-lg overflow-hidden flex flex-col relative"
         >
             <div className="flex flex-col h-full relative z-10">
+                <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className="w-fit bg-primary-dark border border-tertiary-dark text-left flex justify-between items-center p-4 h-auto hover:bg-primary-dark/80"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={FigmaLogo}
+                                        alt="Figma Logo"
+                                        className="h-5 w-5"
+                                    />
+                                    <span className="text-white font-medium">
+                                        Add Figma Design Reference for web
+                                    </span>
+                                </div>
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-primary-dark border-tertiary-dark max-w-[90%] md:max-w-[620px] rounded-lg flex flex-col">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle className="flex items-center gap-2">
+                                    <Image
+                                        src={FigmaLogo}
+                                        alt="Figma Logo"
+                                        className="h-5 w-5"
+                                    />
+                                    <p className="text-white font-medium">
+                                        Add Figma Design Reference for web
+                                    </p>
+                                </AlertDialogTitle>
+                                <AlertDialogDescription className="text-white/70">
+                                    <p className="text-xs md:text-sm flex items-center gap-2">
+                                        <AlertCircleIcon className="h-4 w-4 text-red-500" />
+                                        <span>
+                                            Make sure you set share settings of
+                                            the file to be anyone can view
+                                        </span>
+                                    </p>
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <div className="mt-3">
+                                {figmaUrls.length === 0 && (
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="text"
+                                            placeholder="Enter Figma File URL"
+                                            className="text-sm md:text-base bg-primary-dark border-tertiary-dark text-white"
+                                            value={currentFigmaUrl}
+                                            onChange={(e) =>
+                                                setCurrentFigmaUrl(
+                                                    e.target.value,
+                                                )
+                                            }
+                                        />
+                                        <Button
+                                            onClick={handleAddFigmaUrl}
+                                            className="bg-genesoft text-white"
+                                            disabled={!currentFigmaUrl.trim()}
+                                        >
+                                            Add
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {figmaUrls.length > 0 && (
+                                    <div className="mt-4 w-full">
+                                        <p className="text-white/70 mb-2">
+                                            Added Figma Design Frame URLs:
+                                        </p>
+                                        <div className="flex flex-col gap-2 max-h-40 overflow-y-auto w-10/12 self-center">
+                                            {figmaUrls.map((url, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between bg-tertiary-dark/30 p-2 rounded-md w-10/12 overflow-hidden"
+                                                >
+                                                    <p className="text-white text-sm truncate max-w-[90%]">
+                                                        {url}
+                                                    </p>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() =>
+                                                            handleRemoveFigmaUrl(
+                                                                url,
+                                                            )
+                                                        }
+                                                        className="h-6 w-6 text-white/70 hover:text-white hover:bg-red-500/20"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel className="bg-secondary-dark text-white border-line-in-dark-bg">
+                                    Close
+                                </AlertDialogCancel>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    {figmaFileChildern.length > 0 && (
+                        <div className="flex flex-col items-start gap-2 mb-4 p-6 bg-tertiary-dark/30 rounded-lg">
+                            <div className="w-full max-h-80 overflow-y-auto">
+                                {figmaFileChildern.map((child, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex flex-col items-start mb-2"
+                                    >
+                                        <div className="flex items-center gap-2 text-white/80 font-medium">
+                                            <span className="inline-block w-4 h-4 bg-genesoft rounded-sm"></span>
+                                            {child.type} - {child.name}
+                                        </div>
+                                        {child.children.length > 0 && (
+                                            <div className="flex flex-col items-start gap-1 ml-6 mt-1 border-l-2 border-genesoft/40 pl-3">
+                                                {child.children.map(
+                                                    (
+                                                        child: any,
+                                                        index: number,
+                                                    ) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center gap-2 text-white/70"
+                                                        >
+                                                            <span className="inline-block w-3 h-3 bg-genesoft/60 rounded-sm"></span>
+                                                            {child.type} -{" "}
+                                                            {child.name}
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
                     <p className="text-sm md:text-xl text-white/80 mb-4 text-start">
                         Project Setup

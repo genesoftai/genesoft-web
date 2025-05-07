@@ -70,6 +70,7 @@ export default function LandingPage() {
         branding: projectBranding,
         project_type: projectType,
         backend_requirements: backendRequirements,
+        figma_file_key,
         clearCreateProjectStore,
     } = useCreateProjectStore();
     const { updateCollectionStore, clearCollectionStore } =
@@ -99,12 +100,14 @@ export default function LandingPage() {
         color,
         project_type,
         backend_requirements,
+        figma_file_key,
     }: {
         description: string;
         logo?: string;
         color?: string;
         project_type: string;
         backend_requirements?: string;
+        figma_file_key?: string;
     }) => {
         console.log({
             message: "onboarding complete",
@@ -114,6 +117,7 @@ export default function LandingPage() {
                 color,
                 project_type,
                 backend_requirements,
+                figma_file_key,
             },
         });
 
@@ -125,6 +129,7 @@ export default function LandingPage() {
                 color,
                 project_type,
                 backend_requirements,
+                figma_file_key,
             });
             setIsCreatingProjectFromOnboarding(true);
         } else {
@@ -140,6 +145,7 @@ export default function LandingPage() {
         project_type,
         backend_requirements,
         conversation_id,
+        figma_file_key,
     }: {
         description: string;
         logo?: string;
@@ -147,6 +153,7 @@ export default function LandingPage() {
         project_type: string;
         backend_requirements?: string;
         conversation_id?: string;
+        figma_file_key?: string;
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
@@ -162,6 +169,7 @@ export default function LandingPage() {
                 project_type,
                 backend_requirements,
                 onboarding_conversation_id: conversation_id,
+                figma_file_key,
             };
             console.log({
                 message: "create project from onboarding",
@@ -252,6 +260,7 @@ export default function LandingPage() {
                 project_type: projectType || "web",
                 backend_requirements: backendRequirements || "",
                 conversation_id: onboarding_conversation_id,
+                figma_file_key: figma_file_key,
             });
         }
     }, [is_onboarding, user_id, projectDescription]);

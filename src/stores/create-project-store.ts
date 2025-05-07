@@ -14,6 +14,7 @@ export interface CreateProjectStore {
     project_type?: string;
     backend_requirements?: string;
     onboarding_conversation_id?: string;
+    figma_file_key?: string;
     updateCreateProjectStore: (project: Partial<CreateProjectStore>) => void;
     clearCreateProjectStore: () => void;
     addPage: (page: Page) => void;
@@ -37,6 +38,7 @@ const initialProjectStoreStates = {
     project_type: "web",
     backend_requirements: "",
     onboarding_conversation_id: "",
+    figma_file_key: "",
 };
 
 export const useCreateProjectStore = create<CreateProjectStore>()(
