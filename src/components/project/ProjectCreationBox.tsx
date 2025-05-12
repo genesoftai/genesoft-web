@@ -222,6 +222,29 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         }
     };
 
+
+    const handleGitImportSubmit = async () => {
+        setIsSubmitting(true);
+        setError(null);
+        const template = "git";
+        try {
+            updateCreateProjectStore({
+                is_onboarding: user_id ? false : true,
+                project_type: template,
+            });
+
+            onComplete({
+                description: '',
+                project_type: template,
+            });
+        } catch (err) {
+            setError("Failed to create project. Please try again.");
+            console.error(err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const handleImageUpload = async (
         e: React.ChangeEvent<HTMLInputElement>,
     ) => {
@@ -550,6 +573,15 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                         </div>
                     )}
                 </div>
+                <div>
+                            <button className="bg-genesoft text-white px-4 py-2 rounded-md"
+                                onClick={() => {
+                                    handleGitImportSubmit();
+                                }}
+                            >
+                                Git Import
+                            </button>
+                        </div>
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
                     <p className="text-sm md:text-xl text-white/80 mb-4 text-start">
                         Project Setup
@@ -582,6 +614,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                                 className="rounded-full"
                             />
                         </div>
+
 
                         <div className="flex items-center space-x-2">
                             <Checkbox
