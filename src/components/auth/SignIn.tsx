@@ -133,6 +133,7 @@ export default function SignIn() {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: "github",
                 options: {
+                    scopes: "repo user",
                     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}`,
                     queryParams: {
                         access_type: "offline",

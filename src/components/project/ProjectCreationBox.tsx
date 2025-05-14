@@ -51,6 +51,9 @@ import { Input } from "../ui/input";
 import FigmaLogo from "@public/brand/figma.svg";
 import { getFigmaFile } from "@/actions/figma";
 import { extractFigmaChildren, get_figma_file_key } from "@/utils/figma/file";
+import { createSupabaseClient } from "@/utils/supabase/client";
+import GithubImportModal from "./GithubImportModal";
+    
 interface ProjectCreationBoxProps {
     onComplete: (projectData: {
         description: string;
@@ -98,6 +101,41 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         updateOnboardingConversationStore,
     } = useOnboardingConversationStore();
 
+    const [repoList, setRepoList] = useState<any[]>([]);
+    const [showGitImportModal, setShowGitImportModal] = useState<boolean>(false);
+    const supabase = createSupabaseClient();
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            console.log("userData", data);
+            if(data != null && data.user != null) {
+                const githubIdentity = data.user.identities?.find( ui => ui.provider == 'github')
+                if(githubIdentity != null) {
+                    console.log("githubIdentity", githubIdentity);
+                    const githubUsername = githubIdentity.identity_data?.user_name
+                    const githubSub = githubIdentity.identity_data?.sub
+                    console.log("githubUsername", githubUsername);
+                    console.log("githubSub", githubSub);
+
+                    const { data: { session } } = await supabase.auth.getSession();
+                    console.log("session", session);    
+                    const accessToken = session?.provider_token;
+                    console.log("gitGub AccessToken", accessToken);
+                    const repos = await fetch("https://api.github.com/user/repos", {
+                        headers: {
+                          Authorization: `Bearer ${accessToken}`,
+                          Accept: "application/vnd.github+json",
+                        },
+                      });
+                    const json = await repos.json();
+                    setRepoList(json);
+                    console.log("repos", json);
+                }
+            }
+        };
+        getUser();
+    }, []);
+    
     const handleSendMessage = async () => {
         setIsLoadingSendMessage(true);
         console.log("inputMessage", inputMessage);
@@ -220,6 +258,28 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         } finally {
             setIsSubmitting(false);
         }
+    };
+    const handleGitImportSubmit = async () => {
+
+        // setIsSubmitting(true);
+        // setError(null);
+        // const template = "git";
+        // try {
+        //     updateCreateProjectStore({
+        //         is_onboarding: user_id ? false : true,
+        //         project_type: template,
+        //     });
+
+        //     onComplete({
+        //         description: '',
+        //         project_type: template,
+        //     });
+        // } catch (err) {
+        //     setError("Failed to create project. Please try again.");
+        //     console.error(err);
+        // } finally {
+        //     setIsSubmitting(false);
+        // }
     };
 
     const handleImageUpload = async (
@@ -407,6 +467,18 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             }}
             className="w-full backdrop-blur-md rounded-xl shadow-lg overflow-hidden flex flex-col relative"
         >
+
+        {
+            showGitImportModal && (
+                <GithubImportModal
+                    isOpen={true}
+                    onClose={() => setShowGitImportModal(false)}
+                    repositories={repoList}
+                    onSelectRepository={(handleGitImportSubmit)}
+                />
+            )
+        }
+
             <div className="flex flex-col h-full relative z-10">
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
                     <AlertDialog>
@@ -550,6 +622,15 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                         </div>
                     )}
                 </div>
+                <div>
+                            <button className="bg-genesoft text-white px-4 py-2 rounded-md"
+                                onClick={() => {
+                                    setShowGitImportModal(true);
+                                }}
+                            >
+                                Git Import
+                            </button>
+                        </div>
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
                     <p className="text-sm md:text-xl text-white/80 mb-4 text-start">
                         Project Setup
@@ -582,6 +663,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                                 className="rounded-full"
                             />
                         </div>
+
 
                         <div className="flex items-center space-x-2">
                             <Checkbox
