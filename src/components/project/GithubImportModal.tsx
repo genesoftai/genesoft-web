@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getGithubInstallationId } from '@/actions/integration';
 import { toast } from 'sonner';
+import { CheckCircle2 } from "lucide-react";
+
 interface GithubImportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -29,6 +31,7 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
+  const [installedRepos, setInstalledRepos] = useState<Record<string, number>>({});
 
   const filteredRepos = repositories.filter(repo => 
     repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -38,17 +41,16 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
   const handleRepoSelect = async (repo: any) => {
     setSelectedRepo(repo);
     console.log("repo", repo);
-    // check it have installationId or not
-    try{
-      const installationId =  await getGithubInstallationId(repo.owner.login, repo.name);
-      // example response 
-      // {
-      //   "installationId": 66721556
-      // }
+    try {
+      const installationId = await getGithubInstallationId(repo.owner.login, repo.name);
       if (installationId == null) {
         toast.error("Please install the Github App on the repository");
-      }else {
+      } else {
         console.log("installationId", installationId);
+        setInstalledRepos(prev => ({
+          ...prev,
+          [repo.id]: installationId
+        }));
       }
     } catch (error) {
       console.error("Error getting Github installation ID", error);
@@ -57,9 +59,14 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
   };
 
   const handleImport = () => {
-    if (selectedRepo) {
-      onSelectRepository(selectedRepo);
+    if (selectedRepo && installedRepos[selectedRepo.id]) {
+      onSelectRepository({
+        ...selectedRepo,
+        installationId: installedRepos[selectedRepo.id]
+      });
       onClose();
+    } else {
+      toast.error("Please install the Github App on the repository first");
     }
   };
 
@@ -94,12 +101,22 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
                     onClick={() => handleRepoSelect(repo)}
                   >
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">{repo.name}</span>
-                        {repo.private && (
-                          <Badge variant="secondary" className="text-xs">
-                            Private
-                          </Badge>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{repo.name}</span>
+                          {repo.private && (
+                            <Badge variant="secondary" className="text-xs">
+                              Private
+                            </Badge>
+                          )}
+                          {installedRepos[repo.id] && (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          )}
+                        </div>
+                        {!installedRepos[repo.id] && (
+                          <Button variant="outline" size="sm" className="opacity-0 group-hover:opacity-100">
+                            Install App
+                          </Button>
                         )}
                       </div>
                       
@@ -108,16 +125,6 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
                           {repo.description}
                         </p>
                       )}
-
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        {repo.language && (
-                          <span>{repo.language}</span>
-                        )}
-                        <span>⭐ {repo.stargazers_count}</span>
-                        <span>
-                          Updated {new Date(repo.updated_at).toLocaleDateString()}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -136,7 +143,7 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
           </Button>
           <Button 
             onClick={handleImport}
-            disabled={!selectedRepo}
+            disabled={!selectedRepo || !installedRepos[selectedRepo.id]}
           >
             Import Repository
           </Button>
