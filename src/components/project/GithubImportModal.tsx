@@ -125,53 +125,60 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
             className="w-full"
           />
 
-          <ScrollArea className="h-[400px] rounded-md border">
-            {filteredRepos.length > 0 ? (
-              <div className="divide-y">
-                {filteredRepos.map((repo) => (
-                  <div
-                    key={repo.id}
-                    className={cn(
-                      "p-4 cursor-pointer transition-colors hover:bg-muted/50",
-                      selectedRepo?.id === repo.id && "bg-muted"
-                    )}
-                    onClick={() => handleRepoSelect(repo)}
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">{repo.name}</span>
-                          {repo.private && (
-                            <Badge variant="secondary" className="text-xs">
-                              Private
-                            </Badge>
-                          )}
-                          {installedRepos[repo.id] && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+          {loadingRepos ? (
+            <div className="flex items-center justify-center h-[400px]">
+              <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mr-2"></span>
+              <span>Loading repositories...</span>
+            </div>
+          ) : (
+            <ScrollArea className="h-[400px] rounded-md border">
+              {filteredRepos.length > 0 ? (
+                <div className="divide-y">
+                  {filteredRepos.map((repo) => (
+                    <div
+                      key={repo.id}
+                      className={cn(
+                        "p-4 cursor-pointer transition-colors hover:bg-muted/50",
+                        selectedRepo?.id === repo.id && "bg-muted"
+                      )}
+                      onClick={() => handleRepoSelect(repo)}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">{repo.name}</span>
+                            {repo.private && (
+                              <Badge variant="secondary" className="text-xs">
+                                Private
+                              </Badge>
+                            )}
+                            {installedRepos[repo.id] && (
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            )}
+                          </div>
+                          {!installedRepos[repo.id] && (
+                            <Button variant="outline" size="sm" className="opacity-0 group-hover:opacity-100">
+                              Install App
+                            </Button>
                           )}
                         </div>
-                        {!installedRepos[repo.id] && (
-                          <Button variant="outline" size="sm" className="opacity-0 group-hover:opacity-100">
-                            Install App
-                          </Button>
+                        
+                        {repo.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {repo.description}
+                          </p>
                         )}
                       </div>
-                      
-                      {repo.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {repo.description}
-                        </p>
-                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                No repositories found
-              </div>
-            )}
-          </ScrollArea>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-muted-foreground">
+                  No repositories found
+                </div>
+              )}
+            </ScrollArea>
+          )}
         </div>
 
         <DialogFooter>
