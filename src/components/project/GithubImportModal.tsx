@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import { FaGithub } from 'react-icons/fa';
 import {
   Dialog,
@@ -19,19 +19,55 @@ import { CheckCircle2 } from "lucide-react";
 interface GithubImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  repositories: any[];
+  githubAccessToken: string;
   onSelectRepository: (repository: any) => void;
 }
 
 const GithubImportModal: React.FC<GithubImportModalProps> = ({
   isOpen,
   onClose,
-  repositories,
+  githubAccessToken,
   onSelectRepository,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRepo, setSelectedRepo] = useState<any>(null);
   const [installedRepos, setInstalledRepos] = useState<Record<string, number>>({});
+  const [repositories, setRepositories] = useState<any[]>([]);
+  const [loadingRepos, setLoadingRepos] = useState(false);
+
+  useEffect(() => {
+    const fetchAllRepos = async () => {
+      if (!githubAccessToken || !isOpen) return;
+      setLoadingRepos(true);
+      let allRepos: any[] = [];
+      let page = 1;
+      let hasNext = true;
+      while (hasNext) {
+        const res = await fetch(`https://api.github.com/user/repos?per_page=100&page=${page}`,
+          {
+            headers: {
+              Authorization: `Bearer ${githubAccessToken}`,
+              Accept: "application/vnd.github+json",
+            },
+          }
+        );
+        const repos = await res.json();
+        if (Array.isArray(repos) && repos.length > 0) {
+          allRepos = allRepos.concat(repos);
+          if (repos.length < 100) {
+            hasNext = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasNext = false;
+        }
+      }
+      setRepositories(allRepos);
+      setLoadingRepos(false);
+    };
+    fetchAllRepos();
+  }, [githubAccessToken, isOpen]);
 
   const filteredRepos = repositories.filter(repo => 
     repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,14 +78,15 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
     setSelectedRepo(repo);
     console.log("repo", repo);
     try {
-      const installationId = await getGithubInstallationId(repo.owner.login, repo.name);
-      if (installationId == null) {
+      const resData = await getGithubInstallationId(repo.owner.login, repo.name);
+      if (resData?.installationId == null || resData.installationId == '') {
+        console.log("installationId not exist");
         toast.error("Please install the Github App on the repository");
       } else {
-        console.log("installationId", installationId);
+        console.log("installationId", resData.installationId);
         setInstalledRepos(prev => ({
           ...prev,
-          [repo.id]: installationId
+          [repo.id]: resData.installationId
         }));
       }
     } catch (error) {

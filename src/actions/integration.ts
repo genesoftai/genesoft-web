@@ -322,7 +322,8 @@ export const getGithubInstallationId = async (owner: string, repo: string) => {
                 Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
             },
         });
-        console.log("response", response.data);
+        console.log("response getGithubInstallationId", response.data);
+        console.log("status getGithubInstallationId", response.status);
         return response.data;
     } catch (error) {
         console.error("Error getting GitHub installation ID:", error);
