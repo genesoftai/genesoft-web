@@ -31,6 +31,7 @@ import EditCode from "@public/image/genesoft-usage/v2/code-editor.png";
 import DevMode from "@public/image/genesoft-usage/v2/dev-mode.png";
 import InfrastructureManagement from "@public/image/genesoft-usage/v2/github-integration-and-infrastructure.png";
 import { useOnboardingConversationStore } from "@/stores/onboarding-conversation-store";
+import { Toaster } from "sonner";
 
 const StreamingText = ({
     text,
@@ -267,6 +268,7 @@ export default function LandingPage() {
 
     return (
         <div className="flex flex-col min-h-screen text-subtext-in-dark-bg">
+            <Toaster />
             <main className="flex-grow">
                 {/* Hero Section */}
                 <section className="relative text-center px-5 md:px-10 lg:px-20 pb-24 md:pb-32 overflow-hidden py-16">
