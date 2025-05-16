@@ -129,32 +129,6 @@ export function WebPreview({
         );
     }
 
-    if (isLoadingSetupSandbox) {
-        return (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-                <GenesoftLoading />
-                <div className="flex flex-col items-center gap-2">
-                    <p className="text-white text-sm">
-                        Setup Sandbox for your web application...
-                    </p>
-                    {isRunningInstallCommand && (
-                        <p className="text-white text-sm flex items-center gap-2">
-                            <span>Installing dependencies...</span>
-                            <Loader2 className="h-4 w-4 text-genesoft animate-spin" />
-                        </p>
-                    )}
-
-                    {isRunningDevCommand && (
-                        <p className="text-white text-sm flex items-center gap-2">
-                            <span>Starting development server...</span>
-                            <Loader2 className="h-4 w-4 text-genesoft animate-spin" />
-                        </p>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
     return (
         <Card
             className={`bg-primary-dark text-white  self-center w-full h-full border-none`}
@@ -264,6 +238,30 @@ export function WebPreview({
                                 sandbox="allow-scripts allow-same-origin"
                             ></iframe>
                         </motion.div>
+                    ) : isLoadingSetupSandbox ? (
+                        <div className="flex flex-col items-center justify-center w-full h-full">
+                            <GenesoftLoading />
+                            <div className="flex flex-col items-center gap-2">
+                                <p className="text-white text-sm">
+                                    Setup Sandbox for your web application...
+                                </p>
+                                {isRunningInstallCommand && (
+                                    <p className="text-white text-sm flex items-center gap-2">
+                                        <span>Installing dependencies...</span>
+                                        <Loader2 className="h-4 w-4 text-genesoft animate-spin" />
+                                    </p>
+                                )}
+
+                                {isRunningDevCommand && (
+                                    <p className="text-white text-sm flex items-center gap-2">
+                                        <span>
+                                            Starting development server...
+                                        </span>
+                                        <Loader2 className="h-4 w-4 text-genesoft animate-spin" />
+                                    </p>
+                                )}
+                            </div>
+                        </div>
                     ) : (
                         <div
                             className={`relative flex justify-center w-full h-[90vh]`}
