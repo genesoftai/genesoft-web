@@ -63,6 +63,9 @@ interface ProjectCreationBoxProps {
         backend_requirements?: string;
         onboarding_conversation_id?: string;
         figma_file_key?: string;
+        github_installation_id?: string;
+        github_repo_owner?: string;
+        github_repo_name?: string;
     }) => void;
     initialValues?: {
         description?: string;
@@ -275,6 +278,9 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             onComplete({
                 description: '',
                 project_type: template,
+                github_installation_id: payload.installationId,
+                github_repo_owner: payload.owner.login,
+                github_repo_name: payload.name,
             });
         } catch (err) {
             setError("Failed to create project. Please try again.");
