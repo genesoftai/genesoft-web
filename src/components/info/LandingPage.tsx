@@ -102,6 +102,9 @@ export default function LandingPage() {
         project_type,
         backend_requirements,
         figma_file_key,
+        github_installation_id,
+        github_repository_id,
+        github_repository_name,
     }: {
         description: string;
         logo?: string;
@@ -109,6 +112,9 @@ export default function LandingPage() {
         project_type: string;
         backend_requirements?: string;
         figma_file_key?: string;
+        github_installation_id?: string;
+        github_repository_id?: string;
+        github_repository_name?: string;
     }) => {
         console.log({
             message: "onboarding complete",
@@ -131,6 +137,9 @@ export default function LandingPage() {
                 project_type,
                 backend_requirements,
                 figma_file_key,
+                github_installation_id,
+                github_repository_id,
+                github_repository_name,
             });
             setIsCreatingProjectFromOnboarding(true);
         } else {
@@ -147,6 +156,9 @@ export default function LandingPage() {
         backend_requirements,
         conversation_id,
         figma_file_key,
+        github_installation_id,
+        github_repository_id,
+        github_repository_name,
     }: {
         description: string;
         logo?: string;
@@ -155,6 +167,9 @@ export default function LandingPage() {
         backend_requirements?: string;
         conversation_id?: string;
         figma_file_key?: string;
+        github_installation_id?: string;
+        github_repository_id?: string;
+        github_repository_name?: string;
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
@@ -171,6 +186,9 @@ export default function LandingPage() {
                 backend_requirements,
                 onboarding_conversation_id: conversation_id,
                 figma_file_key,
+                github_installation_id,
+                github_repository_id,
+                github_repository_name,
             };
             console.log({
                 message: "create project from onboarding",
