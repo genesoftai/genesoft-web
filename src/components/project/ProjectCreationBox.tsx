@@ -51,6 +51,9 @@ import { Input } from "../ui/input";
 import FigmaLogo from "@public/brand/figma.svg";
 import { getFigmaFile } from "@/actions/figma";
 import { extractFigmaChildren, get_figma_file_key } from "@/utils/figma/file";
+import { createSupabaseClient } from "@/utils/supabase/client";
+import GithubImportModal from "./GithubImportModal";
+
 interface ProjectCreationBoxProps {
     onComplete: (projectData: {
         description: string;
@@ -60,6 +63,9 @@ interface ProjectCreationBoxProps {
         backend_requirements?: string;
         onboarding_conversation_id?: string;
         figma_file_key?: string;
+        github_installation_id?: string;
+        github_repo_owner?: string;
+        github_repo_name?: string;
     }) => void;
     initialValues?: {
         description?: string;
@@ -97,6 +103,39 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         id: onboarding_conversation_id,
         updateOnboardingConversationStore,
     } = useOnboardingConversationStore();
+
+    const [showGitImportModal, setShowGitImportModal] = useState<boolean>(false);
+    const supabase = createSupabaseClient();
+    const [ghToken, setGhToken] = useState<string>("");
+
+    useEffect(() => {
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log("first session", session);
+        })()
+    }, []);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            console.log("userData", data);
+            if (data != null && data.user != null) {
+                const githubIdentity = data.user.identities?.find(ui => ui.provider == 'github')
+                if (githubIdentity != null) {
+                    console.log("githubIdentity", githubIdentity);
+                    const githubUsername = githubIdentity.identity_data?.user_name
+                    const githubSub = githubIdentity.identity_data?.sub
+                    console.log("githubUsername", githubUsername);
+                    console.log("githubSub", githubSub);
+
+                    const { data: { session } } = await supabase.auth.getSession();
+                    console.log("session", session);
+                    setGhToken(session?.provider_token || "");
+                }
+            }
+        };
+        getUser();
+    }, []);
 
     const handleSendMessage = async () => {
         setIsLoadingSendMessage(true);
@@ -213,6 +252,35 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                         : undefined,
                 onboarding_conversation_id: onboarding_conversation_id,
                 figma_file_key: figmaFileKey,
+            });
+        } catch (err) {
+            setError("Failed to create project. Please try again.");
+            console.error(err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    const handleGitImportSubmit = async (payload: any) => {
+        console.log('handleGitImportSubmit', payload)
+        console.log('handleGitImportSubmit:installationId', payload.installationId)
+        setIsSubmitting(true);
+        setError(null);
+        const template = "git";
+        try {
+            updateCreateProjectStore({
+                is_onboarding: user_id ? false : true,
+                project_type: template,
+                github_installation_id: payload.installationId,
+                github_repo_owner: payload.owner.login,
+                github_repo_name: payload.name,
+            });
+
+            onComplete({
+                description: '',
+                project_type: template,
+                github_installation_id: payload.installationId,
+                github_repo_owner: payload.owner.login,
+                github_repo_name: payload.name,
             });
         } catch (err) {
             setError("Failed to create project. Please try again.");
@@ -407,8 +475,21 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             }}
             className="w-full backdrop-blur-md rounded-xl shadow-lg overflow-hidden flex flex-col relative"
         >
+
+            {
+                showGitImportModal && (
+                    <GithubImportModal
+                        isOpen={true}
+                        onClose={() => setShowGitImportModal(false)}
+                        githubAccessToken={ghToken}
+                        onSelectRepository={(handleGitImportSubmit)}
+                    />
+                )
+            }
+
             <div className="flex flex-col h-full relative z-10">
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
+                    <div className="flex items-center gap-2 justify-starts">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button
@@ -512,6 +593,24 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
+                    <div className="flex items-center gap-2 justify-center">
+                        <div>or </div>
+                        <Button
+                            variant="outline"
+                            className="w-fit bg-primary-dark border border-tertiary-dark text-left flex justify-between items-center p-4 h-auto hover:bg-primary-dark/80"
+                            onClick={() => {
+                                if (ghToken != '') {
+                                    setShowGitImportModal(true);
+                                } else {
+                                    toast.error("Please login to GitHub to import a repository");
+                                }
+                            }}
+                        >
+                            <span className="text-white">Git Import</span>
+                            </Button>
+                    </div>
+                    </div>
+
 
                     {figmaFileChildern.length > 0 && (
                         <div className="flex flex-col items-start gap-2 mb-4 p-6 bg-tertiary-dark/30 rounded-lg">
@@ -550,6 +649,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                         </div>
                     )}
                 </div>
+
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
                     <p className="text-sm md:text-xl text-white/80 mb-4 text-start">
                         Project Setup
@@ -582,6 +682,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                                 className="rounded-full"
                             />
                         </div>
+
 
                         <div className="flex items-center space-x-2">
                             <Checkbox

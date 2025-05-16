@@ -19,6 +19,10 @@ export interface CreateProjectStore {
     clearCreateProjectStore: () => void;
     addPage: (page: Page) => void;
     addFeature: (feature: Feature) => void;
+
+    github_installation_id?: string;
+    github_repo_owner?: string;
+    github_repo_name?: string;
 }
 
 const initialProjectStoreStates = {

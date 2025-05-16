@@ -31,6 +31,7 @@ import EditCode from "@public/image/genesoft-usage/v2/code-editor.png";
 import DevMode from "@public/image/genesoft-usage/v2/dev-mode.png";
 import InfrastructureManagement from "@public/image/genesoft-usage/v2/github-integration-and-infrastructure.png";
 import { useOnboardingConversationStore } from "@/stores/onboarding-conversation-store";
+import { Toaster } from "sonner";
 
 const StreamingText = ({
     text,
@@ -101,6 +102,9 @@ export default function LandingPage() {
         project_type,
         backend_requirements,
         figma_file_key,
+        github_installation_id,
+        github_repository_id,
+        github_repository_name,
     }: {
         description: string;
         logo?: string;
@@ -108,6 +112,9 @@ export default function LandingPage() {
         project_type: string;
         backend_requirements?: string;
         figma_file_key?: string;
+        github_installation_id?: string;
+        github_repository_id?: string;
+        github_repository_name?: string;
     }) => {
         console.log({
             message: "onboarding complete",
@@ -130,6 +137,9 @@ export default function LandingPage() {
                 project_type,
                 backend_requirements,
                 figma_file_key,
+                github_installation_id,
+                github_repository_id,
+                github_repository_name,
             });
             setIsCreatingProjectFromOnboarding(true);
         } else {
@@ -146,6 +156,9 @@ export default function LandingPage() {
         backend_requirements,
         conversation_id,
         figma_file_key,
+        github_installation_id,
+        github_repository_id,
+        github_repository_name,
     }: {
         description: string;
         logo?: string;
@@ -154,6 +167,9 @@ export default function LandingPage() {
         backend_requirements?: string;
         conversation_id?: string;
         figma_file_key?: string;
+        github_installation_id?: string;
+        github_repository_id?: string;
+        github_repository_name?: string;
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
@@ -170,6 +186,9 @@ export default function LandingPage() {
                 backend_requirements,
                 onboarding_conversation_id: conversation_id,
                 figma_file_key,
+                github_installation_id,
+                github_repository_id,
+                github_repository_name,
             };
             console.log({
                 message: "create project from onboarding",
@@ -267,6 +286,7 @@ export default function LandingPage() {
 
     return (
         <div className="flex flex-col min-h-screen text-subtext-in-dark-bg">
+            <Toaster />
             <main className="flex-grow">
                 {/* Hero Section */}
                 <section className="relative text-center px-5 md:px-10 lg:px-20 pb-24 md:pb-32 overflow-hidden py-16">

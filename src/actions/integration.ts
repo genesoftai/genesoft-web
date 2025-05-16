@@ -314,3 +314,19 @@ export const viewLogs = async (projectId: string) => {
 };
 
 
+export const getGithubInstallationId = async (owner: string, repo: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/github/installation?owner=${owner}&repo=${repo}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        console.log("response getGithubInstallationId", response.data);
+        console.log("status getGithubInstallationId", response.status);
+        return response.data;
+    } catch (error) {
+        console.error("Error getting GitHub installation ID:", error);
+        throw new Error("Failed to get GitHub installation ID");
+    }
+};
