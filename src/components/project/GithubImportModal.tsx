@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,7 +115,15 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
           <DialogTitle className="flex items-center gap-3">
             {/* <FaGithub className="h-6 w-6" /> */}
             Import from GitHub
+           
           </DialogTitle>
+          <DialogDescription>
+            <div className="">
+              must install <a href="https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps" target="_blank" rel="noopener noreferrer">
+                <u><b>Github App</b></u>
+              </a> before able to import
+            </div>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -189,7 +198,7 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
             onClick={handleImport}
             disabled={!selectedRepo || !installedRepos[selectedRepo.id]}
           >
-            Import Repository
+            Import Repository 
           </Button>
         </DialogFooter>
       </DialogContent>

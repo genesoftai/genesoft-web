@@ -66,6 +66,8 @@ interface ProjectCreationBoxProps {
         github_installation_id?: string;
         github_repo_owner?: string;
         github_repo_name?: string;
+        github_repo_fullname?: string;
+        github_repository_id?: string;
     }) => void;
     initialValues?: {
         description?: string;
@@ -276,11 +278,13 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             });
 
             onComplete({
-                description: '',
+                description: 'Imported from Github',
                 project_type: template,
                 github_installation_id: payload.installationId,
                 github_repo_owner: payload.owner.login,
                 github_repo_name: payload.name,
+                github_repo_fullname: payload.full_name,
+                github_repository_id: payload.id,
             });
         } catch (err) {
             setError("Failed to create project. Please try again.");
