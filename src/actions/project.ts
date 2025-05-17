@@ -422,6 +422,7 @@ export async function createProjectFromOnboarding(
         });
         return res.data;
     } catch (error) {
+        console.log("error", error?.response?.data);
         console.error("Error creating project from onboarding:", error);
         throw new Error("Failed to create project from onboarding");
     }

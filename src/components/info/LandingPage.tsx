@@ -95,17 +95,7 @@ export default function LandingPage() {
         setHeroStage((prev) => prev + 1);
     };
 
-    const handleOnboardingComplete = ({
-        description,
-        logo,
-        color,
-        project_type,
-        backend_requirements,
-        figma_file_key,
-        github_installation_id,
-        github_repository_id,
-        github_repository_name,
-    }: {
+    const handleOnboardingComplete = (payload: {
         description: string;
         logo?: string;
         color?: string;
@@ -113,9 +103,23 @@ export default function LandingPage() {
         backend_requirements?: string;
         figma_file_key?: string;
         github_installation_id?: string;
-        github_repository_id?: string;
-        github_repository_name?: string;
+        github_repo_id?: string;
+        github_repo_name?: string;
+        github_repo_owner?: string;
     }) => {
+        console.log('onboarding payload', payload)
+        const {
+            description,
+            logo,
+            color,
+            project_type,
+            backend_requirements,
+            figma_file_key,
+            github_installation_id,
+            github_repo_id,
+            github_repo_name,
+            github_repo_owner,
+        } = payload
         console.log({
             message: "onboarding complete",
             data: {
@@ -127,7 +131,6 @@ export default function LandingPage() {
                 figma_file_key,
             },
         });
-
         if (user_id) {
             posthog.capture("onboarding_complete_from_landing_page");
             handleCreateProjectFromOnboarding({
@@ -138,8 +141,9 @@ export default function LandingPage() {
                 backend_requirements,
                 figma_file_key,
                 github_installation_id,
-                github_repository_id,
-                github_repository_name,
+                github_repo_id,
+                github_repo_owner,
+                github_repo_name,
             });
             setIsCreatingProjectFromOnboarding(true);
         } else {
@@ -157,8 +161,9 @@ export default function LandingPage() {
         conversation_id,
         figma_file_key,
         github_installation_id,
-        github_repository_id,
-        github_repository_name,
+        github_repo_id,
+        github_repo_owner,
+        github_repo_name,
     }: {
         description: string;
         logo?: string;
@@ -168,8 +173,9 @@ export default function LandingPage() {
         conversation_id?: string;
         figma_file_key?: string;
         github_installation_id?: string;
-        github_repository_id?: string;
-        github_repository_name?: string;
+        github_repo_id?: string;
+        github_repo_owner?: string;
+        github_repo_name?: string;
     }) => {
         setIsCreatingProjectFromOnboarding(true);
         let projectId = "";
@@ -187,8 +193,9 @@ export default function LandingPage() {
                 onboarding_conversation_id: conversation_id,
                 figma_file_key,
                 github_installation_id,
-                github_repository_id,
-                github_repository_name,
+                github_repo_id,
+                github_repo_name,
+                github_repo_owner,
             };
             console.log({
                 message: "create project from onboarding",
@@ -338,7 +345,10 @@ export default function LandingPage() {
 
                         {!isCreatingProjectFromOnboarding ? (
                             <ProjectCreationBox
-                                onComplete={handleOnboardingComplete}
+                                onComplete={( payload) => {
+                                    console.log(payload)
+                                    handleOnboardingComplete(payload)
+                                }}
                                 initialValues={{
                                     description: projectDescription,
                                     logo: projectBranding?.logo_url,
