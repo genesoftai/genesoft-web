@@ -67,7 +67,9 @@ interface ProjectCreationBoxProps {
         github_repo_owner?: string;
         github_repo_name?: string;
         github_repo_fullname?: string;
-        github_repository_id?: string;
+        github_repo_id?: string;
+        github_repo_branch?: string;
+        github_repo_type?: string;
     }) => void;
     initialValues?: {
         description?: string;
@@ -284,7 +286,9 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                 github_repo_owner: payload.owner.login,
                 github_repo_name: payload.name,
                 github_repo_fullname: payload.full_name,
-                github_repository_id: payload.id,
+                github_repo_id: payload.id,
+                github_repo_branch: payload.branch,
+                github_repo_type: payload.type,
             });
         } catch (err) {
             setError("Failed to create project. Please try again.");

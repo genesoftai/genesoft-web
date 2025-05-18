@@ -330,3 +330,21 @@ export const getGithubInstallationId = async (owner: string, repo: string) => {
         throw new Error("Failed to get GitHub installation ID");
     }
 };
+
+
+export const getGithubBranches = async (installationId: string, owner: string, repo: string) => {
+    const url = `${genesoftCoreApiServiceBaseUrl}/github/branches?installationId=${installationId}&owner=${owner}&repo=${repo}`;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${genesoftCoreApiServiceApiKey}`,
+            },
+        });
+        console.log("response getGithubBranches", response.data);
+        console.log("status getGithubBranches", response.status);
+        return response.data;
+    } catch (error) {
+        console.error("Error getting GitHub getGithubBranches:", error);
+        throw new Error("Failed to get GitHub getGithubBranches");
+    }
+};
