@@ -6,15 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getGithubInstallationId } from '@/actions/integration';
+import { getGithubBranches, getGithubInstallationId } from '@/actions/integration';
 import { toast } from 'sonner';
 import { CheckCircle2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface GithubImportModalProps {
   isOpen: boolean;
@@ -34,6 +36,9 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
   const [installedRepos, setInstalledRepos] = useState<Record<string, number>>({});
   const [repositories, setRepositories] = useState<any[]>([]);
   const [loadingRepos, setLoadingRepos] = useState(false);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [selectedType, setSelectedType] = useState<string>('');
 
   useEffect(() => {
     const fetchAllRepos = async () => {
@@ -79,8 +84,7 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
     console.log("repo", repo);
     try {
       const resData = await getGithubInstallationId(repo.owner.login, repo.name);
-      if (resData?.installationId == null || resData.installationId == '') {
-        console.log("installationId not exist");
+      if (resData.installationId == null) {
         toast.error("Please install the Github App on the repository");
       } else {
         console.log("installationId", resData.installationId);
@@ -88,6 +92,7 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
           ...prev,
           [repo.id]: resData.installationId
         }));
+        getBranches(resData.installationId, repo.owner.login, repo.name);
       }
     } catch (error) {
       console.error("Error getting Github installation ID", error);
@@ -95,15 +100,23 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
     }
   };
 
+  const getBranches = async (installationId: string, owner: string, repo: string) => {
+    const resData = await getGithubBranches(installationId, owner, repo);
+    console.log("resData", resData);
+    setBranches(resData);
+  };
+
   const handleImport = () => {
-    if (selectedRepo && installedRepos[selectedRepo.id]) {
+    if (selectedRepo && installedRepos[selectedRepo.id] && selectedBranch && selectedType) {
       onSelectRepository({
         ...selectedRepo,
-        installationId: installedRepos[selectedRepo.id]
+        installationId: installedRepos[selectedRepo.id],
+        branch: selectedBranch,
+        type: selectedType
       });
       onClose();
     } else {
-      toast.error("Please install the Github App on the repository first");
+      toast.error("Please select a branch and repository type to import");
     }
   };
 
@@ -114,7 +127,15 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
           <DialogTitle className="flex items-center gap-3">
             {/* <FaGithub className="h-6 w-6" /> */}
             Import from GitHub
+           
           </DialogTitle>
+          <DialogDescription>
+            <div className="">
+              must install <a href="https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps" target="_blank" rel="noopener noreferrer">
+                <u><b>Github App</b></u>
+              </a> before able to import
+            </div>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -156,10 +177,23 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
                               <CheckCircle2 className="h-4 w-4 text-green-500" />
                             )}
                           </div>
-                          {!installedRepos[repo.id] && (
-                            <Button variant="outline" size="sm" className="opacity-0 group-hover:opacity-100">
-                              Install App
-                            </Button>
+                          {installedRepos[repo.id] && (
+                            <div className="flex items-center gap-2">
+                              <span> Branch: </span>
+                              <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                                <SelectTrigger className="w-[180px]">
+                                  <SelectValue placeholder="Select a branch" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {branches.map((branch) => (
+                                    <SelectItem key={branch.name} value={branch.name}>
+                                      {branch.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            
+                            </div>
                           )}
                         </div>
                         
@@ -182,15 +216,31 @@ const GithubImportModal: React.FC<GithubImportModalProps> = ({
         </div>
 
         <DialogFooter>
+          <div>
+          <div className="flex mb-2 items-center gap-2">
+            <span> * Type: </span>
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="web">Web</SelectItem>
+                                  <SelectItem value="api">API</SelectItem>
+                                </SelectContent>
+            </Select>
+          </div>
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
           <Button 
             onClick={handleImport}
-            disabled={!selectedRepo || !installedRepos[selectedRepo.id]}
+            disabled={!selectedRepo || !installedRepos[selectedRepo.id] || !selectedBranch || !selectedType}
           >
             Import Repository
           </Button>
+          </div>
+          
+          
         </DialogFooter>
       </DialogContent>
     </Dialog>
