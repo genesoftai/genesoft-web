@@ -35,11 +35,19 @@ const Logo: React.FC<LogoProps> = ({
                 width={width}
                 height={height}
                 className={
-                    size === "small" ? "flex md:hidden" : "hidden md:flex"
+                    size === "small" || size === "extra-small"
+                        ? "flex md:hidden"
+                        : "hidden md:flex"
                 }
             />
             {isInCludeText && (
-                <span className="text-sm sm:text-base md:text-2xl font-bold text-white">
+                <span
+                    className={`text-sm sm:text-base md:text-2xl font-bold text-white ${
+                        size === "small" || size === "extra-small"
+                            ? "flex md:hidden"
+                            : "hidden md:flex"
+                    }`}
+                >
                     Genesoft
                 </span>
             )}

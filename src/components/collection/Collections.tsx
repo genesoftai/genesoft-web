@@ -31,7 +31,7 @@ const Collections = ({ organizationId }: Props) => {
     }, [organizationId]);
 
     return (
-        <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl bg-secondary-dark">
+        <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl">
             <div>
                 <div className="flex flex-col gap-y-2 mb-8">
                     <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ const Collections = ({ organizationId }: Props) => {
 
                 {/* TODO: list all projects in organization */}
                 {organizationCollections.length > 0 ? (
-                    <div className="flex flex-col gap-4 pt-0 w-full items-center rounded-xl bg-secondary-dark">
+                    <div className="flex flex-col gap-4 pt-0 w-full items-center rounded-xl">
                         {organizationCollections.map(
                             (collection: Collection) => (
                                 <CollectionCard
@@ -72,7 +72,7 @@ const Collections = ({ organizationId }: Props) => {
                 onCreateCollection={handleCreateCollection}
             />
 
-            <div className="min-h-[100vh] flex-1 rounded-xl bg-secondary-dark md:min-h-min" />
+            <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
         </div>
     );
 };

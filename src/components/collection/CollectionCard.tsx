@@ -15,7 +15,13 @@ import { getProjectById, getProjects } from "@/actions/project";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import ManageCollectionDialog from "./ManageCollectionDialog";
-import { Loader2, Trash2 } from "lucide-react";
+import {
+    ArrowRight,
+    ArrowRightSquare,
+    GithubIcon,
+    Loader2,
+    Trash2,
+} from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,8 +33,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteCollection } from "@/actions/collection";
+import { deleteCollection, getCollectionById } from "@/actions/collection";
 import { formatDateToHumanReadable } from "@/utils/common/time";
+import { Button } from "../ui/button";
+import { useCollectionStore } from "@/stores/collection-store";
+import { useRouter } from "next/navigation";
 
 interface CollectionCardProps {
     collectionProps: Collection;
@@ -41,6 +50,11 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
     const [loading, setLoading] = useState(true);
     const [open, setOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const { updateCollectionStore, clearCollectionStore } =
+        useCollectionStore();
+
+    const router = useRouter();
+
     const setUpCollection = async () => {
         setLoading(true);
         try {
@@ -120,6 +134,40 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
         setUpCollection();
     }, [collection.id]);
 
+    const handleGoToCollectionWorkspace = async () => {
+        setLoading(true);
+        try {
+            await handleSetupCollectionForWorkspace();
+            router.push(`/dashboard/github/collection/${collection.id}`);
+        } catch (error) {
+            console.error("Error preparing workspace:", error);
+            // Potentially show an error message to the user
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSetupCollectionForWorkspace = async () => {
+        if (!collection.id) return;
+        try {
+            updateCollectionStore({
+                id: collection.id,
+                name: collection.name,
+                description: collection.description,
+                is_active: collection.is_active,
+                web_project_id: collection.web_project_id,
+                backend_service_project_ids:
+                    collection.backend_service_project_ids,
+                organization_id: collection.organization_id,
+                created_at: collection.created_at,
+                updated_at: collection.updated_at,
+            });
+        } catch (error) {
+            console.error("Error setting up collection for workspace:", error);
+            // Potentially show an error message to the user
+        }
+    };
+
     return (
         <Card className="w-full md:w-8/12 h-8/12 md:h-auto bg-primary-dark text-white flex flex-col border-none mb-4 md:mb-0">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -138,7 +186,10 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                 <div className="flex flex-row items-center gap-2">
                     <AlertDialog open={open} onOpenChange={setOpen}>
                         <AlertDialogTrigger asChild>
-                            <Trash2 size={16} className="cursor-pointer" />
+                            <Trash2
+                                size={16}
+                                className="cursor-pointer hover:text-red-500"
+                            />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-primary-dark text-white border-none">
                             <AlertDialogHeader>
@@ -273,6 +324,15 @@ export function CollectionCard({ collectionProps }: CollectionCardProps) {
                     webProject={webProject as Project}
                     backendProjects={backendProjects as Project[]}
                 />
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="bg-genesoft text-white w-fit p-2 border-none"
+                    onClick={handleGoToCollectionWorkspace}
+                >
+                    <p className="text-xs md:text-base">Collection Workspace</p>
+                    <ArrowRightSquare className="w-6 h-6" />
+                </Button>
             </CardFooter>
         </Card>
     );

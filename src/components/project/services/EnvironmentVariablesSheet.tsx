@@ -31,6 +31,7 @@ import {
     Save,
     X,
     Pencil,
+    Variable,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -179,10 +180,10 @@ export const EnvironmentVariablesSheet = ({
                 <Button
                     variant="outline"
                     size="sm"
-                    className="hidden md:flex bg-primary-dark border-secondary-dark hover:bg-primary-dark/80 hover:text-white"
+                    className="hidden md:flex bg-primary-dark border-secondary-dark hover:bg-primary-dark/80 hover:text-white p-4"
                 >
-                    <Plus className="h-4 w-4 mr-2" />
-                    <span className="text-xs font-medium">
+                    <Variable className="h-4 w-4 md:h-6 md:w-6 mr-2" />
+                    <span className="text-xs md:text-sm font-medium">
                         {"Environment Variables"}
                     </span>
                 </Button>
@@ -197,7 +198,9 @@ export const EnvironmentVariablesSheet = ({
                         Environment Variables
                     </SheetTitle>
                     <SheetDescription className="text-subtext-in-dark-bg">
-                        Manage environment variables for your project.
+                        Manage environment variables for your GitHub repository
+                        so Genesoft AI Agents can use these variables in
+                        development environment.
                     </SheetDescription>
                 </SheetHeader>
 

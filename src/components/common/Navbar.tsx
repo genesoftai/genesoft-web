@@ -139,7 +139,7 @@ export default function Navbar() {
             // } else {
             //     router.push(`/dashboard`);
             // }
-            router.push(`/dashboard`);
+            router.push(`/dashboard/github/repository`);
         } else {
             posthog.capture("click_dashboard_from_navbar_but_not_logged_in");
             router.push("/signin");

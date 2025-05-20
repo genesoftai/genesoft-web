@@ -12,6 +12,7 @@ export interface Project {
     project_template_type: string;
     backend_requirements: string;
     sandbox_id?: string;
+    figma_file_id?: string;
 }
 
 export interface Page {

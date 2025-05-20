@@ -79,7 +79,7 @@ export function NavProject() {
                             </span>
                         </a>
                     </SidebarMenuButton>
-                    <SidebarMenuButton
+                    {/* <SidebarMenuButton
                         asChild
                         tooltip="Branding"
                         className="text-white hover:bg-secondary-dark"
@@ -90,7 +90,7 @@ export function NavProject() {
                                 Branding
                             </span>
                         </a>
-                    </SidebarMenuButton>
+                    </SidebarMenuButton> */}
                     <SidebarMenuButton
                         asChild
                         tooltip="Branding"

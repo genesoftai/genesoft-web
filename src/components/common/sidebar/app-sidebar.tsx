@@ -6,6 +6,8 @@ import {
     Boxes,
     Building,
     FlaskConical,
+    GitBranch,
+    GithubIcon,
     LifeBuoy,
     Rocket,
 } from "lucide-react";
@@ -80,6 +82,12 @@ const data = {
                     url: "/dashboard/collections",
                 },
             ],
+        },
+        {
+            title: "Repositories",
+            url: "/dashboard/github/repository",
+            icon: GithubIcon,
+            items: [],
         },
         // {
         //     title: "Documentation",
@@ -172,7 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavProject />
+                {/* <NavProject /> */}
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>

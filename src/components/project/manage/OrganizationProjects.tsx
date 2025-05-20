@@ -34,7 +34,7 @@ const OrganizationProjects = ({ organizationId }: Props) => {
     }, [organizationId]);
 
     return (
-        <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl bg-secondary-dark">
+        <div className="flex flex-col gap-4 p-4 md:p-8 w-full rounded-xl">
             <div>
                 <div className="flex flex-col gap-y-2 mb-8">
                     <p className="text-xl md:text-2xl text-subtext-in-dark-bg font-bold">
@@ -48,7 +48,7 @@ const OrganizationProjects = ({ organizationId }: Props) => {
 
                 {/* TODO: list all projects in organization */}
                 {organizationProjects.length > 0 ? (
-                    <div className="flex flex-col gap-4 pt-0 w-full items-center rounded-xl bg-secondary-dark">
+                    <div className="flex flex-col gap-4 pt-0 w-full items-center rounded-xl">
                         {organizationProjects.map((project: Project) => (
                             <ProjectCard
                                 key={project.id}

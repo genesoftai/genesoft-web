@@ -12,6 +12,7 @@ import {
     ImageIcon,
     X,
     AlertCircleIcon,
+    GithubIcon,
 } from "lucide-react";
 import { rgbaToHex } from "@/utils/common/color";
 import { RGBColor } from "react-color";
@@ -104,15 +105,18 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         updateOnboardingConversationStore,
     } = useOnboardingConversationStore();
 
-    const [showGitImportModal, setShowGitImportModal] = useState<boolean>(false);
+    const [showGitImportModal, setShowGitImportModal] =
+        useState<boolean>(false);
     const supabase = createSupabaseClient();
     const [ghToken, setGhToken] = useState<string>("");
 
     useEffect(() => {
         (async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
             console.log("first session", session);
-        })()
+        })();
     }, []);
 
     useEffect(() => {
@@ -120,15 +124,20 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             const { data } = await supabase.auth.getUser();
             console.log("userData", data);
             if (data != null && data.user != null) {
-                const githubIdentity = data.user.identities?.find(ui => ui.provider == 'github')
+                const githubIdentity = data.user.identities?.find(
+                    (ui) => ui.provider == "github",
+                );
                 if (githubIdentity != null) {
                     console.log("githubIdentity", githubIdentity);
-                    const githubUsername = githubIdentity.identity_data?.user_name
-                    const githubSub = githubIdentity.identity_data?.sub
+                    const githubUsername =
+                        githubIdentity.identity_data?.user_name;
+                    const githubSub = githubIdentity.identity_data?.sub;
                     console.log("githubUsername", githubUsername);
                     console.log("githubSub", githubSub);
 
-                    const { data: { session } } = await supabase.auth.getSession();
+                    const {
+                        data: { session },
+                    } = await supabase.auth.getSession();
                     console.log("session", session);
                     setGhToken(session?.provider_token || "");
                 }
@@ -261,8 +270,11 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
         }
     };
     const handleGitImportSubmit = async (payload: any) => {
-        console.log('handleGitImportSubmit', payload)
-        console.log('handleGitImportSubmit:installationId', payload.installationId)
+        console.log("handleGitImportSubmit", payload);
+        console.log(
+            "handleGitImportSubmit:installationId",
+            payload.installationId,
+        );
         setIsSubmitting(true);
         setError(null);
         const template = "git";
@@ -276,7 +288,7 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             });
 
             onComplete({
-                description: '',
+                description: "",
                 project_type: template,
                 github_installation_id: payload.installationId,
                 github_repo_owner: payload.owner.login,
@@ -475,142 +487,146 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
             }}
             className="w-full backdrop-blur-md rounded-xl shadow-lg overflow-hidden flex flex-col relative"
         >
-
-            {
-                showGitImportModal && (
-                    <GithubImportModal
-                        isOpen={true}
-                        onClose={() => setShowGitImportModal(false)}
-                        githubAccessToken={ghToken}
-                        onSelectRepository={(handleGitImportSubmit)}
-                    />
-                )
-            }
+            {showGitImportModal && (
+                <GithubImportModal
+                    isOpen={true}
+                    onClose={() => setShowGitImportModal(false)}
+                    githubAccessToken={ghToken}
+                    onSelectRepository={handleGitImportSubmit}
+                />
+            )}
 
             <div className="flex flex-col h-full relative z-10">
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 p-6">
                     <div className="flex items-center gap-2 justify-starts">
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="w-fit bg-primary-dark border border-tertiary-dark text-left flex justify-between items-center p-4 h-auto hover:bg-primary-dark/80"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Image
+                                            src={FigmaLogo}
+                                            alt="Figma Logo"
+                                            className="h-5 w-5"
+                                        />
+                                        <span className="text-white font-medium">
+                                            Add Figma Design Reference for web
+                                        </span>
+                                    </div>
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-primary-dark border-tertiary-dark max-w-[90%] md:max-w-[620px] rounded-lg flex flex-col">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="flex items-center gap-2">
+                                        <Image
+                                            src={FigmaLogo}
+                                            alt="Figma Logo"
+                                            className="h-5 w-5"
+                                        />
+                                        <p className="text-white font-medium">
+                                            Add Figma Design Reference for web
+                                        </p>
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="text-white/70">
+                                        <p className="text-xs md:text-sm flex items-center gap-2">
+                                            <AlertCircleIcon className="h-4 w-4 text-red-500" />
+                                            <span>
+                                                Make sure you set share settings
+                                                of the file to be anyone can
+                                                view
+                                            </span>
+                                        </p>
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="mt-3">
+                                    {figmaUrls.length === 0 && (
+                                        <div className="flex gap-2">
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter Figma File URL"
+                                                className="text-sm md:text-base bg-primary-dark border-tertiary-dark text-white"
+                                                value={currentFigmaUrl}
+                                                onChange={(e) =>
+                                                    setCurrentFigmaUrl(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                            <Button
+                                                onClick={handleAddFigmaUrl}
+                                                className="bg-genesoft text-white"
+                                                disabled={
+                                                    !currentFigmaUrl.trim()
+                                                }
+                                            >
+                                                Add
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    {figmaUrls.length > 0 && (
+                                        <div className="mt-4 w-full">
+                                            <p className="text-white/70 mb-2">
+                                                Added Figma Design Frame URLs:
+                                            </p>
+                                            <div className="flex flex-col gap-2 max-h-40 overflow-y-auto w-10/12 self-center">
+                                                {figmaUrls.map((url, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center justify-between bg-tertiary-dark/30 p-2 rounded-md w-10/12 overflow-hidden"
+                                                    >
+                                                        <p className="text-white text-sm truncate max-w-[90%]">
+                                                            {url}
+                                                        </p>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() =>
+                                                                handleRemoveFigmaUrl(
+                                                                    url,
+                                                                )
+                                                            }
+                                                            className="h-6 w-6 text-white/70 hover:text-white hover:bg-red-500/20"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel className="bg-secondary-dark text-white border-line-in-dark-bg">
+                                        Close
+                                    </AlertDialogCancel>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        <div className="flex items-center gap-2 justify-center">
+                            <div>or </div>
                             <Button
                                 variant="outline"
                                 className="w-fit bg-primary-dark border border-tertiary-dark text-left flex justify-between items-center p-4 h-auto hover:bg-primary-dark/80"
+                                onClick={() => {
+                                    if (ghToken != "") {
+                                        setShowGitImportModal(true);
+                                    } else {
+                                        toast.error(
+                                            "Please login to GitHub to import a repository",
+                                        );
+                                    }
+                                }}
                             >
-                                <div className="flex items-center gap-2">
-                                    <Image
-                                        src={FigmaLogo}
-                                        alt="Figma Logo"
-                                        className="h-5 w-5"
-                                    />
-                                    <span className="text-white font-medium">
-                                        Add Figma Design Reference for web
-                                    </span>
-                                </div>
+                                <GithubIcon className="h-4 w-4 text-white" />
+                                <span className="text-white">
+                                    Import Github Repository
+                                </span>
                             </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-primary-dark border-tertiary-dark max-w-[90%] md:max-w-[620px] rounded-lg flex flex-col">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle className="flex items-center gap-2">
-                                    <Image
-                                        src={FigmaLogo}
-                                        alt="Figma Logo"
-                                        className="h-5 w-5"
-                                    />
-                                    <p className="text-white font-medium">
-                                        Add Figma Design Reference for web
-                                    </p>
-                                </AlertDialogTitle>
-                                <AlertDialogDescription className="text-white/70">
-                                    <p className="text-xs md:text-sm flex items-center gap-2">
-                                        <AlertCircleIcon className="h-4 w-4 text-red-500" />
-                                        <span>
-                                            Make sure you set share settings of
-                                            the file to be anyone can view
-                                        </span>
-                                    </p>
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <div className="mt-3">
-                                {figmaUrls.length === 0 && (
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="text"
-                                            placeholder="Enter Figma File URL"
-                                            className="text-sm md:text-base bg-primary-dark border-tertiary-dark text-white"
-                                            value={currentFigmaUrl}
-                                            onChange={(e) =>
-                                                setCurrentFigmaUrl(
-                                                    e.target.value,
-                                                )
-                                            }
-                                        />
-                                        <Button
-                                            onClick={handleAddFigmaUrl}
-                                            className="bg-genesoft text-white"
-                                            disabled={!currentFigmaUrl.trim()}
-                                        >
-                                            Add
-                                        </Button>
-                                    </div>
-                                )}
-
-                                {figmaUrls.length > 0 && (
-                                    <div className="mt-4 w-full">
-                                        <p className="text-white/70 mb-2">
-                                            Added Figma Design Frame URLs:
-                                        </p>
-                                        <div className="flex flex-col gap-2 max-h-40 overflow-y-auto w-10/12 self-center">
-                                            {figmaUrls.map((url, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center justify-between bg-tertiary-dark/30 p-2 rounded-md w-10/12 overflow-hidden"
-                                                >
-                                                    <p className="text-white text-sm truncate max-w-[90%]">
-                                                        {url}
-                                                    </p>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() =>
-                                                            handleRemoveFigmaUrl(
-                                                                url,
-                                                            )
-                                                        }
-                                                        className="h-6 w-6 text-white/70 hover:text-white hover:bg-red-500/20"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel className="bg-secondary-dark text-white border-line-in-dark-bg">
-                                    Close
-                                </AlertDialogCancel>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    <div className="flex items-center gap-2 justify-center">
-                        <div>or </div>
-                        <Button
-                            variant="outline"
-                            className="w-fit bg-primary-dark border border-tertiary-dark text-left flex justify-between items-center p-4 h-auto hover:bg-primary-dark/80"
-                            onClick={() => {
-                                if (ghToken != '') {
-                                    setShowGitImportModal(true);
-                                } else {
-                                    toast.error("Please login to GitHub to import a repository");
-                                }
-                            }}
-                        >
-                            <span className="text-white">Git Import</span>
-                            </Button>
+                        </div>
                     </div>
-                    </div>
-
 
                     {figmaFileChildern.length > 0 && (
                         <div className="flex flex-col items-start gap-2 mb-4 p-6 bg-tertiary-dark/30 rounded-lg">
@@ -682,7 +698,6 @@ const ProjectCreationBox = ({ onComplete }: ProjectCreationBoxProps) => {
                                 className="rounded-full"
                             />
                         </div>
-
 
                         <div className="flex items-center space-x-2">
                             <Checkbox

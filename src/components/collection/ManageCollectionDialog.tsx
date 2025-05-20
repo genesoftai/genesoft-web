@@ -21,7 +21,7 @@ import Image from "next/image";
 import NextjsLogo from "@public/tech/nextjs.jpeg";
 import NestjsLogo from "@public/tech/nestjs.svg";
 import { getFirstCharacterUppercase } from "@/utils/common/text";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, PencilLineIcon, Plus, Trash2 } from "lucide-react";
 import {
     addBackendProjectIntoCollection,
     changeWebProjectInCollection,
@@ -282,7 +282,8 @@ const ManageCollectionDialog = ({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-genesoft text-white rounded-lg text-xs md:text-base">
+                <Button className="bg-genesoft text-white rounded-lg text-xs md:text-base flex flex-row gap-2 items-center">
+                    <PencilLineIcon className="w-4 h-4" />
                     <span className="text-xs md:text-base">
                         Edit Collection
                     </span>

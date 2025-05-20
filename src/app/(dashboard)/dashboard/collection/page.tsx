@@ -66,7 +66,7 @@ export default function CollectionsPage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-primary-dark text-white w-full">
+        <div className="flex flex-col min-h-screen bg-genesoft-dark text-white w-full">
             <header className="flex h-16 shrink-0 items-center gap-2">
                 <div className="flex items-center gap-2 px-4">
                     <SidebarTrigger className="-ml-1 text-white" />

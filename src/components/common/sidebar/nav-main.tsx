@@ -35,7 +35,7 @@ export function NavMain({
 }) {
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
                     <Collapsible
@@ -56,7 +56,7 @@ export function NavMain({
                                     </span>
                                 </a>
                             </SidebarMenuButton>
-                            {item.items?.length ? (
+                            {/* {item.items?.length ? (
                                 <>
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuAction className="data-[state=open]:rotate-90 text-subtext-in-dark-bg">
@@ -87,7 +87,7 @@ export function NavMain({
                                         </SidebarMenuSub>
                                     </CollapsibleContent>
                                 </>
-                            ) : null}
+                            ) : null} */}
                         </SidebarMenuItem>
                     </Collapsible>
                 ))}
